@@ -1,0 +1,88 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3F528850-6745-49ED-B71A-2FD0794D45CD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>ObservableData.Querying</RootNamespace>
+    <AssemblyName>ObservableData.Querying</AssemblyName>
+    <DefaultLanguage>en-US</DefaultLanguage>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include=".Utils\Adapters\ChangeWithLock.cs" />
+    <Compile Include=".Utils\Adapters\CollectionExtensions.cs" />
+    <Compile Include=".Utils\Adapters\ListAdapter.cs" />
+    <Compile Include=".Utils\Adapters\ObserverAdapter.cs" />
+    <Compile Include=".Utils\Adapters\ObserverExtensions.cs" />
+    <Compile Include=".Utils\Adapters\UpdateExtensions.cs" />
+    <Compile Include=".Utils\Annotations.cs" />
+    <Compile Include=".Utils\KeedAliveDisposableAdapter.cs" />
+    <Compile Include=".Utils\WeakObserver.cs" />
+    <Compile Include=".Utils\WeakReferenceExtensions.cs" />
+    <Compile Include="ChangedCollectionData.cs" />
+    <Compile Include="ChangedListData.cs" />
+    <Compile Include="Compatibility\CollectionUpdateToQueryUpdates.cs" />
+    <Compile Include="Compatibility\ListToQueryAdapter.cs" />
+    <Compile Include="Compatibility\ListUpdateToQueryUpdates.cs" />
+    <Compile Include="Compatibility\QueryAsBindableListAdapter.cs" />
+    <Compile Include="Compatibility\QueryAsObservableListAdapter.cs" />
+    <Compile Include="IQuery.cs" />
+    <Compile Include="ListExtensions.cs" />
+    <Compile Include="ListOperation.cs" />
+    <Compile Include="ListOperationType.cs" />
+    <Compile Include="CollectionOperation.cs" />
+    <Compile Include="CollectionOperationType.cs" />
+    <Compile Include=".Utils\Efficiency\InefficientUsageException.cs" />
+    <Compile Include=".Utils\Efficiency\Inneficient.cs" />
+    <Compile Include=".Utils\ListOperationExtensions.cs" />
+    <Compile Include="ObservableExtensions.WhereByImmutable.cs" />
+    <Compile Include="ObservableExtensions.SelectImmutable.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryExtensions.cs" />
+    <Compile Include="Select\Constant\SelectConstantList.cs" />
+    <Compile Include="Select\Constant\SelectConstantQuery.cs" />
+    <Compile Include="Select\SelectImmutable.Collection.cs" />
+    <Compile Include="Select\SelectImmutable.List.cs" />
+    <Compile Include="Select\SelectImmutable.State.cs" />
+    <Compile Include="Weak\WeakQuery.cs" />
+    <Compile Include=".Utils\ItemCounter.cs" />
+    <Compile Include=".Utils\ObservableExtensions.cs" />
+    <Compile Include="Where\WhereByImmutable.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ObservableData.Structures\ObservableData.Structures.csproj">
+      <Project>{2a57421c-29f6-4318-9c08-0cfa2f3270da}</Project>
+      <Name>ObservableData.Structures</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+</Project>
