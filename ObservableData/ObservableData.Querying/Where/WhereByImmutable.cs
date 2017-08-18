@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying.Utils.Adapters;
 using ObservableData.Structures;
@@ -8,7 +10,7 @@ namespace ObservableData.Querying.Where
 {
     internal static class WhereByImmutable
     {
-        public sealed class CollectionChangesObserver<T> : ObserverAdapter<IChange<CollectionOperation<T>>>
+        public sealed class CollectionChangesObserver<T> : CollectionChangesObserverAdapter<T>
         {
             [NotNull] private readonly Func<T, bool> _criterion;
 
@@ -25,6 +27,25 @@ namespace ObservableData.Querying.Where
                 if (value == null) return;
 
                 this.Adaptee.OnNext(new CollectionChange<T>(value, _criterion));
+            }
+        }
+
+        public sealed class CollectionDataObserver<T> : CollectionDataObserverAdapter<T>
+        {
+            [NotNull] private readonly Func<T, bool> _criterion;
+
+            public CollectionDataObserver(
+                [NotNull] IObserver<ChangedCollectionData<T>> previous,
+                [NotNull] Func<T, bool> criterion)
+                : base(previous)
+            {
+                _criterion = criterion;
+            }
+            public override void OnNext(ChangedCollectionData<T> value)
+            {
+                var change = new CollectionChange<T>(value.Change, _criterion);
+                var state = new CollectionAdapter<T>(value.ReachedState, _criterion);
+                this.Adaptee.OnNext(new ChangedCollectionData<T>(change, state));
             }
         }
 
@@ -56,6 +77,28 @@ namespace ObservableData.Querying.Where
                     }
                 }
             }
+        }
+
+        private sealed class CollectionAdapter<T> : IReadOnlyCollection<T>
+        {
+            [NotNull] private readonly IReadOnlyCollection<T> _source;
+            [NotNull] private readonly Func<T, bool> _criterion;
+
+            public CollectionAdapter([NotNull] IReadOnlyCollection<T> source,
+                [NotNull] Func<T, bool> criterion)
+            {
+                _source = source;
+                _criterion = criterion;
+            }
+
+            public int Count => _source.Count;
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return _source.Where(_criterion).GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
         }
     }
 }

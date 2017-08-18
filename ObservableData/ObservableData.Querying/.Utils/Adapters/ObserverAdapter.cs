@@ -23,17 +23,18 @@ namespace ObservableData.Querying.Utils.Adapters
         public abstract void OnNext(T value);
     }
 
-    internal abstract class ObserverAdapter<T> : ObserverAdapter<T, T>
-    {
-        protected ObserverAdapter([NotNull] IObserver<T> adaptee) : base(adaptee)
-        {
-        }
-    }
-
     internal abstract class CollectionChangesObserverAdapter<T, TAdaptee> :
         ObserverAdapter<IChange<CollectionOperation<T>>, IChange<CollectionOperation<TAdaptee>>>
     {
         protected CollectionChangesObserverAdapter([NotNull] IObserver<IChange<CollectionOperation<TAdaptee>>> adaptee) : base(adaptee)
+        {
+        }
+    }
+
+    internal abstract class CollectionChangesObserverAdapter<T> :
+        CollectionChangesObserverAdapter<T,T>
+    {
+        protected CollectionChangesObserverAdapter([NotNull] IObserver<IChange<CollectionOperation<T>>> adaptee) : base(adaptee)
         {
         }
     }
@@ -54,7 +55,7 @@ namespace ObservableData.Querying.Utils.Adapters
         }
     }
 
-    internal abstract class CollectionDataObserverAdapter<T> : ObserverAdapter<ChangedCollectionData<T>>
+    internal abstract class CollectionDataObserverAdapter<T> : CollectionDataObserverAdapter<T, T>
     {
         protected CollectionDataObserverAdapter([NotNull] IObserver<ChangedCollectionData<T>> adaptee) : base(adaptee)
         {
