@@ -8,6 +8,22 @@ namespace ObservableData.Querying.Select
 {
     internal static partial class SelectImmutable
     {
+        private struct ItemCounter<T>
+        {
+            private readonly uint _count;
+            private readonly T _item;
+
+            public ItemCounter(T item, uint count)
+            {
+                _count = count;
+                _item = item;
+            }
+
+            public T Item => _item;
+
+            public uint Count => _count;
+        }
+
         private sealed class SelectState<TKey, T> : IReadOnlyCollection<T>
         {
             private int _count;

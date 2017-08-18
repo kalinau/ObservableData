@@ -1,9 +1,10 @@
 using System;
 using JetBrains.Annotations;
+using ObservableData.Structures;
 
 namespace ObservableData.Querying.Utils.Adapters
 {
-    public abstract class ObserverAdapter<T, TAdaptee> : IObserver<T>
+    internal abstract class ObserverAdapter<T, TAdaptee> : IObserver<T>
     {
         [NotNull] private readonly IObserver<TAdaptee> _adaptee;
 
@@ -22,9 +23,48 @@ namespace ObservableData.Querying.Utils.Adapters
         public abstract void OnNext(T value);
     }
 
-    public abstract class ObserverAdapter<T> : ObserverAdapter<T, T>
+    internal abstract class ObserverAdapter<T> : ObserverAdapter<T, T>
     {
         protected ObserverAdapter([NotNull] IObserver<T> adaptee) : base(adaptee)
+        {
+        }
+    }
+
+    internal abstract class CollectionChangesObserverAdapter<T, TAdaptee> :
+        ObserverAdapter<IChange<CollectionOperation<T>>, IChange<CollectionOperation<TAdaptee>>>
+    {
+        protected CollectionChangesObserverAdapter([NotNull] IObserver<IChange<CollectionOperation<TAdaptee>>> adaptee) : base(adaptee)
+        {
+        }
+    }
+
+    internal abstract class ListChangesObserverAdapter<T, TAdaptee> :
+        ObserverAdapter<IChange<ListOperation<T>>, IChange<ListOperation<TAdaptee>>>
+    {
+        protected ListChangesObserverAdapter([NotNull] IObserver<IChange<ListOperation<TAdaptee>>> adaptee) : base(adaptee)
+        {
+        }
+    }
+
+    internal abstract class CollectionDataObserverAdapter<T, TAdaptee> :
+        ObserverAdapter<ChangedCollectionData<T>, ChangedCollectionData<TAdaptee>>
+    {
+        protected CollectionDataObserverAdapter([NotNull] IObserver<ChangedCollectionData<TAdaptee>> adaptee) : base(adaptee)
+        {
+        }
+    }
+
+    internal abstract class CollectionDataObserverAdapter<T> : ObserverAdapter<ChangedCollectionData<T>>
+    {
+        protected CollectionDataObserverAdapter([NotNull] IObserver<ChangedCollectionData<T>> adaptee) : base(adaptee)
+        {
+        }
+    }
+
+    internal abstract class ListDataObserverAdapter<T, TAdaptee> :
+        ObserverAdapter<ChangedListData<T>, ChangedListData<TAdaptee>>
+    {
+        protected ListDataObserverAdapter([NotNull] IObserver<ChangedListData<TAdaptee>> adaptee) : base(adaptee)
         {
         }
     }

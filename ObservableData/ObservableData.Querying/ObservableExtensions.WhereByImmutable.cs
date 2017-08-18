@@ -17,7 +17,7 @@ namespace ObservableData.Querying
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new WhereByImmutable.CollectionOperationsObserver<T>(o, criterion);
+                var adapter = new WhereByImmutable.CollectionChangesObserver<T>(o, criterion);
                 return previous.Subscribe(adapter);
             });
         }

@@ -8,13 +8,13 @@ namespace ObservableData.Querying.Select
 {
     internal static partial class SelectImmutable
     {
-        public sealed class CollectionOperationsObserver<T, TAdaptee> : ObserverAdapter<IChange<CollectionOperation<T>>,
+        public sealed class CollectionChangesObserver<T, TAdaptee> : ObserverAdapter<IChange<CollectionOperation<T>>,
             ChangedCollectionData<TAdaptee>>
         {
             [NotNull] readonly SelectState<T, TAdaptee> _state = new SelectState<T, TAdaptee>();
             [NotNull] private readonly Func<T, TAdaptee> _func;
 
-            public CollectionOperationsObserver(
+            public CollectionChangesObserver(
                 [NotNull] IObserver<ChangedCollectionData<TAdaptee>> adaptee,
                 [NotNull] Func<T, TAdaptee> func)
                 : base(adaptee)

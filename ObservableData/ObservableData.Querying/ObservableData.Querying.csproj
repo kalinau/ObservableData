@@ -35,11 +35,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include=".Utils\Adapters\ChangeWithLock.cs" />
-    <Compile Include=".Utils\Adapters\CollectionExtensions.cs" />
-    <Compile Include=".Utils\Adapters\ListAdapter.cs" />
     <Compile Include=".Utils\Adapters\ObserverAdapter.cs" />
-    <Compile Include=".Utils\Adapters\ObserverExtensions.cs" />
-    <Compile Include=".Utils\Adapters\UpdateExtensions.cs" />
     <Compile Include=".Utils\Annotations.cs" />
     <Compile Include=".Utils\KeedAliveDisposableAdapter.cs" />
     <Compile Include=".Utils\WeakObserver.cs" />
@@ -47,30 +43,25 @@
     <Compile Include="ChangedCollectionData.cs" />
     <Compile Include="ChangedListData.cs" />
     <Compile Include="Compatibility\CollectionUpdateToQueryUpdates.cs" />
-    <Compile Include="Compatibility\ListToQueryAdapter.cs" />
     <Compile Include="Compatibility\ListUpdateToQueryUpdates.cs" />
     <Compile Include="Compatibility\QueryAsBindableListAdapter.cs" />
-    <Compile Include="Compatibility\QueryAsObservableListAdapter.cs" />
-    <Compile Include="IQuery.cs" />
-    <Compile Include="ListExtensions.cs" />
     <Compile Include="ListOperation.cs" />
     <Compile Include="ListOperationType.cs" />
     <Compile Include="CollectionOperation.cs" />
     <Compile Include="CollectionOperationType.cs" />
     <Compile Include=".Utils\Efficiency\InefficientUsageException.cs" />
     <Compile Include=".Utils\Efficiency\Inneficient.cs" />
-    <Compile Include=".Utils\ListOperationExtensions.cs" />
+    <Compile Include="ObservableExtensions.Covariance.cs" />
+    <Compile Include="ObservableExtensions.SelectConstant.cs" />
     <Compile Include="ObservableExtensions.WhereByImmutable.cs" />
     <Compile Include="ObservableExtensions.SelectImmutable.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QueryExtensions.cs" />
-    <Compile Include="Select\Constant\SelectConstantList.cs" />
-    <Compile Include="Select\Constant\SelectConstantQuery.cs" />
+    <Compile Include="Select\SelectConstant.List.cs" />
     <Compile Include="Select\SelectImmutable.Collection.cs" />
+    <Compile Include="Select\SelectConstant.Collection.cs" />
     <Compile Include="Select\SelectImmutable.List.cs" />
     <Compile Include="Select\SelectImmutable.State.cs" />
-    <Compile Include="Weak\WeakQuery.cs" />
-    <Compile Include=".Utils\ItemCounter.cs" />
     <Compile Include=".Utils\ObservableExtensions.cs" />
     <Compile Include="Where\WhereByImmutable.cs" />
   </ItemGroup>
@@ -83,6 +74,8 @@
   <ItemGroup>
     <None Include="project.json" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Covariance\" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

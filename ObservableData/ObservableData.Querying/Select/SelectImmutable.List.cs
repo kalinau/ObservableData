@@ -10,13 +10,13 @@ namespace ObservableData.Querying.Select
 {
     internal static partial class SelectImmutable
     {
-        public sealed class ListOperationsObserver<T, TAdaptee> :
+        public sealed class ListChangesObserver<T, TAdaptee> :
             ObserverAdapter<IChange<ListOperation<T>>, IChange<ListOperation<TAdaptee>>>
         {
             [NotNull] readonly SelectState<T, TAdaptee> _state = new SelectState<T, TAdaptee>();
             [NotNull] private readonly Func<T, TAdaptee> _func;
 
-            public ListOperationsObserver(
+            public ListChangesObserver(
                 [NotNull] IObserver<IChange<ListOperation<TAdaptee>>> adaptee,
                 [NotNull] Func<T, TAdaptee> func)
                 : base(adaptee)
@@ -50,7 +50,7 @@ namespace ObservableData.Querying.Select
             {
                 var change = _state.Apply(value.Change, _func);
                 var list = new StateAdapter(value.ReachedState, _state);
-                this.Adaptee.OnNext(new ChangedListData<TAdaptee>(list, change));
+                this.Adaptee.OnNext(new ChangedListData<TAdaptee>(change, list));
             }
 
             private sealed class StateAdapter : IReadOnlyList<TAdaptee>

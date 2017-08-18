@@ -8,12 +8,11 @@ namespace ObservableData.Querying.Where
 {
     internal static class WhereByImmutable
     {
-        public sealed class CollectionOperationsObserver<T> 
-            : ObserverAdapter<IChange<CollectionOperation<T>>>
+        public sealed class CollectionChangesObserver<T> : ObserverAdapter<IChange<CollectionOperation<T>>>
         {
             [NotNull] private readonly Func<T, bool> _criterion;
 
-            public CollectionOperationsObserver(
+            public CollectionChangesObserver(
                 [NotNull] IObserver<IChange<CollectionOperation<T>>> previous,
                 [NotNull] Func<T, bool> criterion) 
                 : base(previous)
@@ -25,36 +24,35 @@ namespace ObservableData.Querying.Where
             {
                 if (value == null) return;
 
-                this.Adaptee.OnNext(new Change(value, _criterion));
+                this.Adaptee.OnNext(new CollectionChange<T>(value, _criterion));
             }
+        }
 
+        private sealed class CollectionChange<T> : IChange<CollectionOperation<T>>
+        {
+            [NotNull] private readonly IChange<CollectionOperation<T>> _adaptee;
+            [NotNull] private readonly Func<T, bool> _criterion;
 
-            private sealed class Change : IChange<CollectionOperation<T>>
+            public CollectionChange(
+                [NotNull] IChange<CollectionOperation<T>> adaptee,
+                [NotNull] Func<T, bool> criterion)
             {
-                [NotNull] private readonly IChange<CollectionOperation<T>> _adaptee;
-                [NotNull] private readonly Func<T, bool> _criterion;
+                _adaptee = adaptee;
+                _criterion = criterion;
+            }
+            public void Lock() => _adaptee.Lock();
 
-                public Change(
-                    [NotNull] IChange<CollectionOperation<T>> adaptee, 
-                    [NotNull] Func<T, bool> criterion)
+            public IEnumerable<CollectionOperation<T>> Operations()
+            {
+                foreach (var update in _adaptee.Operations())
                 {
-                    _adaptee = adaptee;
-                    _criterion = criterion;
-                }
-                public void Lock() => _adaptee.Lock();
-
-                public IEnumerable<CollectionOperation<T>> Operations()
-                {
-                    foreach (var update in _adaptee.Operations())
+                    if (update.Type == CollectionOperationType.Clear)
                     {
-                        if (update.Type == CollectionOperationType.Clear)
-                        {
-                            yield return update;
-                        }
-                        else if (_criterion.Invoke(update.Item))
-                        {
-                            yield return update;
-                        }
+                        yield return update;
+                    }
+                    else if (_criterion.Invoke(update.Item))
+                    {
+                        yield return update;
                     }
                 }
             }

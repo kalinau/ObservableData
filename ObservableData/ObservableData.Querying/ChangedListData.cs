@@ -10,8 +10,8 @@ namespace ObservableData.Querying
         [NotNull] private readonly IChange<ListOperation<T>> _change;
 
         public ChangedListData(
-            [NotNull] IReadOnlyList<T> reachedState,
-            [NotNull] IChange<ListOperation<T>> change)
+            [NotNull] IChange<ListOperation<T>> change,
+            [NotNull] IReadOnlyList<T> reachedState)
         {
             _reachedState = reachedState;
             _change = change;
