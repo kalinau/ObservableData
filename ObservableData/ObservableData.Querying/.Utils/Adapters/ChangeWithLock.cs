@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using ObservableData.Structures;
-using ObservableData.Structures.Utils;
 
 namespace ObservableData.Querying.Utils.Adapters
 {
@@ -16,14 +14,14 @@ namespace ObservableData.Querying.Utils.Adapters
             _threadId = ThreadId.FromCurrent();
         }
 
-        public void Lock()
+        public void MakeImmutable()
         {
             if (_locked != null) return;
             _threadId.CheckIsCurrent();
             _locked = this.Enumerate().ToArray();
         }
 
-        public IEnumerable<T> Operations()
+        public IEnumerable<T> Iterations()
         {
             if (_locked != null) return _locked;
             _threadId.CheckIsCurrent();

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying.Utils.Adapters;
-using ObservableData.Structures;
 
 namespace ObservableData.Querying.Select
 {
@@ -64,9 +63,9 @@ namespace ObservableData.Querying.Select
                 _selector = selector;
             }
 
-            public IEnumerable<ListOperation<TAdaptee>> Operations()
+            public IEnumerable<ListOperation<TAdaptee>> Iterations()
             {
-                foreach (var update in _adaptee.Operations())
+                foreach (var update in _adaptee.Iterations())
                 {
                     switch (update.Type)
                     {
@@ -97,9 +96,9 @@ namespace ObservableData.Querying.Select
                 }
             }
 
-            public void Lock()
+            public void MakeImmutable()
             {
-                _adaptee.Lock();
+                _adaptee.MakeImmutable();
             }
         }
 

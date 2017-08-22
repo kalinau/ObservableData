@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying.Utils;
-using ObservableData.Structures;
 
 namespace ObservableData.Querying
 {
@@ -18,9 +17,9 @@ namespace ObservableData.Querying
                 _adaptee = adaptee;
             }
 
-            public IEnumerable<CollectionOperation<T>> Operations()
+            public IEnumerable<CollectionOperation<T>> Iterations()
             {
-                foreach (var update in _adaptee.Operations())
+                foreach (var update in _adaptee.Iterations())
                 {
                     switch (update.Type)
                     {
@@ -50,9 +49,9 @@ namespace ObservableData.Querying
                 }
             }
 
-            public void Lock()
+            public void MakeImmutable()
             {
-                _adaptee.Lock();
+                _adaptee.MakeImmutable();
             }
         }
 

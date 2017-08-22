@@ -36,8 +36,10 @@
   <ItemGroup>
     <Compile Include=".Utils\Adapters\ChangeWithLock.cs" />
     <Compile Include=".Utils\Adapters\ObserverAdapter.cs" />
+    <Compile Include=".Utils\Adapters\StateChange.cs" />
     <Compile Include=".Utils\Annotations.cs" />
     <Compile Include=".Utils\KeedAliveDisposableAdapter.cs" />
+    <Compile Include=".Utils\ThreadId.cs" />
     <Compile Include=".Utils\WeakObserver.cs" />
     <Compile Include=".Utils\WeakReferenceExtensions.cs" />
     <Compile Include="ChangedCollectionData.cs" />
@@ -45,6 +47,7 @@
     <Compile Include="Compatibility\CollectionUpdateToQueryUpdates.cs" />
     <Compile Include="Compatibility\ListUpdateToQueryUpdates.cs" />
     <Compile Include="Compatibility\QueryAsBindableListAdapter.cs" />
+    <Compile Include="IChange.cs" />
     <Compile Include="ListOperation.cs" />
     <Compile Include="ListOperationType.cs" />
     <Compile Include="CollectionOperation.cs" />
@@ -55,7 +58,6 @@
     <Compile Include="ObservableExtensions.Selecting.cs" />
     <Compile Include="ObservableExtensions.Filtering.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QueryExtensions.cs" />
     <Compile Include="Select\SelectConstant.List.cs" />
     <Compile Include="Select\SelectImmutable.Collection.cs" />
     <Compile Include="Select\SelectConstant.Collection.cs" />
@@ -63,12 +65,6 @@
     <Compile Include="Select\SelectImmutable.State.cs" />
     <Compile Include=".Utils\ObservableExtensions.cs" />
     <Compile Include="Where\WhereByImmutable.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ObservableData.Structures\ObservableData.Structures.csproj">
-      <Project>{2a57421c-29f6-4318-9c08-0cfa2f3270da}</Project>
-      <Name>ObservableData.Structures</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />

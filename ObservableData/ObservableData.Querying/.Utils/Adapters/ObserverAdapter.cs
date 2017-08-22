@@ -1,6 +1,5 @@
 using System;
 using JetBrains.Annotations;
-using ObservableData.Structures;
 
 namespace ObservableData.Querying.Utils.Adapters
 {

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying.Utils.Adapters;
-using ObservableData.Structures;
 
 namespace ObservableData.Querying.Select
 {
@@ -90,7 +89,7 @@ namespace ObservableData.Querying.Select
         {
             Dictionary<T, TAdaptee> removedOnChange = null;
 
-            foreach (var update in value.Operations())
+            foreach (var update in value.Iterations())
             {
                 switch (update.Type)
                 {
@@ -141,7 +140,7 @@ namespace ObservableData.Querying.Select
 
             protected override IEnumerable<ListOperation<TAdaptee>> Enumerate()
             {
-                foreach (var update in _adaptee.Operations())
+                foreach (var update in _adaptee.Iterations())
                 {
                     switch (update.Type)
                     {

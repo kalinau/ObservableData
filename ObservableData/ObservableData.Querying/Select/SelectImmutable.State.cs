@@ -35,11 +35,11 @@ namespace ObservableData.Querying.Select
 
             public IEnumerator<T> GetEnumerator()
             {
-                foreach (var pair in _state)
+                foreach (var counter in _state.Values.NotNull())
                 {
-                    for (var i = 0; i < pair.Value.Count; i++)
+                    for (var i = 0; i < counter.Count; i++)
                     {
-                        yield return pair.Value.Item;
+                        yield return counter.Item;
                     }
                 }
             }

@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying.Utils;
 using ObservableData.Querying.Where;
-using ObservableData.Structures;
 
 namespace ObservableData.Querying
 {
