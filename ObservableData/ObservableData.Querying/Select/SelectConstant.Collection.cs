@@ -64,9 +64,9 @@ namespace ObservableData.Querying.Select
                 _selector = selector;
             }
 
-            public IEnumerable<CollectionOperation<TAdaptee>> Iterations()
+            public IEnumerable<CollectionOperation<TAdaptee>> GetIterations()
             {
-                foreach (var u in _adaptee.Iterations())
+                foreach (var u in _adaptee.GetIterations())
                 {
                     switch (u.Type)
                     {

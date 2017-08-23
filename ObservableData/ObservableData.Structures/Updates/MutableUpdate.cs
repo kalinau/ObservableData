@@ -1,3 +1,0 @@
-namespace ObservableData.Structures.Updates
-{
-}

@@ -21,7 +21,7 @@ namespace ObservableData.Querying.Utils.Adapters
             _locked = this.Enumerate().ToArray();
         }
 
-        public IEnumerable<T> Iterations()
+        public IEnumerable<T> GetIterations()
         {
             if (_locked != null) return _locked;
             _threadId.CheckIsCurrent();

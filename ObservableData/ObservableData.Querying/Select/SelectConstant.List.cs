@@ -63,26 +63,35 @@ namespace ObservableData.Querying.Select
                 _selector = selector;
             }
 
-            public IEnumerable<ListOperation<TAdaptee>> Iterations()
+            public IEnumerable<ListOperation<TAdaptee>> GetIterations()
             {
-                foreach (var update in _adaptee.Iterations())
+                foreach (var update in _adaptee.GetIterations())
                 {
                     switch (update.Type)
                     {
                         case ListOperationType.Add:
-                            yield return ListOperation<TAdaptee>.OnAdd(_selector(update.Item), update.Index);
+                            yield return ListOperation<TAdaptee>.OnAdd(
+                                _selector(update.Item),
+                                update.Index);
                             break;
 
                         case ListOperationType.Remove:
-                            yield return ListOperation<TAdaptee>.OnRemove(_selector(update.Item), update.Index);
+                            yield return ListOperation<TAdaptee>.OnRemove(
+                                _selector(update.Item),
+                                update.Index);
                             break;
 
                         case ListOperationType.Move:
-                            yield return ListOperation<TAdaptee>.OnMove(_selector(update.Item), update.Index, update.OriginalIndex);
+                            yield return ListOperation<TAdaptee>.OnMove(
+                                _selector(update.Item),
+                                update.Index,
+                                update.OriginalIndex);
                             break;
 
                         case ListOperationType.Replace:
-                            yield return ListOperation<TAdaptee>.OnReplace(_selector(update.Item), _selector(update.ChangedItem),
+                            yield return ListOperation<TAdaptee>.OnReplace(
+                                _selector(update.Item),
+                                _selector(update.ChangedItem),
                                 update.Index);
                             break;
 

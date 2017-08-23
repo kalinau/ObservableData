@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using ObservableData.Querying;
+using ObservableData.Structures.Utils;
 
 namespace ObservableData.Structures
 {
@@ -42,5 +44,60 @@ namespace ObservableData.Structures
     {
         [CanBeNull]
         IReadOnlyCollection<T> Items { get; }
+    }
+
+    [PublicAPI]
+    public static class CollectionOperationExtensions
+    {
+        [NotNull]
+        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+            [NotNull] this ICollectionOperation<T> operation)
+        {
+            return operation.Match(
+                AsForCollectionQuerying,
+                AsForCollectionQuerying,
+                AsForCollectionQuerying,
+                AsForCollectionQuerying
+            ).NotNull();
+        }
+
+        [NotNull]
+        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+            [NotNull] this ICollectionInsertOperation<T> insert)
+        {
+            foreach (var item in insert.Items)
+            {
+                yield return CollectionOperation<T>.OnAdd(item);
+            }
+}
+
+        [NotNull]
+        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+            [NotNull] this ICollectionRemoveOperation<T> remove)
+        {
+            yield return CollectionOperation<T>.OnRemove(remove.Item);
+        }
+
+        [NotNull]
+        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+            [NotNull] this ICollectionReplaceOperation<T> replace)
+        {
+            yield return CollectionOperation<T>.OnRemove(replace.ReplacedItem);
+            yield return CollectionOperation<T>.OnAdd(replace.Item);
+        }
+
+        [NotNull]
+        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+            [NotNull] this ICollectionResetOperation<T> reset)
+        {
+            yield return CollectionOperation<T>.OnClear();
+            if (reset.Items != null)
+            {
+                foreach (var item in reset.Items)
+                {
+                    yield return CollectionOperation<T>.OnAdd(item);
+                }
+            }
+        }
     }
 }

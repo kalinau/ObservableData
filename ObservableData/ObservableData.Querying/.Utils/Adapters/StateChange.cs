@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using JetBrains.Annotations;
 
 namespace ObservableData.Querying.Utils.Adapters
 {
+    [UsedImplicitly]
     public class StateChange<T> : 
         IChange<CollectionOperation<T>>,
         IChange<ListOperation<T>>
@@ -18,7 +16,7 @@ namespace ObservableData.Querying.Utils.Adapters
             _state = state;
         }
 
-        IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.Iterations()
+        IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
         {
             var i = 0;
             foreach (var item in _state)
@@ -27,7 +25,7 @@ namespace ObservableData.Querying.Utils.Adapters
             }
         }
 
-        IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.Iterations()
+        IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
         {
             foreach (var item in _state)
             {

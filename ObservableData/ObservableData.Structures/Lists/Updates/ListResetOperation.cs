@@ -2,12 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using ObservableData.Structures.Utils;
+using ObservableData.Querying;
+using ObservableData.Querying.Utils;
 
 namespace ObservableData.Structures.Lists.Updates
 {
     public class ListResetOperation<T> :
-        ListBaseOperation<T>,
+        IListChangeNode<T>,
         IListResetOperation<T>, 
         ICollectionResetOperation<T>
     {
@@ -20,6 +21,16 @@ namespace ObservableData.Structures.Lists.Updates
         {
             _items = items;
             _threadId = ThreadId.FromCurrent();
+        }
+
+        IListChangeNode<T> IListChangeNode<T>.Next { get; set; }
+
+        public void MakeImmutable()
+        {
+            if (_locked == null)
+            {
+                _locked = _items.ToList();
+            }
         }
 
         public IReadOnlyCollection<T> Items
@@ -35,32 +46,57 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        public override void Lock()
+        IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
         {
-            if (_locked == null)
+            yield return ListOperation<T>.OnClear();
+            if (this.Items != null)
             {
-                _locked = _items.ToList();
+                var index = 0;
+                foreach (var item in this.Items)
+                {
+                    yield return ListOperation<T>.OnAdd(item, index++);
+                }
             }
         }
 
-        public override TResult Match<TResult>(Func<IListInsertOperation<T>, TResult> onInsert, Func<IListRemoveOperation<T>, TResult> onRemove, Func<IListReplaceOperation<T>, TResult> onReplace, Func<IListMoveOperation<T>, TResult> onMove, Func<IListResetOperation<T>, TResult> onReset)
+        IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+        {
+            yield return CollectionOperation<T>.OnClear(); 
+            if (this.Items != null)
+            {
+                foreach (var item in this.Items)
+                {
+                    yield return CollectionOperation<T>.OnAdd(item);
+                }
+            }
+        }
+
+        IEnumerable<IListOperation<T>> IChange<IListOperation<T>>.GetIterations()
+        {
+            yield return this;
+        }
+
+        IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.GetIterations()
+        {
+            yield return this;
+        }
+
+        TResult IListOperation<T>.Match<TResult>(Func<IListInsertOperation<T>, TResult> onInsert, Func<IListRemoveOperation<T>, TResult> onRemove, Func<IListReplaceOperation<T>, TResult> onReplace, Func<IListMoveOperation<T>, TResult> onMove, Func<IListResetOperation<T>, TResult> onReset)
         {
             return onReset.Invoke(this);
         }
 
-        public override void Match(Action<IListInsertOperation<T>> onInsert, Action<IListRemoveOperation<T>> onRemove, Action<IListReplaceOperation<T>> onReplace, Action<IListMoveOperation<T>> onMove, Action<IListResetOperation<T>> onReset)
+        void IListOperation<T>.Match(Action<IListInsertOperation<T>> onInsert, Action<IListRemoveOperation<T>> onRemove, Action<IListReplaceOperation<T>> onReplace, Action<IListMoveOperation<T>> onMove, Action<IListResetOperation<T>> onReset)
         {
             onReset?.Invoke(this);
         }
 
-        public override ICollectionOperation<T> TryGetCollectionOperation() => this;
-
-        public TResult Match<TResult>(Func<ICollectionInsertOperation<T>, TResult> onInsert, Func<ICollectionRemoveOperation<T>, TResult> onRemove, Func<ICollectionReplaceOperation<T>, TResult> onReplace, Func<ICollectionResetOperation<T>, TResult> onReset)
+        TResult ICollectionOperation<T>.Match<TResult>(Func<ICollectionInsertOperation<T>, TResult> onInsert, Func<ICollectionRemoveOperation<T>, TResult> onRemove, Func<ICollectionReplaceOperation<T>, TResult> onReplace, Func<ICollectionResetOperation<T>, TResult> onReset)
         {
             return onReset.Invoke(this);
         }
 
-        public void Match(Action<ICollectionInsertOperation<T>> onInsert, Action<ICollectionRemoveOperation<T>> onRemove, Action<ICollectionReplaceOperation<T>> onReplace, Action<ICollectionResetOperation<T>> onReset)
+        void ICollectionOperation<T>.Match(Action<ICollectionInsertOperation<T>> onInsert, Action<ICollectionRemoveOperation<T>> onRemove, Action<ICollectionReplaceOperation<T>> onReplace, Action<ICollectionResetOperation<T>> onReset)
         {
             onReset?.Invoke(this);
         }

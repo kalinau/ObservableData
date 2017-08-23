@@ -35,18 +35,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include=".Utils\Annotations.cs" />
-    <Compile Include=".Utils\ItemOrEnumerable.cs" />
-    <Compile Include=".Utils\ThreadId.cs" />
+    <Compile Include=".Utils\ChangeExtensions.cs" />
     <Compile Include="Collections\Updates\CollectionBaseOperation.cs" />
     <Compile Include="Collections\Updates\CollectionInsertBatchOperation.cs" />
-    <Compile Include="IUpdate.cs" />
-    <Compile Include="Lists\Updates\IListUpdate.cs" />
-    <Compile Include="Lists\Updates\ListBatchUpdate.cs" />
-    <Compile Include="Lists\Updates\ListIndex.cs" />
+    <Compile Include="Lists\Updates\IListChangeNode.cs" />
+    <Compile Include="Lists\IListUpdate.cs" />
+    <Compile Include="Lists\Updates\ListBatchChange.cs" />
+    <Compile Include=".Utils\ListIndex.cs" />
+    <Compile Include="Lists\Updates\ListChangesSubject.cs" />
     <Compile Include="Lists\Updates\ListInsertBatchOperation.cs" />
-    <Compile Include="Lists\Updates\ListMoveOperation.cs" />
-    <Compile Include="Lists\Updates\ListRemoveOperation.cs" />
-    <Compile Include="Lists\Updates\ListReplaceOperation.cs" />
     <Compile Include="Lists\Updates\ListResetOperation.cs" />
     <Compile Include="IBatchCollection.cs" />
     <Compile Include="ICollectionOperation.cs" />
@@ -55,16 +52,20 @@
     <Compile Include="IObservableList.cs" />
     <Compile Include="IObservableReadOnlyCollection.cs" />
     <Compile Include="IObservableReadOnlyList.cs" />
-    <Compile Include="Lists\Updates\ListUpdatesAggregator.cs" />
     <Compile Include="Lists\ObservableList.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="ListExtensions.cs" />
+    <Compile Include="Lists\Updates\QueryingOperationAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Lists\Updates\ListBaseOperation.cs" />
-    <Compile Include="Lists\Updates\ListInsertItemOperation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ObservableData.Querying\ObservableData.Querying.csproj">
+      <Project>{3f528850-6745-49ed-b71a-2fd0794d45cd}</Project>
+      <Name>ObservableData.Querying</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

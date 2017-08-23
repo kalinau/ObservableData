@@ -2,14 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using ObservableData.Querying;
 using ObservableData.Structures.Lists.Updates;
+using ObservableData.Structures.Utils;
 
 namespace ObservableData.Structures.Lists
 {
     public class ObservableList<T> : IObservableList<T>
     {
         [NotNull] private readonly List<T> _list;
-        [NotNull] private readonly ListUpdatesAggregator<T> _subject = new ListUpdatesAggregator<T>();
+        [NotNull] private readonly ListChangesSubject<T> _subject = new ListChangesSubject<T>();
 
         public ObservableList()
         {
@@ -23,9 +25,12 @@ namespace ObservableData.Structures.Lists
 
         public int Count => _list.Count;
 
-        IObservable<IChange<IListOperation<T>>> IObservableReadOnlyList<T>.WhenUpdated => _subject;
+        IObservable<IChange<IListOperation<T>>> IObservableReadOnlyList<T>.WhenUpdated => this.WhenUpdated;
 
-        IObservable<IChange<ICollectionOperation<T>>> IObservableReadOnlyCollection<T>.WhenUpdated => _subject;
+        IObservable<IChange<ICollectionOperation<T>>> IObservableReadOnlyCollection<T>.WhenUpdated => this.WhenUpdated;
+
+        [NotNull]
+        public IObservable<IListChange<T>> WhenUpdated =>_subject;
 
         public bool IsReadOnly => false;
 
@@ -36,10 +41,9 @@ namespace ObservableData.Structures.Lists
             {
                 var changedItem = _list[index];
                 _list[index] = value;
-                _subject.OnReplace(value, changedItem, index);
+                _subject.OnOperation(ListOperation<T>.OnReplace(value, changedItem, index));
             }
         }
-        
 
         public IEnumerator<T> GetEnumerator() => _list.GetEnumerator();
 
@@ -58,7 +62,7 @@ namespace ObservableData.Structures.Lists
             var index = this.IndexOf(oldItem);
             if (index == -1) return false;
             _list[index] = newItem;
-            _subject.OnReplace(newItem, oldItem, index);
+            _subject.OnOperation(ListOperation<T>.OnReplace(newItem, oldItem, index));
             return true;
         }
 
@@ -66,7 +70,7 @@ namespace ObservableData.Structures.Lists
         {
             var index = _list.Count;
             _list.Add(item);
-            _subject.OnAdd(item, index);
+            _subject.OnOperation(ListOperation<T>.OnAdd(item, index));
         }
 
         public void Clear()
@@ -97,15 +101,14 @@ namespace ObservableData.Structures.Lists
             var item = _list[from];
             _list.RemoveAt(from);
             _list.Insert(to, item);
-            _subject.OnMove(item, from, to);
+            _subject.OnOperation(ListOperation<T>.OnMove(item, to, from));
         }
-
 
         public void Insert(int index, T item)
         {
             ListIndex.Check(index, this.Count + 1);
             _list.Insert(index, item);
-            _subject.OnAdd(item, index);
+            _subject.OnOperation(ListOperation<T>.OnAdd(item, index));
         }
 
         public void RemoveAt(int index)
@@ -113,7 +116,7 @@ namespace ObservableData.Structures.Lists
             ListIndex.Check(index, _list.Count);
             var item = _list[index];
             _list.RemoveAt(index);
-            _subject.OnRemove(item, index);
+            _subject.OnOperation(ListOperation<T>.OnRemove(item, index));
         }
 
         public void Reset(IReadOnlyCollection<T> items)
@@ -121,7 +124,7 @@ namespace ObservableData.Structures.Lists
             if (_list.Count == 0)
             {
                 _list.AddRange(items);
-                _subject.OnAdd(items, 0);
+                _subject.OnAddBatch(items, 0);
             }
             else
             {
@@ -135,7 +138,7 @@ namespace ObservableData.Structures.Lists
         {
             var index = _list.Count;
             _list.AddRange(items);
-            _subject.OnAdd(items, index);
+            _subject.OnAddBatch(items, index);
         }
     }
 }

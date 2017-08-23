@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using ObservableData.Structures.Utils;
+using ObservableData.Querying.Utils;
 
 namespace ObservableData.Structures.Collections.Updates
 {
-    public class CollectionInsertBatchOperation<T> : CollectionBaseOperation<T>, ICollectionInsertOperation<T>
+    public class CollectionInsertBatchOperation<T> :
+        CollectionBaseOperation<T>, 
+        ICollectionInsertOperation<T>
     {
         [NotNull] private readonly IReadOnlyCollection<T> _items;
         [CanBeNull] private IReadOnlyCollection<T> _locked;
@@ -32,7 +34,7 @@ namespace ObservableData.Structures.Collections.Updates
             }
         }
 
-        public override void Lock()
+        public override void MakeImmutable()
         {
             if (_locked == null)
             {

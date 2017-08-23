@@ -44,9 +44,7 @@
     <Compile Include=".Utils\WeakReferenceExtensions.cs" />
     <Compile Include="ChangedCollectionData.cs" />
     <Compile Include="ChangedListData.cs" />
-    <Compile Include="Compatibility\CollectionUpdateToQueryUpdates.cs" />
-    <Compile Include="Compatibility\ListUpdateToQueryUpdates.cs" />
-    <Compile Include="Compatibility\QueryAsBindableListAdapter.cs" />
+    <Compile Include="Compatibility\NotifyCollectionEvents.cs" />
     <Compile Include="IChange.cs" />
     <Compile Include="ListOperation.cs" />
     <Compile Include="ListOperationType.cs" />

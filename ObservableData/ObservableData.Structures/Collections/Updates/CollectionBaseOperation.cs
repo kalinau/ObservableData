@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using ObservableData.Querying;
 
 namespace ObservableData.Structures.Collections.Updates
 {
-    public abstract class CollectionBaseOperation<T> : ICollectionOperation<T>, IChange<ICollectionOperation<T>>
+    public abstract class CollectionBaseOperation<T> : 
+        ICollectionOperation<T>, 
+        IChange<ICollectionOperation<T>>
     {
-        public abstract void Lock();
+        public abstract void MakeImmutable();
 
-        IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.Operations()
+        IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.GetIterations()
         {
             yield return this;
         }

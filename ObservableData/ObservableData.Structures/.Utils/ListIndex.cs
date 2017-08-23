@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ObservableData.Structures.Lists.Updates
+namespace ObservableData.Structures.Utils
 {
     public static class ListIndex
     {

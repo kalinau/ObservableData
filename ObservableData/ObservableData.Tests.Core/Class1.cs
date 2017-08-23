@@ -19,16 +19,16 @@ namespace ObservableData.Tests.Core
         public void ChangeValue(int value)
         {
             _value = value;
-            OnPropertyChanged(nameof(Value));
+            this.OnPropertyChanged(nameof(this.Value));
             _subject.OnNext(_value);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
-        protected virtual void OnPropertyChanged(string propertyName = null)
+        private void OnPropertyChanged(string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public override string ToString() => $"TestEntity: {_value}";

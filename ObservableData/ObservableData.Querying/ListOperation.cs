@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace ObservableData.Querying
 {
@@ -49,5 +51,38 @@ namespace ObservableData.Querying
         public int Index { get; }
 
         public int OriginalIndex { get; }
+    }
+
+    public static class ListOperationExtensions
+    {
+        [NotNull]
+        public static IEnumerable<CollectionOperation<T>> AsForCollection<T>(this ListOperation<T> operation)
+        {
+            switch (operation.Type)
+            {
+                case ListOperationType.Add:
+                    yield return CollectionOperation<T>.OnAdd(operation.Item);
+                    break;
+
+                case ListOperationType.Remove:
+                    yield return CollectionOperation<T>.OnRemove(operation.Item);
+                    break;
+
+                case ListOperationType.Move:
+                    break;
+
+                case ListOperationType.Replace:
+                    yield return CollectionOperation<T>.OnRemove(operation.ChangedItem);
+                    yield return CollectionOperation<T>.OnAdd(operation.Item);
+                    break;
+
+                case ListOperationType.Clear:
+                    yield return CollectionOperation<T>.OnClear();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }

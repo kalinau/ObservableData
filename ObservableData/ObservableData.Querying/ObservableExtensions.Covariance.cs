@@ -17,34 +17,13 @@ namespace ObservableData.Querying
                 _adaptee = adaptee;
             }
 
-            public IEnumerable<CollectionOperation<T>> Iterations()
+            public IEnumerable<CollectionOperation<T>> GetIterations()
             {
-                foreach (var update in _adaptee.Iterations())
+                foreach (var i in _adaptee.GetIterations())
                 {
-                    switch (update.Type)
+                    foreach (var operation in i.AsForCollection())
                     {
-                        case ListOperationType.Add:
-                            yield return CollectionOperation<T>.OnAdd(update.Item);
-                            break;
-
-                        case ListOperationType.Remove:
-                            yield return CollectionOperation<T>.OnRemove(update.Item);
-                            break;
-
-                        case ListOperationType.Move:
-                            break;
-
-                        case ListOperationType.Replace:
-                            yield return CollectionOperation<T>.OnRemove(update.ChangedItem);
-                            yield return CollectionOperation<T>.OnAdd(update.Item);
-                            break;
-
-                        case ListOperationType.Clear:
-                            yield return CollectionOperation<T>.OnClear();
-                            break;
-
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        yield return operation;
                     }
                 }
             }

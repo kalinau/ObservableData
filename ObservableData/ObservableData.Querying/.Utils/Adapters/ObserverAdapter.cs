@@ -13,7 +13,7 @@ namespace ObservableData.Querying.Utils.Adapters
         }
 
         [NotNull]
-        public IObserver<TAdaptee> Adaptee => _adaptee;
+        protected IObserver<TAdaptee> Adaptee => _adaptee;
 
         public void OnCompleted() => _adaptee.OnCompleted();
 

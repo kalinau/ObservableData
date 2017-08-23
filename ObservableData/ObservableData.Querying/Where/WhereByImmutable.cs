@@ -62,9 +62,9 @@ namespace ObservableData.Querying.Where
             }
             public void MakeImmutable() => _adaptee.MakeImmutable();
 
-            public IEnumerable<CollectionOperation<T>> Iterations()
+            public IEnumerable<CollectionOperation<T>> GetIterations()
             {
-                foreach (var update in _adaptee.Iterations())
+                foreach (var update in _adaptee.GetIterations())
                 {
                     if (update.Type == CollectionOperationType.Clear)
                     {

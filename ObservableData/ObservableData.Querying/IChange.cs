@@ -5,8 +5,9 @@ namespace ObservableData.Querying
 {
     public interface IChange<out T>
     {
-        [NotNull, ItemNotNull]
-        IEnumerable<T> Iterations();
+        [NotNull]
+        [ItemNotNull]
+        IEnumerable<T> GetIterations();
 
         void MakeImmutable();
     }
