@@ -1,8 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using ObservableData.Querying;
 
 namespace ObservableData.Structures.Lists
 {
-    // ReSharper disable once PossibleInterfaceMemberAmbiguity
+    [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
     public interface IListChange<T> :
         IChange<ListOperation<T>>,
         IChange<CollectionOperation<T>>,
