@@ -50,7 +50,6 @@ namespace ObservableData.Querying.Select
             }
         }
 
-
         private sealed class CollectionChange<T, TAdaptee> : IChange<CollectionOperation<TAdaptee>>
         {
             [NotNull] private readonly IChange<CollectionOperation<T>> _adaptee;

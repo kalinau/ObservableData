@@ -87,6 +87,5 @@ namespace ObservableData.Structures.Utils
                 }
             }
         }
-
     }
 }

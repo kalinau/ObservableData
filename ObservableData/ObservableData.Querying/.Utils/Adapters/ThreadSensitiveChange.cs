@@ -4,12 +4,12 @@ using JetBrains.Annotations;
 
 namespace ObservableData.Querying.Utils.Adapters
 {
-    public abstract class ChangeWithLock<T> : IChange<T>
+    public abstract class ThreadSensitiveChange<T> : IChange<T>
     {
         [CanBeNull] private IEnumerable<T> _locked;
         private ThreadId _threadId;
 
-        protected ChangeWithLock()
+        protected ThreadSensitiveChange()
         {
             _threadId = ThreadId.FromCurrent();
         }

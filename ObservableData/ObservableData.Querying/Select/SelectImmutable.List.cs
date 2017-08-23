@@ -30,6 +30,46 @@ namespace ObservableData.Querying.Select
                 this.Adaptee.OnNext(_state.Apply(value, _func));
             }
         }
+        [NotNull]
+        private static IChange<ListOperation<TAdaptee>> Apply<T, TAdaptee>(
+            [NotNull] this SelectState<T, TAdaptee> state,
+            [NotNull] IChange<ListOperation<T>> value,
+            [NotNull] Func<T, TAdaptee> func)
+        {
+            Dictionary<T, TAdaptee> removedOnChange = null;
+
+            foreach (var update in value.GetIterations())
+            {
+                switch (update.Type)
+                {
+                    case ListOperationType.Add:
+                        state.OnAdd(update.Item, func, removedOnChange);
+                        break;
+
+                    case ListOperationType.Remove:
+                        state.OnRemove(update.Item, ref removedOnChange);
+                        break;
+
+                    case ListOperationType.Move:
+                        break;
+
+                    case ListOperationType.Replace:
+                        state.OnRemove(update.Item, ref removedOnChange);
+                        state.OnAdd(update.Item, func, removedOnChange);
+                        break;
+
+                    case ListOperationType.Clear:
+                        state.Clear();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            var adapter = new ListChange<T, TAdaptee>(value, state, removedOnChange);
+            return adapter;
+        }
 
         public sealed class ListDataObserver<T, TAdaptee> :
             ObserverAdapter<ChangedListData<T>, ChangedListData<TAdaptee>>
@@ -81,48 +121,7 @@ namespace ObservableData.Querying.Select
             }
         }
 
-        [NotNull]
-        private static IChange<ListOperation<TAdaptee>> Apply<T, TAdaptee>(
-            [NotNull] this SelectState<T, TAdaptee> state,
-            [NotNull] IChange<ListOperation<T>> value,
-            [NotNull] Func<T, TAdaptee> func)
-        {
-            Dictionary<T, TAdaptee> removedOnChange = null;
-
-            foreach (var update in value.GetIterations())
-            {
-                switch (update.Type)
-                {
-                    case ListOperationType.Add:
-                        state.OnAdd(update.Item, func, removedOnChange);
-                        break;
-
-                    case ListOperationType.Remove:
-                        state.OnRemove(update.Item, ref removedOnChange);
-                        break;
-
-                    case ListOperationType.Move:
-                        break;
-
-                    case ListOperationType.Replace:
-                        state.OnRemove(update.Item, ref removedOnChange);
-                        state.OnAdd(update.Item, func, removedOnChange);
-                        break;
-
-                    case ListOperationType.Clear:
-                        state.Clear();
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            var adapter = new ListChange<T, TAdaptee>(value, state, removedOnChange);
-            return adapter;
-        }
-
-        private sealed class ListChange<T, TAdaptee> : ChangeWithLock<ListOperation<TAdaptee>>
+        private sealed class ListChange<T, TAdaptee> : ThreadSensitiveChange<ListOperation<TAdaptee>>
         {
             [NotNull] private readonly IChange<ListOperation<T>> _adaptee;
             [NotNull] private readonly SelectState<T, TAdaptee> _state;

@@ -34,9 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include=".Utils\Adapters\ChangeWithLock.cs" />
     <Compile Include=".Utils\Adapters\ObserverAdapter.cs" />
     <Compile Include=".Utils\Adapters\StateChange.cs" />
+    <Compile Include=".Utils\Adapters\ThreadSensitiveChange.cs" />
     <Compile Include=".Utils\Annotations.cs" />
     <Compile Include=".Utils\KeedAliveDisposableAdapter.cs" />
     <Compile Include=".Utils\ThreadId.cs" />

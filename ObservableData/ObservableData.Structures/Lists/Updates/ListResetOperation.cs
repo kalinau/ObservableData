@@ -27,7 +27,7 @@ namespace ObservableData.Structures.Lists.Updates
 
         public void MakeImmutable()
         {
-            if (_locked == null)
+            if (_locked == null && _items != null)
             {
                 _locked = _items.ToList();
             }

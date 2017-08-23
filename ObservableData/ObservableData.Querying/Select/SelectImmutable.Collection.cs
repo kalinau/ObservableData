@@ -48,50 +48,50 @@ namespace ObservableData.Querying.Select
                     }
                 }
 
-                var adapter = new Change(value, _state, removedOnChange);
+                var adapter = new CollectionChange<T, TAdaptee>(value, _state, removedOnChange);
                 var result = new ChangedCollectionData<TAdaptee>(adapter, _state);
                 this.Adaptee.OnNext(result);
             }
+        }
 
-            private sealed class Change : ChangeWithLock<CollectionOperation<TAdaptee>>
+        private sealed class CollectionChange<T, TAdaptee> : ThreadSensitiveChange<CollectionOperation<TAdaptee>>
+        {
+            [NotNull] private readonly IChange<CollectionOperation<T>> _adaptee;
+            [NotNull] private readonly SelectState<T, TAdaptee> _state;
+            [CanBeNull] private readonly Dictionary<T, TAdaptee> _removedOnChange;
+
+            public CollectionChange(
+                [NotNull] IChange<CollectionOperation<T>> adaptee,
+                [NotNull] SelectState<T, TAdaptee> state,
+                [CanBeNull] Dictionary<T, TAdaptee> removedOnChange)
             {
-                [NotNull] private readonly IChange<CollectionOperation<T>> _adaptee;
-                [NotNull] private readonly SelectState<T, TAdaptee> _state;
-                [CanBeNull] private readonly Dictionary<T, TAdaptee> _removedOnChange;
+                _adaptee = adaptee;
+                _state = state;
+                _removedOnChange = removedOnChange;
+            }
 
-                public Change(
-                    [NotNull] IChange<CollectionOperation<T>> adaptee,
-                    [NotNull] SelectState<T, TAdaptee> state,
-                    [CanBeNull] Dictionary<T, TAdaptee> removedOnChange)
+            protected override IEnumerable<CollectionOperation<TAdaptee>> Enumerate()
+            {
+                foreach (var update in _adaptee.GetIterations())
                 {
-                    _adaptee = adaptee;
-                    _state = state;
-                    _removedOnChange = removedOnChange;
-                }
-
-                protected override IEnumerable<CollectionOperation<TAdaptee>> Enumerate()
-                {
-                    foreach (var update in _adaptee.GetIterations())
+                    switch (update.Type)
                     {
-                        switch (update.Type)
-                        {
-                            case CollectionOperationType.Add:
-                                var added = _state.Get(update.Item, _removedOnChange);
-                                yield return CollectionOperation<TAdaptee>.OnAdd(added);
-                                break;
+                        case CollectionOperationType.Add:
+                            var added = _state.Get(update.Item, _removedOnChange);
+                            yield return CollectionOperation<TAdaptee>.OnAdd(added);
+                            break;
 
-                            case CollectionOperationType.Remove:
-                                var removed = _state.Get(update.Item, _removedOnChange);
-                                yield return CollectionOperation<TAdaptee>.OnRemove(removed);
-                                break;
+                        case CollectionOperationType.Remove:
+                            var removed = _state.Get(update.Item, _removedOnChange);
+                            yield return CollectionOperation<TAdaptee>.OnRemove(removed);
+                            break;
 
-                            case CollectionOperationType.Clear:
-                                yield return CollectionOperation<TAdaptee>.OnClear();
-                                break;
+                        case CollectionOperationType.Clear:
+                            yield return CollectionOperation<TAdaptee>.OnClear();
+                            break;
 
-                            default:
-                                throw new ArgumentOutOfRangeException();
-                        }
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
             }
