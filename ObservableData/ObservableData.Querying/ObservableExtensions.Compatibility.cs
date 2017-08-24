@@ -14,7 +14,18 @@ namespace ObservableData.Querying
         {
             var list = new BindableList<T>();
             state = list;
-            return observable.Subscribe(x => list.OnNext(x)).NotNull();
+            return observable.Subscribe(x =>
+            {
+                list.Subject = x.ReachedState;
+                foreach (var update in x.Change.GetIterations())
+                {
+                    list.Events.OnOperation(update);
+                    if (update.Type == ListOperationType.Clear)
+                    {
+                        break;
+                    }
+                }
+            }).NotNull();
         }
     }
 }

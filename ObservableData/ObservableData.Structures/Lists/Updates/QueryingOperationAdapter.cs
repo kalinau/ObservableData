@@ -207,11 +207,11 @@ namespace ObservableData.Structures.Lists.Updates
 
         T IListMoveOperation<T>.Item => this.Get(_adaptee.Item, ListOperationType.Move);
 
-        int IListReplaceOperation<T>.Index => this.Get(_adaptee.Index, ListOperationType.Move);
+        int IListReplaceOperation<T>.Index => this.Get(_adaptee.Index, ListOperationType.Replace);
 
-        T IListReplaceOperation<T>.ReplacedItem => this.Get(_adaptee.ChangedItem, ListOperationType.Move);
+        T IListReplaceOperation<T>.ReplacedItem => this.Get(_adaptee.ChangedItem, ListOperationType.Replace);
 
-        T IListReplaceOperation<T>.Item => this.Get(_adaptee.Item, ListOperationType.Move);
+        T IListReplaceOperation<T>.Item => this.Get(_adaptee.Item, ListOperationType.Replace);
 
         IReadOnlyCollection<T> IListResetOperation<T>.Items
         {
@@ -222,7 +222,7 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IReadOnlyCollection<T> ICollectionInsertOperation<T>.Items => this;
+        IReadOnlyCollection<T> ICollectionInsertOperation<T>.Items => this.Get(this, ListOperationType.Add);
 
         T ICollectionRemoveOperation<T>.Item => this.Get(_adaptee.Item, ListOperationType.Remove);
 

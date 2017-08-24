@@ -7,7 +7,6 @@
     Title="MainWindow"
     Width="1024"
     Height="350"
-    Background="#F0F0F0"
     FontSize="16"
     mc:Ignorable="d">
     <Grid>
@@ -15,48 +14,83 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Border />
+        <Grid Grid.Row="0" MouseUp="OnHeaderTap" Background="#F0F0F0">
             <StackPanel
                 Grid.Row="0"
                 Grid.Column="0"
+                Margin="24,12"
                 VerticalAlignment="Top"
-                Orientation="Horizontal"
+                Orientation="Vertical"
                 Visibility="Visible">
 
-                <TextBlock VerticalAlignment="Center" Text="Index:" />
-                <TextBox
-                    x:Name="Index"
-                    Width="100"
-                    Margin="12" />
-                <TextBlock VerticalAlignment="Center" Text="Value:" />
-                <TextBox
-                    x:Name="Value"
-                    Width="100"
-                    Margin="12" />
-                <Button
-                    x:Name="Button"
-                    Width="100"
-                    Margin="12"
-                    Click="OnButton"
-                    Content="Add" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock VerticalAlignment="Center" Text="Index:" />
+                    <TextBox
+                        x:Name="Index"
+                        Width="100"
+                        Margin="12" />
+                    <TextBlock VerticalAlignment="Center" Text="Value:" />
+
+                    <TextBox
+                        x:Name="Value"
+                        Width="100"
+                        Margin="12" />
+                </StackPanel>
+                <WrapPanel x:Name="ButtonsPanel">
+                    <Button
+                        x:Name="AddButton"
+                        Padding="12"
+                        Click="OnAdd"
+                        Content="Add" />
+                    <Button
+                        x:Name="AddRangeButton"
+                        Padding="12"
+                        Click="OnAddRangeClick"
+                        Content="Add range" />
+                    <Button
+                        x:Name="ClearButton"
+                        Padding="12"
+                        Click="OnClearClick"
+                        Content="Clear" />
+                    <Button
+                        x:Name="ResetButton"
+                        Padding="12"
+                        Click="OnResetClick"
+                        Content="Reset" />
+                    <Button
+                        x:Name="UpdateValueButton"
+                        Visibility="Collapsed"
+                        Padding="12"
+                        Click="OnUpdateValueClick"
+                        Content="Update value" />
+                    <Button
+                        x:Name="UpdateIndexButton"
+                        Visibility="Collapsed"
+                        Padding="12"
+                        Click="OnUpdateIndexClick"
+                        Content="Update index" />
+                    <Button
+                        x:Name="ReplaceButton"
+                        Visibility="Collapsed"
+                        Padding="12"
+                        Click="OnReplaceClick"
+                        Content="Replace" />
+                    <Button
+                        x:Name="RemoveButton"
+                        Visibility="Collapsed"
+                        Padding="12"
+                        Click="OnRemoveClick"
+                        Content="Remove" />
+                </WrapPanel>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" x:Name="ListsPanel">
             <ListView
                 x:Name="SourceList"
                 Grid.Column="0"
-                HorizontalContentAlignment="Stretch"
+                HorizontalContentAlignment="Center"
                 SelectionChanged="OnSelected" />
-            <ListView
-                x:Name="ResultList"
-                Grid.Column="1"
-                HorizontalContentAlignment="Stretch"
-                SelectionChanged="OnSelected" />
+
         </Grid>
     </Grid>
 </Window>

@@ -11,7 +11,7 @@ namespace ObservableData.Querying.Compatibility
         [NotNull] private IReadOnlyCollection<T> _subject = Default;
 
         [NotNull]
-        protected IReadOnlyCollection<T> Subject
+        public IReadOnlyCollection<T> Subject
         {
             get => _subject;
             set => _subject = value;

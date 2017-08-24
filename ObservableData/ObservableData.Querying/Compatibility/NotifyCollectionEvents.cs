@@ -16,10 +16,6 @@ namespace ObservableData.Querying.Compatibility
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnCompleted() {}
-
-        public void OnError(Exception error) {}
-
         public void OnOperation(ListOperation<T> value)
         {
             switch (value.Type)
@@ -71,13 +67,15 @@ namespace ObservableData.Querying.Compatibility
 
         private void OnReplace(ListOperation<T> update)
         {
-            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, update.Item, update.ChangedItem, update.Index);
+            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, update.Item, update.ChangedItem, update.Index);
             this.CollectionChanged?.Invoke(this, args);
         }
 
         private void OnClear()
         {
-            this.CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            this.CollectionChanged?.Invoke(
+                this,
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             this.OnPropertyChanged(nameof(IReadOnlyCollection<T>.Count));
         }
 

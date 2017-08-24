@@ -11,7 +11,7 @@ namespace ObservableData.Querying.Compatibility
         [NotNull] private IReadOnlyList<T> _subject = Default;
 
         [NotNull]
-        protected IReadOnlyList<T> Subject
+        public IReadOnlyList<T> Subject
         {
             get => _subject;
             set => _subject = value;

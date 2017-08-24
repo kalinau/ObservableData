@@ -12,14 +12,8 @@ namespace ObservableData.Querying.Compatibility
     {
         [NotNull] private readonly NotifyCollectionEvents<T> _events = new NotifyCollectionEvents<T>();
 
-        public void OnNext(ListChangePlusState<T> value)
-        {
-            base.Subject = value.ReachedState;
-            foreach (var update in value.Change.GetIterations())
-            {
-                _events.OnOperation(update);
-            }
-        }
+        [NotNull]
+        public NotifyCollectionEvents<T> Events => _events;
 
         event NotifyCollectionChangedEventHandler INotifyCollectionChanged.CollectionChanged
         {

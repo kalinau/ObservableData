@@ -1,18 +1,17 @@
 ﻿// ReSharper disable All
 
 using System;
-using System.Collections.Generic;
+using System.Collections;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
+using System.Linq;
 using System.Reactive.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using ObservableData.Structures;
 using ObservableData.Querying;
 using ObservableData.Structures.Lists;
-using ObservableData.Structures.Utils;
 using ObservableData.Tests.Core;
 
 namespace ObservableData.Tests.Visual
@@ -29,28 +28,45 @@ namespace ObservableData.Tests.Visual
     {
         private StringBuilder _stringBuilder = new StringBuilder();
         private readonly ObservableList<TestEntity> _source = new ObservableList<TestEntity>();
-        private int _index;
-        private TestEntity _selected;
 
         public MainWindow()
         {
             this.InitializeComponent();
 
-            var s = new S() {Value = 5};
-            var s2 = new S() {Value = 1};
+            var sourceSub = _source.ToBindableList(out var bindableSource);
+            this.SourceList.ItemsSource = bindableSource;
 
-            Debug.WriteLine(s.GetHashCode());
-            Debug.WriteLine(s2.GetHashCode());
-
-            var result = new ObservableCollection<int>();
-            this.ResultList.ItemsSource = result;
-
-            var sub = _source
+            _source
                 .AsListChangesPlusState()
                 .ForSelectConstant(x => x.Value)
-                //.ForWhereByImmutable(x => x > 5)
                 .ToBindableStateProxy(out var state);
-            this.ResultList.ItemsSource = state;
+            this.AddListView(state);
+
+
+            var result = new ObservableCollection<int>();
+            this.AddListView(result);
+            _source
+                .AsCollectionChanges()
+                .ForSelectConstant(x => x.Value)
+                .ForWhereByImmutable(x => x > 5)
+                .Subscribe(x => x.ApplyTo(result));
+        }
+
+        private void AddListView(IEnumerable source)
+        {
+            var panel = this.ListsPanel;
+            var listView = new ListView()
+            {
+                HorizontalContentAlignment = HorizontalAlignment.Center,
+                ItemsSource = source
+            };
+            if (panel.ColumnDefinitions.Count == 0)
+            {
+                panel.ColumnDefinitions.Add(new ColumnDefinition() {Width = new GridLength(1, GridUnitType.Star)});
+            }
+            listView.SetValue(Grid.ColumnProperty, panel.ColumnDefinitions.Count);
+            panel.ColumnDefinitions.Add(new ColumnDefinition() {Width = new GridLength(1, GridUnitType.Star)});
+            panel.Children.Add(listView);
         }
 
         private static bool TryGetInt(TextBox textBox, out int value)
@@ -62,40 +78,60 @@ namespace ObservableData.Tests.Visual
             return false;
         }
 
-        private void OnAdd(object sender, RoutedEventArgs e)
+        private TestEntity GetSelected()
         {
+            return this.SourceList?.SelectedItem as TestEntity;
         }
 
-        private void OnButton(object sender, RoutedEventArgs e)
+        private bool TryGetIndex(out int index)
         {
-            if (_selected == null)
+            return TryGetInt(this.Index, out index);
+        }
+
+        private bool TryGetValue(out int value)
+        {
+            return TryGetInt(this.Value, out value);
+        }
+
+        private void CollapseButtons()
+        {
+            foreach (var button in this.ButtonsPanel.Children.OfType<Button>())
             {
-                Add();
+                button.Visibility = Visibility.Collapsed;
             }
-            else
-            {
-                Update();
-            }
-            _selected = null;
+        }
+
+
+        private void ToValueSelectedState(TestEntity entity)
+        {
+            this.CollapseButtons();
+            this.UpdateValueButton.Visibility = Visibility.Visible;
+            this.UpdateIndexButton.Visibility = Visibility.Visible;
+            this.RemoveButton.Visibility = Visibility.Visible;
+            this.ReplaceButton.Visibility = Visibility.Visible;
+
+            this.Index.Text = _source.IndexOf(entity).ToString();
+            this.Value.Text = entity.Value.ToString();
+        }
+
+        private void ToDefaultState()
+        {
+            this.CollapseButtons();
+            this.AddButton.Visibility = Visibility.Visible;
+            this.AddRangeButton.Visibility = Visibility.Visible;
+            this.ClearButton.Visibility = Visibility.Visible;
+            this.ResetButton.Visibility = Visibility.Visible;
+
+            this.Index.Text = string.Empty;
             this.Value.Text = string.Empty;
-            this.Value.Text = string.Empty;
-            this.Button.Content = "Add";
             this.SourceList.SelectedItem = null;
         }
 
-        private void Update()
+        private void OnAdd(object sender, RoutedEventArgs e)
         {
-            if (TryGetInt(Value, out var value))
+            if (TryGetValue(out var value))
             {
-                _selected?.ChangeValue(value);
-            }
-        }
-
-        private void Add()
-        {
-            if (TryGetInt(Value, out var value))
-            {
-                if (TryGetInt(Index, out var index))
+                if (TryGetIndex(out var index))
                 {
                     _source.Insert(index, new TestEntity(value));
                 }
@@ -106,14 +142,85 @@ namespace ObservableData.Tests.Visual
             }
         }
 
-        private void OnSelected(object sender, RoutedEventArgs e)
+        private void OnAddRangeClick(object sender, RoutedEventArgs e)
         {
-            _selected = this.SourceList?.SelectedItem as TestEntity;
-            if (_selected == null) return;
+            if (TryGetValue(out var value))
+            {
+                _source.Add(new[] { new TestEntity(value), new TestEntity(value + 1) });
+            }
+        }
 
-            this.Value.Text = _selected.Value.ToString();
-            this.Index.Text = _source.IndexOf(_selected).ToString();
-            this.Button.Content = "Save";
+        private void OnSelected(object sender, SelectionChangedEventArgs e)
+        {
+            var selected = e.AddedItems.OfType<TestEntity>().FirstOrDefault();
+
+            if (selected == null)
+            {
+                this.ToDefaultState();
+            }
+            else
+            {
+                this.ToValueSelectedState(selected);
+            }
+        }
+
+        private void OnUpdateValueClick(object sender, RoutedEventArgs e)
+        {
+            return;
+
+            if (TryGetValue(out var value))
+            {
+                this.GetSelected()?.ChangeValue(value);
+            }
+
+            this.ToDefaultState();
+        }
+
+        private void OnUpdateIndexClick(object sender, RoutedEventArgs e)
+        {
+            if (TryGetIndex(out var index))
+            {
+                var originalIndex = _source.IndexOf(this.GetSelected());
+                _source.Move(originalIndex, index);
+            }
+
+            this.ToDefaultState();
+        }
+
+        private void OnReplaceClick(object sender, RoutedEventArgs e)
+        {
+            if (TryGetInt(Value, out var value))
+            {
+                var index = _source.IndexOf(this.GetSelected());
+                _source[index] = new TestEntity(value);
+            }
+
+            this.ToDefaultState();
+        }
+
+        private void OnRemoveClick(object sender, RoutedEventArgs e)
+        {
+            _source.Remove(this.GetSelected());
+
+            this.ToDefaultState();
+        }
+
+        private void OnHeaderTap(object sender, MouseButtonEventArgs e)
+        {
+            this.ToDefaultState();
+        }
+
+        private void OnClearClick(object sender, RoutedEventArgs e)
+        {
+            _source.Clear();
+        }
+
+        private void OnResetClick(object sender, RoutedEventArgs e)
+        {
+            if (this.TryGetValue(out var value))
+            {
+                _source.Reset(new[] { new TestEntity(value), new TestEntity(value + 1) });
+            }
         }
     }
 }
