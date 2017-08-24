@@ -59,8 +59,7 @@ namespace ObservableData.Querying.Select
 
             public bool TryGet(TKey key, out T result)
             {
-                ItemCounter<T> existing;
-                if (_state.TryGetValue(key, out existing))
+                if (_state.TryGetValue(key, out var existing))
                 {
                     result = existing.Item;
                     return true;
@@ -71,8 +70,7 @@ namespace ObservableData.Querying.Select
 
             public bool TryIncreaseCount(TKey key)
             {
-                ItemCounter<T> existing;
-                if (_state.TryGetValue(key, out existing))
+                if (_state.TryGetValue(key, out var existing))
                 {
                     _state[key] = new ItemCounter<T>(existing.Item, existing.Count + 1);
                     _count++;
@@ -83,8 +81,7 @@ namespace ObservableData.Querying.Select
 
             public uint DecreaseCount(TKey key, out T currentValue)
             {
-                ItemCounter<T> existing;
-                if (!_state.TryGetValue(key, out existing))
+                if (!_state.TryGetValue(key, out var existing))
                 {
                     throw new ArgumentOutOfRangeException();
                 }

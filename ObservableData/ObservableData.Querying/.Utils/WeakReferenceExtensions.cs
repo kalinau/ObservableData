@@ -9,8 +9,7 @@ namespace ObservableData.Querying.Utils
         [CanBeNull]
         public static T TryGetTarget<T>([NotNull] this WeakReference<T> reference) where T : class
         {
-            T o;
-            reference.TryGetTarget(out o);
+            reference.TryGetTarget(out var o);
             return o;
         }
     }

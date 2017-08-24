@@ -4,6 +4,7 @@ using ObservableData.Querying;
 
 namespace ObservableData.Structures.Utils
 {
+    [PublicAPI]
     public static class ChangeExtensions
     {
         [NotNull]
