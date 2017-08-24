@@ -3,12 +3,12 @@ using JetBrains.Annotations;
 
 namespace ObservableData.Querying
 {
-    public struct ChangedCollectionData<T>
+    public struct CollectionChangePlusState<T>
     {
         [NotNull] private readonly IChange<CollectionOperation<T>> _change;
         [NotNull] private readonly IReadOnlyCollection<T> _reachedState;
 
-        public ChangedCollectionData(
+        public CollectionChangePlusState(
             [NotNull] IChange<CollectionOperation<T>> change,
             [NotNull] IReadOnlyCollection<T> reachedState)
         {
@@ -25,13 +25,13 @@ namespace ObservableData.Querying
 
 
     [PublicAPI]
-    public static class ChangedCollectionDataExtensions
+    public static class CollectionChangePlusStateExtensions
     {
         public static void ApplyTo<T>(
-            this ChangedCollectionData<T> changedData,
+            this CollectionChangePlusState<T> changePlusState,
             [NotNull] ICollection<T> collection)
         {
-            changedData.Change.ApplyTo(collection);
+            changePlusState.Change.ApplyTo(collection);
         }
     }
 }

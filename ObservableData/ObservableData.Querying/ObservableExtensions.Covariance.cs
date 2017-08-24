@@ -42,10 +42,10 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ChangedCollectionData<T>> AsCollectionData<T>(
-            [NotNull] this IObservable<ChangedListData<T>> previous)
+        public static IObservable<CollectionChangePlusState<T>> AsCollectionData<T>(
+            [NotNull] this IObservable<ListChangePlusState<T>> previous)
         {
-            return previous.Select(x => new ChangedCollectionData<T>(
+            return previous.Select(x => new CollectionChangePlusState<T>(
                 new ListChangeAdapter<T>(x.Change),
                 x.ReachedState))
                 .NotNull();
@@ -53,14 +53,14 @@ namespace ObservableData.Querying
 
         [NotNull]
         public static IObservable<IChange<ListOperation<T>>> AsChanges<T>(
-            [NotNull] this IObservable<ChangedListData<T>> previous)
+            [NotNull] this IObservable<ListChangePlusState<T>> previous)
         {
             return previous.Select(x => x.Change).NotNull();
         }
 
         [NotNull]
         public static IObservable<IChange<CollectionOperation<T>>> AsChanges<T>(
-            [NotNull] this IObservable<ChangedCollectionData<T>> previous)
+            [NotNull] this IObservable<CollectionChangePlusState<T>> previous)
         {
             return previous.Select(x => x.Change).NotNull();
         }

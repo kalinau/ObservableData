@@ -25,11 +25,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ChangedCollectionData<T>> ForWhereByImmutable<T>(
-            [NotNull] this IObservable<ChangedCollectionData<T>> previous,
+        public static IObservable<CollectionChangePlusState<T>> ForWhereByImmutable<T>(
+            [NotNull] this IObservable<CollectionChangePlusState<T>> previous,
             [NotNull] Func<T, bool> criterion)
         {
-            return Observable.Create<ChangedCollectionData<T>>(o =>
+            return Observable.Create<CollectionChangePlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 

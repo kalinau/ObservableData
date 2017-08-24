@@ -12,7 +12,7 @@ namespace ObservableData.Structures
     public static class QueryingPreparer
     {
         [NotNull]
-        public static IObservable<IChange<ListOperation<T>>> AsListChangesObservable<T>(
+        public static IObservable<IChange<ListOperation<T>>> AsListChanges<T>(
             [NotNull] this IObservableReadOnlyList<T> list) =>
             list.WhenUpdated
                 .Select(x => x.NotNull().AsForListQuerying())
@@ -20,14 +20,14 @@ namespace ObservableData.Structures
                 .NotNull();
 
         [NotNull]
-        public static IObservable<ChangedListData<T>> AsChangedListDataObservable<T>(
+        public static IObservable<ListChangePlusState<T>> AsListChangesPlusState<T>(
             [NotNull] this IObservableReadOnlyList<T> list) =>
-            list.AsListChangesObservable()
-                .Select(x => new ChangedListData<T>(x.NotNull(), list))
+            list.AsListChanges()
+                .Select(x => new ListChangePlusState<T>(x.NotNull(), list))
                 .NotNull();
 
         [NotNull]
-        public static IObservable<IChange<CollectionOperation<T>>> AsCollectionChangesObservable<T>(
+        public static IObservable<IChange<CollectionOperation<T>>> AsCollectionChanges<T>(
             [NotNull] this IObservableReadOnlyCollection<T> list) =>
             list.WhenUpdated
                 .Select(x => x.NotNull().AsForCollectionQuerying())
@@ -35,38 +35,38 @@ namespace ObservableData.Structures
                 .NotNull();
 
         [NotNull]
-        public static IObservable<ChangedCollectionData<T>> AsChangedCollectionDataObservable<T>(
+        public static IObservable<CollectionChangePlusState<T>> AsCollectionChangesPlusState<T>(
             [NotNull] this IObservableReadOnlyCollection<T> list) =>
-            list.AsCollectionChangesObservable()
-                .Select(x => new ChangedCollectionData<T>(x.NotNull(), list))
+            list.AsCollectionChanges()
+                .Select(x => new CollectionChangePlusState<T>(x.NotNull(), list))
                 .NotNull();
 
         [NotNull]
-        public static IObservable<IChange<ListOperation<T>>> AsListChangesObservable<T>(
+        public static IObservable<IChange<ListOperation<T>>> AsListChanges<T>(
             [NotNull] this ObservableList<T> list) =>
             list.WhenUpdated
                 .StartWith(new ListInsertBatchOperation<T>(list, 0))
                 .NotNull();
 
         [NotNull]
-        public static IObservable<ChangedListData<T>> AsChangedListDataObservable<T>(
+        public static IObservable<ListChangePlusState<T>> AsListChangesPlusState<T>(
             [NotNull] this ObservableList<T> list) =>
-            list.AsListChangesObservable()
-                .Select(x => new ChangedListData<T>(x.NotNull(), list))
+            list.AsListChanges()
+                .Select(x => new ListChangePlusState<T>(x.NotNull(), list))
                 .NotNull();
 
         [NotNull]
-        public static IObservable<IChange<CollectionOperation<T>>> AsCollectionChangesObservable<T>(
+        public static IObservable<IChange<CollectionOperation<T>>> AsCollectionChanges<T>(
             [NotNull] this ObservableList<T> list) =>
             list.WhenUpdated
                 .StartWith(new ListInsertBatchOperation<T>(list, 0))
                 .NotNull();
 
         [NotNull]
-        public static IObservable<ChangedCollectionData<T>> AsChangedCollectionDataObservable<T>(
+        public static IObservable<CollectionChangePlusState<T>> AsCollectionChangesPlusState<T>(
             [NotNull] this ObservableList<T> list) =>
-            list.AsCollectionChangesObservable()
-                .Select(x => new ChangedCollectionData<T>(x.NotNull(), list))
+            list.AsCollectionChanges()
+                .Select(x => new CollectionChangePlusState<T>(x.NotNull(), list))
                 .NotNull();
     }
 }

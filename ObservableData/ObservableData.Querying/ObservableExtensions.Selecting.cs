@@ -24,11 +24,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ChangedCollectionData<T>> ForSelectConstant<TPrevious, T>(
-            [NotNull] this IObservable<ChangedCollectionData<TPrevious>> previous,
+        public static IObservable<CollectionChangePlusState<T>> ForSelectConstant<TPrevious, T>(
+            [NotNull] this IObservable<CollectionChangePlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<ChangedCollectionData<T>>(o =>
+            return Observable.Create<CollectionChangePlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
@@ -52,11 +52,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ChangedListData<T>> ForSelectConstant<TPrevious, T>(
-            [NotNull] this IObservable<ChangedListData<TPrevious>> previous,
+        public static IObservable<ListChangePlusState<T>> ForSelectConstant<TPrevious, T>(
+            [NotNull] this IObservable<ListChangePlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<ChangedListData<T>>(o =>
+            return Observable.Create<ListChangePlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
@@ -66,11 +66,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ChangedCollectionData<T>> ForSelectImmutable<TPrevious, T>(
+        public static IObservable<CollectionChangePlusState<T>> ForSelectImmutable<TPrevious, T>(
             [NotNull] this IObservable<IChange<CollectionOperation<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<ChangedCollectionData<T>>(o =>
+            return Observable.Create<CollectionChangePlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
@@ -80,8 +80,8 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ChangedCollectionData<T>> ForSelectImmutable<TPrevious, T>(
-            [NotNull] this IObservable<ChangedCollectionData<TPrevious>> previous,
+        public static IObservable<CollectionChangePlusState<T>> ForSelectImmutable<TPrevious, T>(
+            [NotNull] this IObservable<CollectionChangePlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
             return previous.Select(x => x.Change).NotNull().ForSelectImmutable(func);
@@ -102,11 +102,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ChangedListData<T>> ForSelectImmutable<TPrevious, T>(
-            [NotNull] this IObservable<ChangedListData<TPrevious>> previous,
+        public static IObservable<ListChangePlusState<T>> ForSelectImmutable<TPrevious, T>(
+            [NotNull] this IObservable<ListChangePlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<ChangedListData<T>>(o =>
+            return Observable.Create<ListChangePlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 

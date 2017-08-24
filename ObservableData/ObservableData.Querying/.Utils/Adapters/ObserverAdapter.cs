@@ -47,24 +47,24 @@ namespace ObservableData.Querying.Utils.Adapters
     }
 
     internal abstract class CollectionDataObserverAdapter<T, TAdaptee> :
-        ObserverAdapter<ChangedCollectionData<T>, ChangedCollectionData<TAdaptee>>
+        ObserverAdapter<CollectionChangePlusState<T>, CollectionChangePlusState<TAdaptee>>
     {
-        protected CollectionDataObserverAdapter([NotNull] IObserver<ChangedCollectionData<TAdaptee>> adaptee) : base(adaptee)
+        protected CollectionDataObserverAdapter([NotNull] IObserver<CollectionChangePlusState<TAdaptee>> adaptee) : base(adaptee)
         {
         }
     }
 
     internal abstract class CollectionDataObserverAdapter<T> : CollectionDataObserverAdapter<T, T>
     {
-        protected CollectionDataObserverAdapter([NotNull] IObserver<ChangedCollectionData<T>> adaptee) : base(adaptee)
+        protected CollectionDataObserverAdapter([NotNull] IObserver<CollectionChangePlusState<T>> adaptee) : base(adaptee)
         {
         }
     }
 
     internal abstract class ListDataObserverAdapter<T, TAdaptee> :
-        ObserverAdapter<ChangedListData<T>, ChangedListData<TAdaptee>>
+        ObserverAdapter<ListChangePlusState<T>, ListChangePlusState<TAdaptee>>
     {
-        protected ListDataObserverAdapter([NotNull] IObserver<ChangedListData<TAdaptee>> adaptee) : base(adaptee)
+        protected ListDataObserverAdapter([NotNull] IObserver<ListChangePlusState<TAdaptee>> adaptee) : base(adaptee)
         {
         }
     }

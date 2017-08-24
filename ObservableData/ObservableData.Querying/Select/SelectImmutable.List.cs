@@ -72,24 +72,24 @@ namespace ObservableData.Querying.Select
         }
 
         public sealed class ListDataObserver<T, TAdaptee> :
-            ObserverAdapter<ChangedListData<T>, ChangedListData<TAdaptee>>
+            ObserverAdapter<ListChangePlusState<T>, ListChangePlusState<TAdaptee>>
         {
             [NotNull] readonly SelectState<T, TAdaptee> _state = new SelectState<T, TAdaptee>();
             [NotNull] private readonly Func<T, TAdaptee> _func;
 
             public ListDataObserver(
-                [NotNull] IObserver<ChangedListData<TAdaptee>> adaptee,
+                [NotNull] IObserver<ListChangePlusState<TAdaptee>> adaptee,
                 [NotNull] Func<T, TAdaptee> func)
                 : base(adaptee)
             {
                 _func = func;
             }
 
-            public override void OnNext(ChangedListData<T> value)
+            public override void OnNext(ListChangePlusState<T> value)
             {
                 var change = _state.Apply(value.Change, _func);
                 var list = new StateAdapter(value.ReachedState, _state);
-                this.Adaptee.OnNext(new ChangedListData<TAdaptee>(change, list));
+                this.Adaptee.OnNext(new ListChangePlusState<TAdaptee>(change, list));
             }
 
             private sealed class StateAdapter : IReadOnlyList<TAdaptee>

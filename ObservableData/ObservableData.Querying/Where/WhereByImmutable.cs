@@ -34,17 +34,17 @@ namespace ObservableData.Querying.Where
             [NotNull] private readonly Func<T, bool> _criterion;
 
             public CollectionDataObserver(
-                [NotNull] IObserver<ChangedCollectionData<T>> previous,
+                [NotNull] IObserver<CollectionChangePlusState<T>> previous,
                 [NotNull] Func<T, bool> criterion)
                 : base(previous)
             {
                 _criterion = criterion;
             }
-            public override void OnNext(ChangedCollectionData<T> value)
+            public override void OnNext(CollectionChangePlusState<T> value)
             {
                 var change = new CollectionChange<T>(value.Change, _criterion);
                 var state = new CollectionAdapter<T>(value.ReachedState, _criterion);
-                this.Adaptee.OnNext(new ChangedCollectionData<T>(change, state));
+                this.Adaptee.OnNext(new CollectionChangePlusState<T>(change, state));
             }
         }
 

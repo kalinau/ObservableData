@@ -9,7 +9,7 @@ namespace ObservableData.Querying
     {
         [NotNull]
         public static IDisposable ToBindableStateProxy<T>(
-            [NotNull] this IObservable<ChangedListData<T>> observable,
+            [NotNull] this IObservable<ListChangePlusState<T>> observable,
             [NotNull] out BindableList<T> state)
         {
             var list = new BindableList<T>();

@@ -42,12 +42,13 @@ namespace ObservableData.Tests.Visual
             Debug.WriteLine(s.GetHashCode());
             Debug.WriteLine(s2.GetHashCode());
 
-            //var observableList = new ObservableCollection<int>();
-            //this.ResultList.ItemsSource = observableList;
+            var result = new ObservableCollection<int>();
+            this.ResultList.ItemsSource = result;
 
             var sub = _source
-                .AsChangedListDataObservable()
+                .AsListChangesPlusState()
                 .ForSelectConstant(x => x.Value)
+                //.ForWhereByImmutable(x => x > 5)
                 .ToBindableStateProxy(out var state);
             this.ResultList.ItemsSource = state;
         }

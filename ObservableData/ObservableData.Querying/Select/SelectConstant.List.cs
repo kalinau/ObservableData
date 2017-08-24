@@ -35,18 +35,18 @@ namespace ObservableData.Querying.Select
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
             public ListDataObserver(
-                [NotNull] IObserver<ChangedListData<TAdaptee>> adaptee,
+                [NotNull] IObserver<ListChangePlusState<TAdaptee>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
                 : base(adaptee)
             {
                 _selector = selector;
             }
 
-            public override void OnNext(ChangedListData<T> value)
+            public override void OnNext(ListChangePlusState<T> value)
             {
                 var change = new ListChange<T, TAdaptee>(value.Change, _selector);
                 var state = new ListAdapter<T, TAdaptee>(value.ReachedState, _selector);
-                this.Adaptee.OnNext(new ChangedListData<TAdaptee>(change, state));
+                this.Adaptee.OnNext(new ListChangePlusState<TAdaptee>(change, state));
             }
         }
 
