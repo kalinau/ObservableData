@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F765EB67-087E-4AD4-83A9-3E7BDFA7F44F}</ProjectGuid>
+    <ProjectGuid>{078F037E-D5B3-4E2C-8EC8-D41B10666C1F}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>ObservableData.Tests.Visual</RootNamespace>
-    <AssemblyName>ObservableData.Tests.Visual</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <RootNamespace>ObservableData.Tests.Visual.WPF</RootNamespace>
+    <AssemblyName>ObservableData.Tests.Visual.WPF</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -36,6 +36,15 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Reactive.Core, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Core.3.1.1\lib\net46\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Linq.3.1.1\lib\net46\System.Reactive.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -85,6 +94,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -95,11 +105,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ObservableData.Querying\ObservableData.Querying.csproj">
-      <Project>{3f528850-6745-49ed-b71a-2fd0794d45cd}</Project>
+      <Project>{4c4844ce-4e96-4115-aa57-3e4a69588aad}</Project>
       <Name>ObservableData.Querying</Name>
     </ProjectReference>
     <ProjectReference Include="..\ObservableData.Structures\ObservableData.Structures.csproj">
-      <Project>{2a57421c-29f6-4318-9c08-0cfa2f3270da}</Project>
+      <Project>{efadf919-75a5-4660-8d50-63f0c8c0569b}</Project>
       <Name>ObservableData.Structures</Name>
     </ProjectReference>
     <ProjectReference Include="..\ObservableData.Tests.Core\ObservableData.Tests.Core.csproj">

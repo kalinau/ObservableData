@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ObservableData.Tests.Visual.Properties
+namespace ObservableData.Tests.Visual.WPF.Properties
 {
 
 

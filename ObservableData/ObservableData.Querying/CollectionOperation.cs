@@ -1,4 +1,7 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace ObservableData.Querying
 {
@@ -29,5 +32,30 @@ namespace ObservableData.Querying
 
         [CanBeNull]
         public T Item { get; }
+    }
+
+    [PublicAPI]
+    public static class CollectionOperationExtensions
+    {
+        public static void ApplyTo<T>(this CollectionOperation<T> operation, [NotNull] ICollection<T> list)
+        {
+            switch (operation.Type)
+            {
+                case CollectionOperationType.Add:
+                    list.Add(operation.Item);
+                    break;
+
+                case CollectionOperationType.Remove:
+                    list.Remove(operation.Item);
+                    break;
+
+                case CollectionOperationType.Clear:
+                    list.Clear();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
     }
 }

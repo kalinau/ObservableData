@@ -22,4 +22,16 @@ namespace ObservableData.Querying
         [NotNull]
         public IChange<CollectionOperation<T>> Change => _change;
     }
+
+
+    [PublicAPI]
+    public static class ChangedCollectionDataExtensions
+    {
+        public static void ApplyTo<T>(
+            this ChangedCollectionData<T> changedData,
+            [NotNull] ICollection<T> collection)
+        {
+            changedData.Change.ApplyTo(collection);
+        }
+    }
 }

@@ -1,15 +1,27 @@
-﻿using System;
+﻿// ReSharper disable All
+
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Reactive.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using ObservableData.Querying;
-using ObservableData.Tests.Core;
 using ObservableData.Structures;
+using ObservableData.Querying;
 using ObservableData.Structures.Lists;
+using ObservableData.Structures.Utils;
+using ObservableData.Tests.Core;
 
 namespace ObservableData.Tests.Visual
 {
+    public struct S
+    {
+        public int Value { get; set; }
+    }
+
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -22,12 +34,22 @@ namespace ObservableData.Tests.Visual
 
         public MainWindow()
         {
-            InitializeComponent();
-            SourceList.ItemsSource = _source.AsBindableList();
-            ResultList.ItemsSource = _source
-                .SelectConstant(x => x.Value * 2)
-                .WhereImmutable(x => x > 5)
-                .AsBindableList();
+            this.InitializeComponent();
+
+            var s = new S() {Value = 5};
+            var s2 = new S() {Value = 1};
+
+            Debug.WriteLine(s.GetHashCode());
+            Debug.WriteLine(s2.GetHashCode());
+
+            //var observableList = new ObservableCollection<int>();
+            //this.ResultList.ItemsSource = observableList;
+
+            var sub = _source
+                .AsChangedListDataObservable()
+                .ForSelectConstant(x => x.Value)
+                .ToBindableStateProxy(out var state);
+            this.ResultList.ItemsSource = state;
         }
 
         private static bool TryGetInt(TextBox textBox, out int value)

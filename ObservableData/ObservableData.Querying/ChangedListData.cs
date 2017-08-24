@@ -22,4 +22,16 @@ namespace ObservableData.Querying
         [NotNull]
         public IChange<ListOperation<T>> Change => _change;
     }
+
+
+    [PublicAPI]
+    public static class ChangedListDataExtensions
+    {
+        public static void ApplyTo<T>(
+            this ChangedListData<T> changedData,
+            [NotNull] IList<T> list)
+        {
+            changedData.Change.ApplyTo(list);
+        }
+    }
 }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ObservableData.Tests.Visual.Properties
+namespace ObservableData.Tests.Visual.WPF.Properties
 {
 
 
@@ -44,7 +44,7 @@ namespace ObservableData.Tests.Visual.Properties
             {
                 if ((resourceMan == null))
                 {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ObservableData.Tests.Visual.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ObservableData.Tests.Visual.WPF.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

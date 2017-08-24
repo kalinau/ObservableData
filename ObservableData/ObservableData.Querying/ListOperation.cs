@@ -53,6 +53,7 @@ namespace ObservableData.Querying
         public int OriginalIndex { get; }
     }
 
+    [PublicAPI]
     public static class ListOperationExtensions
     {
         [NotNull]
@@ -78,6 +79,36 @@ namespace ObservableData.Querying
 
                 case ListOperationType.Clear:
                     yield return CollectionOperation<T>.OnClear();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        public static void ApplyTo<T>(this ListOperation<T> operation, [NotNull] IList<T> list)
+        {
+            switch (operation.Type)
+            {
+                case ListOperationType.Add:
+                    list.Insert(operation.Index, operation.Item);
+                    break;
+
+                case ListOperationType.Remove:
+                    list.RemoveAt(operation.Index);
+                    break;
+
+                case ListOperationType.Move:
+                    list.RemoveAt(operation.OriginalIndex);
+                    list.Insert(operation.Index, operation.Item);
+                    break;
+
+                case ListOperationType.Replace:
+                    list[operation.Index] = operation.Item;
+                    break;
+
+                case ListOperationType.Clear:
+                    list.Clear();
                     break;
 
                 default:

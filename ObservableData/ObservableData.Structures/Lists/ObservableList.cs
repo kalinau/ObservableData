@@ -8,7 +8,8 @@ using ObservableData.Structures.Utils;
 
 namespace ObservableData.Structures.Lists
 {
-    public class ObservableList<T> : IObservableList<T>
+    public class ObservableList<T> : 
+        IObservableList<T>
     {
         [NotNull] private readonly List<T> _list;
         [NotNull] private readonly ListChangesSubject<T> _subject = new ListChangesSubject<T>();

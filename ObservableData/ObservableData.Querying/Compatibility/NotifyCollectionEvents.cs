@@ -10,8 +10,7 @@ namespace ObservableData.Querying.Compatibility
     [PublicAPI]
     public sealed class NotifyCollectionEvents<T> :
         INotifyCollectionChanged,
-        INotifyPropertyChanged,
-        IObserver<IChange<ListOperation<T>>>
+        INotifyPropertyChanged
     {
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
@@ -21,35 +20,32 @@ namespace ObservableData.Querying.Compatibility
 
         public void OnError(Exception error) {}
 
-        public void OnNext([NotNull] IChange<ListOperation<T>> value)
+        public void OnOperation(ListOperation<T> value)
         {
-            foreach (var update in value.GetIterations())
+            switch (value.Type)
             {
-                switch (update.Type)
-                {
-                    case ListOperationType.Add:
-                        this.OnAdd(update);
-                        break;
+                case ListOperationType.Add:
+                    this.OnAdd(value);
+                    break;
 
-                    case ListOperationType.Remove:
-                        this.OnRemove(update);
-                        break;
+                case ListOperationType.Remove:
+                    this.OnRemove(value);
+                    break;
 
-                    case ListOperationType.Move:
-                        this.OnMove(update);
-                        break;
+                case ListOperationType.Move:
+                    this.OnMove(value);
+                    break;
 
-                    case ListOperationType.Replace:
-                        this.OnReplace(update);
-                        break;
+                case ListOperationType.Replace:
+                    this.OnReplace(value);
+                    break;
 
-                    case ListOperationType.Clear:
-                        this.OnClear();
-                        return;
+                case ListOperationType.Clear:
+                    this.OnClear();
+                    return;
 
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
 

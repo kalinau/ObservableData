@@ -50,7 +50,7 @@ namespace ObservableData.Querying.Select
             }
         }
 
-        private sealed class ListChange<T, TAdaptee> : IChange<ListOperation<TAdaptee>>
+        public sealed class ListChange<T, TAdaptee> : IChange<ListOperation<TAdaptee>>
         {
             [NotNull] private readonly IChange<ListOperation<T>> _adaptee;
             [NotNull] private readonly Func<T, TAdaptee> _selector;
@@ -111,7 +111,7 @@ namespace ObservableData.Querying.Select
             }
         }
 
-        private sealed class ListAdapter<T, TAdaptee> : IReadOnlyList<TAdaptee>
+        public sealed class ListAdapter<T, TAdaptee> : IReadOnlyList<TAdaptee>
         {
             [NotNull] private readonly IReadOnlyList<T> _source;
             [NotNull] private readonly Func<T, TAdaptee> _selector;
