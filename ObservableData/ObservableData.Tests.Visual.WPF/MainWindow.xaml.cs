@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using ObservableData.Structures;
 using ObservableData.Querying;
 using ObservableData.Structures.Lists;
@@ -16,11 +17,6 @@ using ObservableData.Tests.Core;
 
 namespace ObservableData.Tests.Visual
 {
-    public struct S
-    {
-        public int Value { get; set; }
-    }
-
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
@@ -28,31 +24,30 @@ namespace ObservableData.Tests.Visual
     {
         private StringBuilder _stringBuilder = new StringBuilder();
         private readonly ObservableList<TestEntity> _source = new ObservableList<TestEntity>();
+        private IDisposable _transaction;
+        private Action _validate;
 
         public MainWindow()
         {
             this.InitializeComponent();
 
-            var sourceSub = _source.ToBindableList(out var bindableSource);
-            this.SourceList.ItemsSource = bindableSource;
+            this.SourceList.ItemsSource = _source;
 
             _source
                 .AsListChangesPlusState()
-                .ForSelectConstant(x => x.Value)
+                .ForSelectImmutable(x => x.Value)
                 .ToBindableStateProxy(out var state);
             this.AddListView(state);
 
-
-            var result = new ObservableCollection<int>();
+            var result = new ObservableCollection<TestEntity>();
             this.AddListView(result);
             _source
                 .AsCollectionChanges()
-                .ForSelectConstant(x => x.Value)
-                .ForWhereByImmutable(x => x > 5)
+                .ForWhereByImmutable(x => x.Value > 5)
                 .Subscribe(x => x.ApplyTo(result));
         }
 
-        private void AddListView(IEnumerable source)
+        private ListView AddListView(IEnumerable source)
         {
             var panel = this.ListsPanel;
             var listView = new ListView()
@@ -67,6 +62,7 @@ namespace ObservableData.Tests.Visual
             listView.SetValue(Grid.ColumnProperty, panel.ColumnDefinitions.Count);
             panel.ColumnDefinitions.Add(new ColumnDefinition() {Width = new GridLength(1, GridUnitType.Star)});
             panel.Children.Add(listView);
+            return listView;
         }
 
         private static bool TryGetInt(TextBox textBox, out int value)
@@ -101,7 +97,6 @@ namespace ObservableData.Tests.Visual
             }
         }
 
-
         private void ToValueSelectedState(TestEntity entity)
         {
             this.CollapseButtons();
@@ -116,16 +111,28 @@ namespace ObservableData.Tests.Visual
 
         private void ToDefaultState()
         {
+            this.SourceList.ItemsSource = null;
+            this.SourceList.ItemsSource = _source;
+            if (_transaction != null)
+            {
+                _validate?.Invoke();
+            }
             this.CollapseButtons();
             this.AddButton.Visibility = Visibility.Visible;
             this.AddRangeButton.Visibility = Visibility.Visible;
             this.ClearButton.Visibility = Visibility.Visible;
             this.ResetButton.Visibility = Visibility.Visible;
 
+            this.TransactionButton.Visibility = Visibility.Visible;
+            this.TransactionButton.Content = _transaction == null
+                ? "Start Transaction"
+                : "Stop Transaction";
+
             this.Index.Text = string.Empty;
             this.Value.Text = string.Empty;
             this.SourceList.SelectedItem = null;
         }
+
 
         private void OnAdd(object sender, RoutedEventArgs e)
         {
@@ -140,6 +147,7 @@ namespace ObservableData.Tests.Visual
                     _source.Add(new TestEntity(value));
                 }
             }
+            this.ToDefaultState();
         }
 
         private void OnAddRangeClick(object sender, RoutedEventArgs e)
@@ -148,6 +156,7 @@ namespace ObservableData.Tests.Visual
             {
                 _source.Add(new[] { new TestEntity(value), new TestEntity(value + 1) });
             }
+            this.ToDefaultState();
         }
 
         private void OnSelected(object sender, SelectionChangedEventArgs e)
@@ -213,6 +222,7 @@ namespace ObservableData.Tests.Visual
         private void OnClearClick(object sender, RoutedEventArgs e)
         {
             _source.Clear();
+            this.ToDefaultState();
         }
 
         private void OnResetClick(object sender, RoutedEventArgs e)
@@ -221,6 +231,22 @@ namespace ObservableData.Tests.Visual
             {
                 _source.Reset(new[] { new TestEntity(value), new TestEntity(value + 1) });
             }
+            this.ToDefaultState();
+        }
+
+        private void OnTransactionClick(object sender, RoutedEventArgs e)
+        {
+            if (_transaction == null)
+            {
+                _transaction = _source.StartBatchUpdate();
+            }
+            else
+            {
+                var transaction = _transaction;
+                _transaction = null;
+                transaction.Dispose();
+            }
+            this.ToDefaultState();
         }
     }
 }

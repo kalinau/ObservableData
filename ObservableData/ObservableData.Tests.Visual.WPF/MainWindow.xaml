@@ -58,6 +58,11 @@
                         Click="OnResetClick"
                         Content="Reset" />
                     <Button
+                        x:Name="TransactionButton"
+                        Padding="12"
+                        Click="OnTransactionClick"
+                        Content="Start transaction" />
+                    <Button
                         x:Name="UpdateValueButton"
                         Visibility="Collapsed"
                         Padding="12"

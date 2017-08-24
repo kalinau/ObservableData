@@ -45,9 +45,10 @@ namespace ObservableData.Querying
         public static IObservable<CollectionChangePlusState<T>> AsCollectionData<T>(
             [NotNull] this IObservable<ListChangePlusState<T>> previous)
         {
-            return previous.Select(x => new CollectionChangePlusState<T>(
-                new ListChangeAdapter<T>(x.Change),
-                x.ReachedState))
+            return previous.Select(x =>
+                    new CollectionChangePlusState<T>(
+                        new ListChangeAdapter<T>(x.Change),
+                        x.ReachedState))
                 .NotNull();
         }
 

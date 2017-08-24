@@ -54,7 +54,7 @@ namespace ObservableData.Querying.Select
                         break;
 
                     case ListOperationType.Replace:
-                        state.OnRemove(update.Item, ref removedOnChange);
+                        state.OnRemove(update.ChangedItem, ref removedOnChange);
                         state.OnAdd(update.Item, func, removedOnChange);
                         break;
 
