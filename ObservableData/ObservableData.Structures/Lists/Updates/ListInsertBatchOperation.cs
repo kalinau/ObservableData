@@ -83,7 +83,7 @@ namespace ObservableData.Structures.Lists.Updates
             Func<IListRemoveOperation<T>, TResult> onRemove, 
             Func<IListReplaceOperation<T>, TResult> onReplace, 
             Func<IListMoveOperation<T>, TResult> onMove,
-            Func<IListResetOperation<T>, TResult> onReset)
+            Func<IListClearOperation<T>, TResult> onReset)
         {
             return onInsert.Invoke(this);
         }
@@ -93,7 +93,7 @@ namespace ObservableData.Structures.Lists.Updates
             Action<IListRemoveOperation<T>> onRemove, 
             Action<IListReplaceOperation<T>> onReplace,
             Action<IListMoveOperation<T>> onMove,
-            Action<IListResetOperation<T>> onReset)
+            Action<IListClearOperation<T>> onReset)
         {
             onInsert?.Invoke(this);
         }
@@ -102,7 +102,7 @@ namespace ObservableData.Structures.Lists.Updates
             Func<ICollectionInsertOperation<T>, TResult> onInsert, 
             Func<ICollectionRemoveOperation<T>, TResult> onRemove,
             Func<ICollectionReplaceOperation<T>, TResult> onReplace,
-            Func<ICollectionResetOperation<T>, TResult> onReset)
+            Func<ICollectionClearOperation<T>, TResult> onReset)
         {
             return onInsert.Invoke(this);
         }
@@ -111,7 +111,7 @@ namespace ObservableData.Structures.Lists.Updates
             Action<ICollectionInsertOperation<T>> onInsert, 
             Action<ICollectionRemoveOperation<T>> onRemove, 
             Action<ICollectionReplaceOperation<T>> onReplace,
-            Action<ICollectionResetOperation<T>> onReset)
+            Action<ICollectionClearOperation<T>> onReset)
         {
             onInsert?.Invoke(this);
         }

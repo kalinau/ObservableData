@@ -53,11 +53,6 @@
                         Click="OnClearClick"
                         Content="Clear" />
                     <Button
-                        x:Name="ResetButton"
-                        Padding="12"
-                        Click="OnResetClick"
-                        Content="Reset" />
-                    <Button
                         x:Name="TransactionButton"
                         Padding="12"
                         Click="OnTransactionClick"

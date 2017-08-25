@@ -14,10 +14,18 @@ namespace ObservableData.Structures.Lists.Updates
 
         [CanBeNull] private ListBatchChange<T> _batch;
 
-        private bool ShouldNotify => _batch != null || _subject.HasObservers;
+        private bool ShouldTrackChange
+        {
+            get
+            {
+                if (_batch == null) return _subject.HasObservers;
+
+                return !_batch.IsReadOnly;
+            }
+        }
 
         [NotNull]
-        public IDisposable StartBatchUpdate()
+        public IDisposable StartBatchUpdate([NotNull] IReadOnlyList<T> list)
         {
             if (_batch != null)
             {
@@ -25,6 +33,13 @@ namespace ObservableData.Structures.Lists.Updates
             }
 
             var current = new ListBatchChange<T>();
+
+            if (list.Count == 0)
+            {
+                current.Add(new ListInsertBatchOperation<T>(list, 0));
+                current.IsReadOnly = true;
+            }
+
             _batch = current;
             return Disposable.Create(() =>
             {
@@ -35,34 +50,55 @@ namespace ObservableData.Structures.Lists.Updates
             }).NotNull();
         }
 
-        public void OnOperation(ListOperation<T> operation)
-        {
-            if (operation.Type == ListOperationType.Clear)
-            {
-                _batch?.Clear();
-            }
-            if (this.ShouldNotify)
-            {
-                var update = new QueryingOperationAdapter<T>(operation);
-                this.OnNext(update);
-            }
-        }
-
         public void OnAddBatch([NotNull] IReadOnlyCollection<T> items, int index)
         {
-            if (this.ShouldNotify)
+            if (this.ShouldTrackChange)
             {
                 var update = new ListInsertBatchOperation<T>(items, index);
                 this.OnNext(update);
             }
         }
 
-        public void OnReset([CanBeNull] IReadOnlyCollection<T> items)
+        public void OnAdd(T item, int index)
         {
-            _batch?.Clear();
-            if (this.ShouldNotify)
+            this.OnOperation(ListOperation<T>.OnAdd(item, index));
+        }
+
+        public void OnRemove(T item, int index)
+        {
+            this.OnOperation(ListOperation<T>.OnRemove(item, index));
+        }
+
+        public void OnClear([NotNull] IReadOnlyList<T> state)
+        {
+            if (_batch?.IsReadOnly == false)
             {
-                var update = new ListResetOperation<T>(items);
+                _batch?.Clear();
+                _batch.Add(new ListClearOperation<T>());
+                _batch.Add(new ListInsertBatchOperation<T>(state, 0));
+                _batch.IsReadOnly = true;
+            }
+            else
+            {
+                this.OnOperation(ListOperation<T>.OnClear());
+            }
+        }
+
+        public void OnMove(T item, int from, int to)
+        {
+            this.OnOperation(ListOperation<T>.OnMove(item, to, from));
+        }
+
+        public void OnReplace(T value, T changedItem, int index)
+        {
+            this.OnOperation(ListOperation<T>.OnReplace(value, changedItem, index));
+        }
+
+        private void OnOperation(ListOperation<T> operation)
+        {
+            if (this.ShouldTrackChange)
+            {
+                var update = new QueryingOperationAdapter<T>(operation);
                 this.OnNext(update);
             }
         }

@@ -13,13 +13,13 @@ namespace ObservableData.Structures
             [NotNull] Func<ICollectionInsertOperation<T>, TResult> onInsert,
             [NotNull] Func<ICollectionRemoveOperation<T>, TResult> onRemove,
             [NotNull] Func<ICollectionReplaceOperation<T>, TResult> onReplace,
-            [NotNull] Func<ICollectionResetOperation<T>, TResult> onReset);
+            [NotNull] Func<ICollectionClearOperation<T>, TResult> onReset);
 
         void Match(
             Action<ICollectionInsertOperation<T>> onInsert,
             Action<ICollectionRemoveOperation<T>> onRemove,
             Action<ICollectionReplaceOperation<T>> onReplace,
-            Action<ICollectionResetOperation<T>> onReset);
+            Action<ICollectionClearOperation<T>> onReset);
     }
 
     public interface ICollectionInsertOperation<out T> : ICollectionOperation<T>
@@ -40,10 +40,8 @@ namespace ObservableData.Structures
         T ReplacedItem { get; }
     }
 
-    public interface ICollectionResetOperation<out T> : ICollectionOperation<T>
+    public interface ICollectionClearOperation<out T> : ICollectionOperation<T>
     {
-        [CanBeNull]
-        IReadOnlyCollection<T> Items { get; }
     }
 
     [PublicAPI]
@@ -88,16 +86,9 @@ namespace ObservableData.Structures
 
         [NotNull]
         public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
-            [NotNull] this ICollectionResetOperation<T> reset)
+            [NotNull] this ICollectionClearOperation<T> clear)
         {
             yield return CollectionOperation<T>.OnClear();
-            if (reset.Items != null)
-            {
-                foreach (var item in reset.Items)
-                {
-                    yield return CollectionOperation<T>.OnAdd(item);
-                }
-            }
         }
     }
 }

@@ -15,14 +15,14 @@ namespace ObservableData.Structures
             [NotNull] Func<IListRemoveOperation<T>, TResult> onRemove,
             [NotNull] Func<IListReplaceOperation<T>, TResult> onReplace,
             [NotNull] Func<IListMoveOperation<T>, TResult> onMove,
-            [NotNull] Func<IListResetOperation<T>, TResult> onReset);
+            [NotNull] Func<IListClearOperation<T>, TResult> onReset);
 
         void Match(
             Action<IListInsertOperation<T>> onInsert,
             Action<IListRemoveOperation<T>> onRemove,
             Action<IListReplaceOperation<T>> onReplace,
             Action<IListMoveOperation<T>> onMove,
-            Action<IListResetOperation<T>> onReset);
+            Action<IListClearOperation<T>> onReset);
     }
 
     [PublicAPI]
@@ -63,10 +63,8 @@ namespace ObservableData.Structures
     }
 
     [PublicAPI]
-    public interface IListResetOperation<out T> : IListOperation<T>
+    public interface IListClearOperation<out T> : IListOperation<T>
     {
-        [CanBeNull]
-        IReadOnlyCollection<T> Items { get; }
     }
 
     [PublicAPI]
@@ -119,17 +117,9 @@ namespace ObservableData.Structures
 
         [NotNull]
         public static IEnumerable<ListOperation<T>> AsForListQuerying<T>(
-            [NotNull] this IListResetOperation<T> reset)
+            [NotNull] this IListClearOperation<T> clear)
         {
             yield return ListOperation<T>.OnClear();
-            var index = 0;
-            if (reset.Items != null)
-            {
-                foreach (var item in reset.Items)
-                {
-                    yield return ListOperation<T>.OnAdd(item, index++);
-                }
-            }
         }
 
         [NotNull]
@@ -179,16 +169,9 @@ namespace ObservableData.Structures
 
         [NotNull]
         public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
-            [NotNull] this IListResetOperation<T> reset)
+            [NotNull] this IListClearOperation<T> clear)
         {
             yield return CollectionOperation<T>.OnClear();
-            if (reset.Items != null)
-            {
-                foreach (var item in reset.Items)
-                {
-                    yield return CollectionOperation<T>.OnAdd(item);
-                }
-            }
         }
     }
 }

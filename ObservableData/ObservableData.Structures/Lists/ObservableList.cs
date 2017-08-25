@@ -42,7 +42,7 @@ namespace ObservableData.Structures.Lists
             {
                 var changedItem = _list[index];
                 _list[index] = value;
-                _subject.OnOperation(ListOperation<T>.OnReplace(value, changedItem, index));
+                _subject.OnReplace(value, changedItem, index);
             }
         }
 
@@ -56,14 +56,14 @@ namespace ObservableData.Structures.Lists
 
         public int IndexOf(T item) => _list.IndexOf(item);
 
-        public IDisposable StartBatchUpdate() => _subject.StartBatchUpdate();
+        public IDisposable StartBatchUpdate() => _subject.StartBatchUpdate(_list);
 
         public bool Replace(T oldItem, T newItem)
         {
             var index = this.IndexOf(oldItem);
             if (index == -1) return false;
             _list[index] = newItem;
-            _subject.OnOperation(ListOperation<T>.OnReplace(newItem, oldItem, index));
+            _subject.OnReplace(newItem, oldItem, index);
             return true;
         }
 
@@ -71,14 +71,14 @@ namespace ObservableData.Structures.Lists
         {
             var index = _list.Count;
             _list.Add(item);
-            _subject.OnOperation(ListOperation<T>.OnAdd(item, index));
+            _subject.OnAdd(item, index);
         }
 
         public void Clear()
         {
             if (_list.Count == 0) return;
             _list.Clear();
-            _subject.OnReset(null);
+            _subject.OnClear(_list);
         }
 
         public bool Remove(T item)
@@ -102,14 +102,14 @@ namespace ObservableData.Structures.Lists
             var item = _list[from];
             _list.RemoveAt(from);
             _list.Insert(to, item);
-            _subject.OnOperation(ListOperation<T>.OnMove(item, to, from));
+            _subject.OnMove(item, from, to);
         }
 
         public void Insert(int index, T item)
         {
             ListIndex.Check(index, this.Count + 1);
             _list.Insert(index, item);
-            _subject.OnOperation(ListOperation<T>.OnAdd(item, index));
+            _subject.OnAdd(item, index);
         }
 
         public void RemoveAt(int index)
@@ -117,22 +117,7 @@ namespace ObservableData.Structures.Lists
             ListIndex.Check(index, _list.Count);
             var item = _list[index];
             _list.RemoveAt(index);
-            _subject.OnOperation(ListOperation<T>.OnRemove(item, index));
-        }
-
-        public void Reset(IReadOnlyCollection<T> items)
-        {
-            if (_list.Count == 0)
-            {
-                _list.AddRange(items);
-                _subject.OnAddBatch(items, 0);
-            }
-            else
-            {
-                _list.Clear();
-                _list.AddRange(items);
-                _subject.OnReset(items);
-            }
+            _subject.OnRemove(item, index);
         }
 
         public void Add(IReadOnlyCollection<T> items)

@@ -121,7 +121,6 @@ namespace ObservableData.Tests.Visual
             this.AddButton.Visibility = Visibility.Visible;
             this.AddRangeButton.Visibility = Visibility.Visible;
             this.ClearButton.Visibility = Visibility.Visible;
-            this.ResetButton.Visibility = Visibility.Visible;
 
             this.TransactionButton.Visibility = Visibility.Visible;
             this.TransactionButton.Content = _transaction == null
@@ -222,15 +221,6 @@ namespace ObservableData.Tests.Visual
         private void OnClearClick(object sender, RoutedEventArgs e)
         {
             _source.Clear();
-            this.ToDefaultState();
-        }
-
-        private void OnResetClick(object sender, RoutedEventArgs e)
-        {
-            if (this.TryGetValue(out var value))
-            {
-                _source.Reset(new[] { new TestEntity(value), new TestEntity(value + 1) });
-            }
             this.ToDefaultState();
         }
 

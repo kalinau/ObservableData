@@ -8,6 +8,8 @@ namespace ObservableData.Structures.Lists.Updates
         private IListChangeNode<T> _first;
         private IListChangeNode<T> _last;
 
+        public bool IsReadOnly { get; set; }
+
         public void Add(IListChangeNode<T> update)
         {
             if (_last == null)
@@ -27,7 +29,6 @@ namespace ObservableData.Structures.Lists.Updates
             _last = null;
             _first = null;
         }
-
 
         void IChange<ICollectionOperation<T>>.MakeImmutable()
         {
@@ -72,7 +73,6 @@ namespace ObservableData.Structures.Lists.Updates
                 next = next.Next;
             }
         }
-
 
         IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.GetIterations()
         {
@@ -129,5 +129,6 @@ namespace ObservableData.Structures.Lists.Updates
                 next = next.Next;
             }
         }
+
     }
 }
