@@ -71,12 +71,15 @@ namespace ObservableData.Structures.Lists.Updates
 
         public void OnClear([NotNull] IReadOnlyList<T> state)
         {
-            if (_batch?.IsReadOnly == false)
+            if (_batch != null)
             {
-                _batch?.Clear();
-                _batch.Add(new ListClearOperation<T>());
-                _batch.Add(new ListInsertBatchOperation<T>(state, 0));
-                _batch.IsReadOnly = true;
+                if (!_batch.IsReadOnly)
+                {
+                    _batch?.Clear();
+                    _batch.Add(ListClearOperation<T>.Instance);
+                    _batch.Add(new ListInsertBatchOperation<T>(state, 0));
+                    _batch.IsReadOnly = true;
+                }
             }
             else
             {

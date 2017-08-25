@@ -9,7 +9,9 @@ namespace ObservableData.Structures.Lists.Updates
         IListClearOperation<T>, 
         ICollectionClearOperation<T>
     {
-        public ListClearOperation()
+        public static ListClearOperation<T> Instance { get; } = new ListClearOperation<T>();
+
+        private ListClearOperation()
         {
         }
 
