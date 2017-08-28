@@ -11,9 +11,4 @@ namespace ObservableData.Structures
         [NotNull]
         IObservable<IChange<ICollectionOperation<T>>> WhenUpdated { get; }
     }
-
-    [PublicAPI]
-    public static class ReadOnlyCollectionExtensions
-    {
-    }
 }

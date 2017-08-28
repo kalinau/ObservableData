@@ -71,7 +71,7 @@ namespace ObservableData.Structures.Lists.Updates
 
         IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
         {
-            return _adaptee.AsForCollection();
+            return _adaptee.AsCollectionOpperations();
         }
 
         IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
@@ -84,7 +84,7 @@ namespace ObservableData.Structures.Lists.Updates
             Func<IListRemoveOperation<T>, TResult> onRemove, 
             Func<IListReplaceOperation<T>, TResult> onReplace, 
             Func<IListMoveOperation<T>, TResult> onMove, 
-            Func<IListClearOperation<T>, TResult> onReset)
+            Func<IListClearOperation<T>, TResult> onClear)
         {
             switch (_adaptee.Type)
             {
@@ -101,7 +101,7 @@ namespace ObservableData.Structures.Lists.Updates
                     return onReplace(this);
 
                 case ListOperationType.Clear:
-                    return onReset(this);
+                    return onClear(this);
 
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -113,7 +113,7 @@ namespace ObservableData.Structures.Lists.Updates
             Action<IListRemoveOperation<T>> onRemove, 
             Action<IListReplaceOperation<T>> onReplace, 
             Action<IListMoveOperation<T>> onMove, 
-            Action<IListClearOperation<T>> onReset)
+            Action<IListClearOperation<T>> onClear)
         {
             switch (_adaptee.Type)
             {
@@ -134,7 +134,7 @@ namespace ObservableData.Structures.Lists.Updates
                     break;
 
                 case ListOperationType.Clear:
-                    onReset?.Invoke(this);
+                    onClear?.Invoke(this);
                     break;
 
                 default:
@@ -146,7 +146,7 @@ namespace ObservableData.Structures.Lists.Updates
             Func<ICollectionInsertOperation<T>, TResult> onInsert, 
             Func<ICollectionRemoveOperation<T>, TResult> onRemove,
             Func<ICollectionReplaceOperation<T>, TResult> onReplace, 
-            Func<ICollectionClearOperation<T>, TResult> onReset)
+            Func<ICollectionClearOperation<T>, TResult> onClear)
         {
             switch (_adaptee.Type)
             {
@@ -157,7 +157,7 @@ namespace ObservableData.Structures.Lists.Updates
                     return onRemove(this);
 
                 case ListOperationType.Clear:
-                    return onReset(this);
+                    return onClear(this);
 
                 case ListOperationType.Replace:
                 case ListOperationType.Move:
@@ -170,7 +170,7 @@ namespace ObservableData.Structures.Lists.Updates
             Action<ICollectionInsertOperation<T>> onInsert, 
             Action<ICollectionRemoveOperation<T>> onRemove, 
             Action<ICollectionReplaceOperation<T>> onReplace,
-            Action<ICollectionClearOperation<T>> onReset)
+            Action<ICollectionClearOperation<T>> onClear)
         {
             switch (_adaptee.Type)
             {
@@ -183,7 +183,7 @@ namespace ObservableData.Structures.Lists.Updates
                     break;
 
                 case ListOperationType.Clear:
-                    onReset?.Invoke(this);
+                    onClear?.Invoke(this);
                     break;
 
                 case ListOperationType.Replace:
@@ -233,12 +233,12 @@ namespace ObservableData.Structures.Lists.Updates
         {
             public T Item { get; set; }
 
-            public TResult Match<TResult>(Func<ICollectionInsertOperation<T>, TResult> onInsert, Func<ICollectionRemoveOperation<T>, TResult> onRemove, Func<ICollectionReplaceOperation<T>, TResult> onReplace, Func<ICollectionClearOperation<T>, TResult> onReset)
+            public TResult Match<TResult>(Func<ICollectionInsertOperation<T>, TResult> onInsert, Func<ICollectionRemoveOperation<T>, TResult> onRemove, Func<ICollectionReplaceOperation<T>, TResult> onReplace, Func<ICollectionClearOperation<T>, TResult> onClear)
             {
                 return onRemove(this);
             }
 
-            public void Match(Action<ICollectionInsertOperation<T>> onInsert, Action<ICollectionRemoveOperation<T>> onRemove, Action<ICollectionReplaceOperation<T>> onReplace, Action<ICollectionClearOperation<T>> onReset)
+            public void Match(Action<ICollectionInsertOperation<T>> onInsert, Action<ICollectionRemoveOperation<T>> onRemove, Action<ICollectionReplaceOperation<T>> onReplace, Action<ICollectionClearOperation<T>> onClear)
             {
                 onRemove?.Invoke(this);
             }
@@ -256,12 +256,12 @@ namespace ObservableData.Structures.Lists.Updates
 
             public IReadOnlyCollection<T> Items => _items;
 
-            public TResult Match<TResult>(Func<ICollectionInsertOperation<T>, TResult> onInsert, Func<ICollectionRemoveOperation<T>, TResult> onRemove, Func<ICollectionReplaceOperation<T>, TResult> onReplace, Func<ICollectionClearOperation<T>, TResult> onReset)
+            public TResult Match<TResult>(Func<ICollectionInsertOperation<T>, TResult> onInsert, Func<ICollectionRemoveOperation<T>, TResult> onRemove, Func<ICollectionReplaceOperation<T>, TResult> onReplace, Func<ICollectionClearOperation<T>, TResult> onClear)
             {
                 return onInsert(this);
             }
 
-            public void Match(Action<ICollectionInsertOperation<T>> onInsert, Action<ICollectionRemoveOperation<T>> onRemove, Action<ICollectionReplaceOperation<T>> onReplace, Action<ICollectionClearOperation<T>> onReset)
+            public void Match(Action<ICollectionInsertOperation<T>> onInsert, Action<ICollectionRemoveOperation<T>> onRemove, Action<ICollectionReplaceOperation<T>> onReplace, Action<ICollectionClearOperation<T>> onClear)
             {
                 onInsert?.Invoke(this);
             }

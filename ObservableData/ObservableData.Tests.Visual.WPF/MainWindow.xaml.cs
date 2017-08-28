@@ -9,7 +9,6 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using ObservableData.Structures;
 using ObservableData.Querying;
 using ObservableData.Structures.Lists;
@@ -33,17 +32,30 @@ namespace ObservableData.Tests.Visual
 
             this.SourceList.ItemsSource = _source;
 
-            _source
-                .AsListChangesPlusState()
-                .ForSelectImmutable(x => x.Value)
-                .ToBindableStateProxy(out var state);
-            this.AddListView(state);
+            _source.Add(new [] {new TestEntity(12),new TestEntity(21)  });
+
+            _source.WhenUpdated
+                .SelectQueryingListChanges()
+                .WithState(_source)
+                .ToBindableStateProxy(out var bindableSource);
+
+            this.AddListView(bindableSource);
+
+            _source.WhenUpdated
+                .SelectQueryingListChanges()
+                .StartWith(_source)
+                .WithState(_source)
+                .Select(x => x.Value)
+                .ToBindableStateProxy(out var projection);
+
+            this.AddListView(projection);
 
             var result = new ObservableCollection<TestEntity>();
             this.AddListView(result);
-            _source
-                .AsCollectionChanges()
-                .ForWhereByImmutable(x => x.Value > 5)
+            _source.WhenUpdated
+                .SelectQueryingCollectionChanges()
+                .StartWith(_source)
+                .Where(x => x.Value > 5)
                 .Subscribe(x => x.ApplyTo(result));
         }
 

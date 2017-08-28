@@ -13,13 +13,13 @@ namespace ObservableData.Structures
             [NotNull] Func<ICollectionInsertOperation<T>, TResult> onInsert,
             [NotNull] Func<ICollectionRemoveOperation<T>, TResult> onRemove,
             [NotNull] Func<ICollectionReplaceOperation<T>, TResult> onReplace,
-            [NotNull] Func<ICollectionClearOperation<T>, TResult> onReset);
+            [NotNull] Func<ICollectionClearOperation<T>, TResult> onClear);
 
         void Match(
             Action<ICollectionInsertOperation<T>> onInsert,
             Action<ICollectionRemoveOperation<T>> onRemove,
             Action<ICollectionReplaceOperation<T>> onReplace,
-            Action<ICollectionClearOperation<T>> onReset);
+            Action<ICollectionClearOperation<T>> onClear);
     }
 
     public interface ICollectionInsertOperation<out T> : ICollectionOperation<T>
@@ -48,19 +48,19 @@ namespace ObservableData.Structures
     public static class CollectionOperationExtensions
     {
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this ICollectionOperation<T> operation)
         {
             return operation.Match(
-                AsForCollectionQuerying,
-                AsForCollectionQuerying,
-                AsForCollectionQuerying,
-                AsForCollectionQuerying
+                AsQueryingCollectionOperations,
+                AsQueryingCollectionOperations,
+                AsQueryingCollectionOperations,
+                AsQueryingCollectionOperations
             ).NotNull();
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this ICollectionInsertOperation<T> insert)
         {
             foreach (var item in insert.Items)
@@ -70,14 +70,14 @@ namespace ObservableData.Structures
 }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this ICollectionRemoveOperation<T> remove)
         {
             yield return CollectionOperation<T>.OnRemove(remove.Item);
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this ICollectionReplaceOperation<T> replace)
         {
             yield return CollectionOperation<T>.OnRemove(replace.ReplacedItem);
@@ -85,7 +85,7 @@ namespace ObservableData.Structures
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this ICollectionClearOperation<T> clear)
         {
             yield return CollectionOperation<T>.OnClear();

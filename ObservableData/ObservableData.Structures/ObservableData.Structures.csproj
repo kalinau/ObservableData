@@ -1,13 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard1.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include=".Utils\Annotations.cs" />
-    <Compile Include=".Utils\ChangeExtensions.cs" />
-    <Compile Include=".Utils\ListIndex.cs" />
+    <Compile Include=".Utils\Index.cs" />
   </ItemGroup>
 
   <ItemGroup>

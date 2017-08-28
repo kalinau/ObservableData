@@ -57,7 +57,7 @@ namespace ObservableData.Querying
     public static class ListOperationExtensions
     {
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollection<T>(this ListOperation<T> operation)
+        public static IEnumerable<CollectionOperation<T>> AsCollectionOpperations<T>(this ListOperation<T> operation)
         {
             switch (operation.Type)
             {

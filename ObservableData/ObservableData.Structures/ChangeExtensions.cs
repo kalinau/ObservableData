@@ -1,31 +1,47 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using ObservableData.Querying;
+using ObservableData.Structures.Lists;
 
-namespace ObservableData.Structures.Utils
+namespace ObservableData.Structures
 {
     [PublicAPI]
     public static class ChangeExtensions
     {
         [NotNull]
-        public static IChange<ListOperation<T>> AsForListQuerying<T>(
+        public static IChange<ListOperation<T>> AsQueryingListChange<T>(
             [NotNull] this IChange<IListOperation<T>> change)
         {
             return new ListChangeAdapter<T>(change);
         }
 
         [NotNull]
-        public static IChange<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IChange<CollectionOperation<T>> AsQueryingCollectionChange<T>(
             [NotNull] this IChange<IListOperation<T>> change)
         {
             return new ListChangeAdapter<T>(change);
         }
 
         [NotNull]
-        public static IChange<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IChange<CollectionOperation<T>> AsQueryingCollectionChange<T>(
             [NotNull] this IChange<ICollectionOperation<T>> change)
         {
             return new CollectionChangeAdapter<T>(change);
+        }
+
+        [NotNull]
+        public static IObservable<IChange<ListOperation<T>>> SelectQueryingListChanges<T>(
+            [NotNull] this IObservable<IListChange<T>> observable)
+        {
+            return observable;
+        }
+
+        [NotNull]
+        public static IObservable<IChange<CollectionOperation<T>>> SelectQueryingCollectionChanges<T>(
+            [NotNull] this IObservable<IListChange<T>> observable)
+        {
+            return observable;
         }
 
         private sealed class ListChangeAdapter<T> :
@@ -45,7 +61,7 @@ namespace ObservableData.Structures.Utils
             {
                 foreach (var i in _adaptee.GetIterations())
                 {
-                    foreach (var o in i.AsForCollectionQuerying())
+                    foreach (var o in i.AsQueryingCollectionOperations())
                     {
                         yield return o;
                     }
@@ -56,7 +72,7 @@ namespace ObservableData.Structures.Utils
             {
                 foreach (var i in _adaptee.GetIterations())
                 {
-                    var operations = i.AsForListQuerying();
+                    var operations = i.AsQueryingListOperations();
                     foreach (var o in operations)
                     {
                         yield return o;
@@ -81,7 +97,7 @@ namespace ObservableData.Structures.Utils
             {
                 foreach (var i in _adaptee.GetIterations())
                 {
-                    foreach (var o in i.AsForCollectionQuerying())
+                    foreach (var o in i.AsQueryingCollectionOperations())
                     {
                         yield return o;
                     }

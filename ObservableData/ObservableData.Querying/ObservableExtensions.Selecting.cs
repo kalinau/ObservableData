@@ -10,7 +10,7 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IChange<CollectionOperation<T>>> ForSelectConstant<TPrevious, T>(
+        public static IObservable<IChange<CollectionOperation<T>>> SelectConstant<TPrevious, T>(
             [NotNull] this IObservable<IChange<CollectionOperation<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -24,7 +24,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> ForSelectConstant<TPrevious, T>(
+        public static IObservable<CollectionChangePlusState<T>> SelectConstant<TPrevious, T>(
             [NotNull] this IObservable<CollectionChangePlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -38,7 +38,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<IChange<ListOperation<T>>> ForSelectConstant<TPrevious, T>(
+        public static IObservable<IChange<ListOperation<T>>> SelectConstant<TPrevious, T>(
             [NotNull] this IObservable<IChange<ListOperation<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -52,7 +52,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ListChangePlusState<T>> ForSelectConstant<TPrevious, T>(
+        public static IObservable<ListChangePlusState<T>> SelectConstant<TPrevious, T>(
             [NotNull] this IObservable<ListChangePlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -66,7 +66,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> ForSelectImmutable<TPrevious, T>(
+        public static IObservable<CollectionChangePlusState<T>> Select<TPrevious, T>(
             [NotNull] this IObservable<IChange<CollectionOperation<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -80,15 +80,15 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> ForSelectImmutable<TPrevious, T>(
+        public static IObservable<CollectionChangePlusState<T>> Select<TPrevious, T>(
             [NotNull] this IObservable<CollectionChangePlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return previous.Select(x => x.Change).NotNull().ForSelectImmutable(func);
+            return previous.Select(x => x.Change).NotNull().Select(func);
         }
 
         [NotNull]
-        public static IObservable<IChange<ListOperation<T>>> ForSelectImmutable<TPrevious, T>(
+        public static IObservable<IChange<ListOperation<T>>> Select<TPrevious, T>(
             [NotNull] this IObservable<IChange<ListOperation<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -102,7 +102,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ListChangePlusState<T>> ForSelectImmutable<TPrevious, T>(
+        public static IObservable<ListChangePlusState<T>> Select<TPrevious, T>(
             [NotNull] this IObservable<ListChangePlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {

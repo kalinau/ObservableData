@@ -129,6 +129,5 @@ namespace ObservableData.Structures.Lists.Updates
                 next = next.Next;
             }
         }
-
     }
 }

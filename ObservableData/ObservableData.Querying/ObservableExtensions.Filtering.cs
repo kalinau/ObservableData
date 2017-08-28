@@ -11,7 +11,7 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IChange<CollectionOperation<T>>> ForWhereByImmutable<T>(
+        public static IObservable<IChange<CollectionOperation<T>>> Where<T>(
             [NotNull] this IObservable<IChange<CollectionOperation<T>>> previous,
             [NotNull] Func<T, bool> criterion)
         {
@@ -25,7 +25,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> ForWhereByImmutable<T>(
+        public static IObservable<CollectionChangePlusState<T>> Where<T>(
             [NotNull] this IObservable<CollectionChangePlusState<T>> previous,
             [NotNull] Func<T, bool> criterion)
         {

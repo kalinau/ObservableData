@@ -11,7 +11,6 @@ namespace ObservableData.Structures.Lists.Updates
     internal class ListChangesSubject<T> : IObservable<IListChange<T>>
     {
         [NotNull] private readonly Subject<IListChange<T>> _subject = new Subject<IListChange<T>>();
-
         [CanBeNull] private ListBatchChange<T> _batch;
 
         private bool ShouldTrackChange
@@ -69,6 +68,16 @@ namespace ObservableData.Structures.Lists.Updates
             this.OnOperation(ListOperation<T>.OnRemove(item, index));
         }
 
+        public void OnMove(T item, int from, int to)
+        {
+            this.OnOperation(ListOperation<T>.OnMove(item, to, from));
+        }
+
+        public void OnReplace(T value, T changedItem, int index)
+        {
+            this.OnOperation(ListOperation<T>.OnReplace(value, changedItem, index));
+        }
+
         public void OnClear([NotNull] IReadOnlyList<T> state)
         {
             if (_batch != null)
@@ -85,16 +94,6 @@ namespace ObservableData.Structures.Lists.Updates
             {
                 this.OnOperation(ListOperation<T>.OnClear());
             }
-        }
-
-        public void OnMove(T item, int from, int to)
-        {
-            this.OnOperation(ListOperation<T>.OnMove(item, to, from));
-        }
-
-        public void OnReplace(T value, T changedItem, int index)
-        {
-            this.OnOperation(ListOperation<T>.OnReplace(value, changedItem, index));
         }
 
         private void OnOperation(ListOperation<T> operation)

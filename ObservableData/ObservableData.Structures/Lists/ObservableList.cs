@@ -95,8 +95,8 @@ namespace ObservableData.Structures.Lists
 
         public void Move(int from, int to)
         {
-            ListIndex.Check(from, this.Count);
-            ListIndex.Check(to, this.Count);
+            Index.Check(from, this.Count);
+            Index.Check(to, this.Count);
             if (from == to) return;
 
             var item = _list[from];
@@ -107,14 +107,14 @@ namespace ObservableData.Structures.Lists
 
         public void Insert(int index, T item)
         {
-            ListIndex.Check(index, this.Count + 1);
+            Index.Check(index, this.Count + 1);
             _list.Insert(index, item);
             _subject.OnAdd(item, index);
         }
 
         public void RemoveAt(int index)
         {
-            ListIndex.Check(index, _list.Count);
+            Index.Check(index, _list.Count);
             var item = _list[index];
             _list.RemoveAt(index);
             _subject.OnRemove(item, index);

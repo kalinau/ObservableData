@@ -21,7 +21,7 @@ namespace ObservableData.Querying
             {
                 foreach (var i in _adaptee.GetIterations())
                 {
-                    foreach (var operation in i.AsForCollection())
+                    foreach (var operation in i.AsCollectionOpperations())
                     {
                         yield return operation;
                     }

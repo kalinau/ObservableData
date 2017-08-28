@@ -15,14 +15,14 @@ namespace ObservableData.Structures
             [NotNull] Func<IListRemoveOperation<T>, TResult> onRemove,
             [NotNull] Func<IListReplaceOperation<T>, TResult> onReplace,
             [NotNull] Func<IListMoveOperation<T>, TResult> onMove,
-            [NotNull] Func<IListClearOperation<T>, TResult> onReset);
+            [NotNull] Func<IListClearOperation<T>, TResult> onClear);
 
         void Match(
             Action<IListInsertOperation<T>> onInsert,
             Action<IListRemoveOperation<T>> onRemove,
             Action<IListReplaceOperation<T>> onReplace,
             Action<IListMoveOperation<T>> onMove,
-            Action<IListClearOperation<T>> onReset);
+            Action<IListClearOperation<T>> onClear);
     }
 
     [PublicAPI]
@@ -71,20 +71,20 @@ namespace ObservableData.Structures
     public static class ListOperationExtensions
     {
         [NotNull]
-        public static IEnumerable<ListOperation<T>> AsForListQuerying<T>(
+        public static IEnumerable<ListOperation<T>> AsQueryingListOperations<T>(
             [NotNull] this IListOperation<T> operation)
         {
             return operation.Match(
-                AsForListQuerying,
-                AsForListQuerying,
-                AsForListQuerying,
-                AsForListQuerying,
-                AsForListQuerying
+                AsQueryingListOperations,
+                AsQueryingListOperations,
+                AsQueryingListOperations,
+                AsQueryingListOperations,
+                AsQueryingListOperations
             ).NotNull();
         }
 
         [NotNull]
-        public static IEnumerable<ListOperation<T>> AsForListQuerying<T>(
+        public static IEnumerable<ListOperation<T>> AsQueryingListOperations<T>(
             [NotNull] this IListInsertOperation<T> insert)
         {
             var index = insert.Index;
@@ -95,48 +95,48 @@ namespace ObservableData.Structures
         }
 
         [NotNull]
-        public static IEnumerable<ListOperation<T>> AsForListQuerying<T>(
+        public static IEnumerable<ListOperation<T>> AsQueryingListOperations<T>(
             [NotNull] this IListRemoveOperation<T> remove)
         {
             yield return ListOperation<T>.OnRemove(remove.Item, remove.Index);
         }
 
         [NotNull]
-        public static IEnumerable<ListOperation<T>> AsForListQuerying<T>(
+        public static IEnumerable<ListOperation<T>> AsQueryingListOperations<T>(
             [NotNull] this IListReplaceOperation<T> replace)
         {
             yield return ListOperation<T>.OnReplace(replace.Item, replace.ReplacedItem, replace.Index);
         }
 
         [NotNull]
-        public static IEnumerable<ListOperation<T>> AsForListQuerying<T>(
+        public static IEnumerable<ListOperation<T>> AsQueryingListOperations<T>(
             [NotNull] this IListMoveOperation<T> move)
         {
             yield return ListOperation<T>.OnMove(move.Item, move.To, move.From);
         }
 
         [NotNull]
-        public static IEnumerable<ListOperation<T>> AsForListQuerying<T>(
+        public static IEnumerable<ListOperation<T>> AsQueryingListOperations<T>(
             [NotNull] this IListClearOperation<T> clear)
         {
             yield return ListOperation<T>.OnClear();
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this IListOperation<T> operation)
         {
             return operation.Match(
-                AsForCollectionQuerying,
-                AsForCollectionQuerying,
-                AsForCollectionQuerying,
-                AsForCollectionQuerying,
-                AsForCollectionQuerying
+                AsQueryingCollectionOperations,
+                AsQueryingCollectionOperations,
+                AsQueryingCollectionOperations,
+                AsQueryingCollectionOperations,
+                AsQueryingCollectionOperations
             ).NotNull();
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this IListInsertOperation<T> insert)
         {
             foreach (var item in insert.Items)
@@ -146,14 +146,14 @@ namespace ObservableData.Structures
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this IListRemoveOperation<T> remove)
         {
             yield return CollectionOperation<T>.OnRemove(remove.Item);
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this IListReplaceOperation<T> replace)
         {
             yield return CollectionOperation<T>.OnRemove(replace.ReplacedItem);
@@ -161,14 +161,14 @@ namespace ObservableData.Structures
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this IListMoveOperation<T> move)
         {
             return Enumerable.Empty<CollectionOperation<T>>().NotNull();
         }
 
         [NotNull]
-        public static IEnumerable<CollectionOperation<T>> AsForCollectionQuerying<T>(
+        public static IEnumerable<CollectionOperation<T>> AsQueryingCollectionOperations<T>(
             [NotNull] this IListClearOperation<T> clear)
         {
             yield return CollectionOperation<T>.OnClear();

@@ -19,12 +19,12 @@ namespace ObservableData.Structures.Collections.Updates
             Func<ICollectionInsertOperation<T>, TResult> onInsert,
             Func<ICollectionRemoveOperation<T>, TResult> onRemove,
             Func<ICollectionReplaceOperation<T>, TResult> onReplace,
-            Func<ICollectionClearOperation<T>, TResult> onReset);
+            Func<ICollectionClearOperation<T>, TResult> onClear);
 
         public abstract void Match(
             Action<ICollectionInsertOperation<T>> onInsert,
             Action<ICollectionRemoveOperation<T>> onRemove,
             Action<ICollectionReplaceOperation<T>> onReplace,
-            Action<ICollectionClearOperation<T>> onReset);
+            Action<ICollectionClearOperation<T>> onClear);
     }
 }

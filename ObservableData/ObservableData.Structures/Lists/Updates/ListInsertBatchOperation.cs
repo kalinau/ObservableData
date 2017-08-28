@@ -7,7 +7,7 @@ using ObservableData.Querying.Utils;
 
 namespace ObservableData.Structures.Lists.Updates
 {
-    public sealed class ListInsertBatchOperation<T> :
+    internal sealed class ListInsertBatchOperation<T> :
         IListChangeNode<T>,
         IListInsertOperation<T>, 
         ICollectionInsertOperation<T>
@@ -83,7 +83,7 @@ namespace ObservableData.Structures.Lists.Updates
             Func<IListRemoveOperation<T>, TResult> onRemove, 
             Func<IListReplaceOperation<T>, TResult> onReplace, 
             Func<IListMoveOperation<T>, TResult> onMove,
-            Func<IListClearOperation<T>, TResult> onReset)
+            Func<IListClearOperation<T>, TResult> onClear)
         {
             return onInsert.Invoke(this);
         }
@@ -93,7 +93,7 @@ namespace ObservableData.Structures.Lists.Updates
             Action<IListRemoveOperation<T>> onRemove, 
             Action<IListReplaceOperation<T>> onReplace,
             Action<IListMoveOperation<T>> onMove,
-            Action<IListClearOperation<T>> onReset)
+            Action<IListClearOperation<T>> onClear)
         {
             onInsert?.Invoke(this);
         }
@@ -102,7 +102,7 @@ namespace ObservableData.Structures.Lists.Updates
             Func<ICollectionInsertOperation<T>, TResult> onInsert, 
             Func<ICollectionRemoveOperation<T>, TResult> onRemove,
             Func<ICollectionReplaceOperation<T>, TResult> onReplace,
-            Func<ICollectionClearOperation<T>, TResult> onReset)
+            Func<ICollectionClearOperation<T>, TResult> onClear)
         {
             return onInsert.Invoke(this);
         }
@@ -111,7 +111,7 @@ namespace ObservableData.Structures.Lists.Updates
             Action<ICollectionInsertOperation<T>> onInsert, 
             Action<ICollectionRemoveOperation<T>> onRemove, 
             Action<ICollectionReplaceOperation<T>> onReplace,
-            Action<ICollectionClearOperation<T>> onReset)
+            Action<ICollectionClearOperation<T>> onClear)
         {
             onInsert?.Invoke(this);
         }
