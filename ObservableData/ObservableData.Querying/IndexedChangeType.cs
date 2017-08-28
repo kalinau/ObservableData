@@ -1,6 +1,6 @@
 ﻿namespace ObservableData.Querying
 {
-    public enum ListOperationType
+    public enum IndexedChangeType
     {
         Add,
         Remove,

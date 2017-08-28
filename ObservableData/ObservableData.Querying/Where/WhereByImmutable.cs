@@ -14,18 +14,18 @@ namespace ObservableData.Querying.Where
             [NotNull] private readonly Func<T, bool> _criterion;
 
             public CollectionChangesObserver(
-                [NotNull] IObserver<IChange<CollectionOperation<T>>> previous,
+                [NotNull] IObserver<IBatch<GeneralChange<T>>> previous,
                 [NotNull] Func<T, bool> criterion) 
                 : base(previous)
             {
                 _criterion = criterion;
             }
 
-            public override void OnNext(IChange<CollectionOperation<T>> value)
+            public override void OnNext(IBatch<GeneralChange<T>> value)
             {
                 if (value == null) return;
 
-                this.Adaptee.OnNext(new CollectionChange<T>(value, _criterion));
+                this.Adaptee.OnNext(new CollectionChanges<T>(value, _criterion));
             }
         }
 
@@ -34,27 +34,27 @@ namespace ObservableData.Querying.Where
             [NotNull] private readonly Func<T, bool> _criterion;
 
             public CollectionDataObserver(
-                [NotNull] IObserver<CollectionChangePlusState<T>> previous,
+                [NotNull] IObserver<GeneralChangesPlusState<T>> previous,
                 [NotNull] Func<T, bool> criterion)
                 : base(previous)
             {
                 _criterion = criterion;
             }
-            public override void OnNext(CollectionChangePlusState<T> value)
+            public override void OnNext(GeneralChangesPlusState<T> value)
             {
-                var change = new CollectionChange<T>(value.Change, _criterion);
+                var change = new CollectionChanges<T>(value.Changes, _criterion);
                 var state = new CollectionAdapter<T>(value.ReachedState, _criterion);
-                this.Adaptee.OnNext(new CollectionChangePlusState<T>(change, state));
+                this.Adaptee.OnNext(new GeneralChangesPlusState<T>(change, state));
             }
         }
 
-        private sealed class CollectionChange<T> : IChange<CollectionOperation<T>>
+        private sealed class CollectionChanges<T> : IBatch<GeneralChange<T>>
         {
-            [NotNull] private readonly IChange<CollectionOperation<T>> _adaptee;
+            [NotNull] private readonly IBatch<GeneralChange<T>> _adaptee;
             [NotNull] private readonly Func<T, bool> _criterion;
 
-            public CollectionChange(
-                [NotNull] IChange<CollectionOperation<T>> adaptee,
+            public CollectionChanges(
+                [NotNull] IBatch<GeneralChange<T>> adaptee,
                 [NotNull] Func<T, bool> criterion)
             {
                 _adaptee = adaptee;
@@ -62,11 +62,11 @@ namespace ObservableData.Querying.Where
             }
             public void MakeImmutable() => _adaptee.MakeImmutable();
 
-            public IEnumerable<CollectionOperation<T>> GetIterations()
+            public IEnumerable<GeneralChange<T>> GetIterations()
             {
                 foreach (var update in _adaptee.GetIterations())
                 {
-                    if (update.Type == CollectionOperationType.Clear)
+                    if (update.Type == GeneralChangeType.Clear)
                     {
                         yield return update;
                     }

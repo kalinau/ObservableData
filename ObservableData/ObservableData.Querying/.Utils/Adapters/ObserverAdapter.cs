@@ -23,9 +23,9 @@ namespace ObservableData.Querying.Utils.Adapters
     }
 
     internal abstract class CollectionChangesObserverAdapter<T, TAdaptee> :
-        ObserverAdapter<IChange<CollectionOperation<T>>, IChange<CollectionOperation<TAdaptee>>>
+        ObserverAdapter<IBatch<GeneralChange<T>>, IBatch<GeneralChange<TAdaptee>>>
     {
-        protected CollectionChangesObserverAdapter([NotNull] IObserver<IChange<CollectionOperation<TAdaptee>>> adaptee) : base(adaptee)
+        protected CollectionChangesObserverAdapter([NotNull] IObserver<IBatch<GeneralChange<TAdaptee>>> adaptee) : base(adaptee)
         {
         }
     }
@@ -33,38 +33,38 @@ namespace ObservableData.Querying.Utils.Adapters
     internal abstract class CollectionChangesObserverAdapter<T> :
         CollectionChangesObserverAdapter<T,T>
     {
-        protected CollectionChangesObserverAdapter([NotNull] IObserver<IChange<CollectionOperation<T>>> adaptee) : base(adaptee)
+        protected CollectionChangesObserverAdapter([NotNull] IObserver<IBatch<GeneralChange<T>>> adaptee) : base(adaptee)
         {
         }
     }
 
     internal abstract class ListChangesObserverAdapter<T, TAdaptee> :
-        ObserverAdapter<IChange<ListOperation<T>>, IChange<ListOperation<TAdaptee>>>
+        ObserverAdapter<IBatch<IndexedChange<T>>, IBatch<IndexedChange<TAdaptee>>>
     {
-        protected ListChangesObserverAdapter([NotNull] IObserver<IChange<ListOperation<TAdaptee>>> adaptee) : base(adaptee)
+        protected ListChangesObserverAdapter([NotNull] IObserver<IBatch<IndexedChange<TAdaptee>>> adaptee) : base(adaptee)
         {
         }
     }
 
     internal abstract class CollectionDataObserverAdapter<T, TAdaptee> :
-        ObserverAdapter<CollectionChangePlusState<T>, CollectionChangePlusState<TAdaptee>>
+        ObserverAdapter<GeneralChangesPlusState<T>, GeneralChangesPlusState<TAdaptee>>
     {
-        protected CollectionDataObserverAdapter([NotNull] IObserver<CollectionChangePlusState<TAdaptee>> adaptee) : base(adaptee)
+        protected CollectionDataObserverAdapter([NotNull] IObserver<GeneralChangesPlusState<TAdaptee>> adaptee) : base(adaptee)
         {
         }
     }
 
     internal abstract class CollectionDataObserverAdapter<T> : CollectionDataObserverAdapter<T, T>
     {
-        protected CollectionDataObserverAdapter([NotNull] IObserver<CollectionChangePlusState<T>> adaptee) : base(adaptee)
+        protected CollectionDataObserverAdapter([NotNull] IObserver<GeneralChangesPlusState<T>> adaptee) : base(adaptee)
         {
         }
     }
 
     internal abstract class ListDataObserverAdapter<T, TAdaptee> :
-        ObserverAdapter<ListChangePlusState<T>, ListChangePlusState<TAdaptee>>
+        ObserverAdapter<IndexedChangesPlusState<T>, IndexedChangesPlusState<TAdaptee>>
     {
-        protected ListDataObserverAdapter([NotNull] IObserver<ListChangePlusState<TAdaptee>> adaptee) : base(adaptee)
+        protected ListDataObserverAdapter([NotNull] IObserver<IndexedChangesPlusState<TAdaptee>> adaptee) : base(adaptee)
         {
         }
     }

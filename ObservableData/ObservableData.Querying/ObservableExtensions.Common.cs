@@ -10,8 +10,8 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         public class CurrentStateChange<T> :
-            IChange<ListOperation<T>>,
-            IChange<CollectionOperation<T>>
+            IBatch<IndexedChange<T>>,
+            IBatch<GeneralChange<T>>
         {
             [NotNull] private readonly IReadOnlyCollection<T> _items;
             [CanBeNull] private IReadOnlyCollection<T> _locked;
@@ -33,20 +33,20 @@ namespace ObservableData.Querying
                 }
             }
 
-            IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
+            IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
             {
                 int i = 0;
                 foreach (var item in this.GetItems())
                 {
-                    yield return ListOperation<T>.OnAdd(item, i++);
+                    yield return IndexedChange<T>.OnAdd(item, i++);
                 }
             }
 
-            IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+            IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
             {
                 foreach (var item in this.GetItems())
                 {
-                    yield return CollectionOperation<T>.OnAdd(item);
+                    yield return GeneralChange<T>.OnAdd(item);
                 }
             }
 
@@ -63,36 +63,36 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<IChange<ListOperation<T>>> StartWith<T>(
-            [NotNull] this IObservable<IChange<ListOperation<T>>> observable,
+        public static IObservable<IBatch<IndexedChange<T>>> StartWith<T>(
+            [NotNull] this IObservable<IBatch<IndexedChange<T>>> observable,
             [NotNull] IReadOnlyCollection<T> state)
         {
             return observable.StartWith(new CurrentStateChange<T>(state)).NotNull();
         }
 
         [NotNull]
-        public static IObservable<IChange<CollectionOperation<T>>> StartWith<T>(
-            [NotNull] this IObservable<IChange<CollectionOperation<T>>> observable,
+        public static IObservable<IBatch<GeneralChange<T>>> StartWith<T>(
+            [NotNull] this IObservable<IBatch<GeneralChange<T>>> observable,
             [NotNull] IReadOnlyCollection<T> state)
         {
             return observable.StartWith(new CurrentStateChange<T>(state)).NotNull();
         }
 
         [NotNull]
-        public static IObservable<ListChangePlusState<T>> WithState<T>(
-            [NotNull] this IObservable<IChange<ListOperation<T>>> observable,
+        public static IObservable<IndexedChangesPlusState<T>> WithState<T>(
+            [NotNull] this IObservable<IBatch<IndexedChange<T>>> observable,
             [NotNull] IReadOnlyList<T> state)
         {
-            return observable.Select(x => new ListChangePlusState<T>(x.NotNull(), state))
+            return observable.Select(x => new IndexedChangesPlusState<T>(x.NotNull(), state))
                 .NotNull();
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> WithState<T>(
-            [NotNull] this IObservable<IChange<CollectionOperation<T>>> observable,
+        public static IObservable<GeneralChangesPlusState<T>> WithState<T>(
+            [NotNull] this IObservable<IBatch<GeneralChange<T>>> observable,
             [NotNull] IReadOnlyCollection<T> state)
         {
-            return observable.Select(x => new CollectionChangePlusState<T>(x.NotNull(), state))
+            return observable.Select(x => new GeneralChangesPlusState<T>(x.NotNull(), state))
                 .NotNull();
         }
 

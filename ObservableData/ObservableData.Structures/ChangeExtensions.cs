@@ -10,54 +10,54 @@ namespace ObservableData.Structures
     public static class ChangeExtensions
     {
         [NotNull]
-        public static IChange<ListOperation<T>> AsQueryingListChange<T>(
-            [NotNull] this IChange<IListOperation<T>> change)
+        public static IBatch<IndexedChange<T>> AsQueryingListChange<T>(
+            [NotNull] this IBatch<IListOperation<T>> changes)
         {
-            return new ListChangeAdapter<T>(change);
+            return new ListChangesAdapter<T>(changes);
         }
 
         [NotNull]
-        public static IChange<CollectionOperation<T>> AsQueryingCollectionChange<T>(
-            [NotNull] this IChange<IListOperation<T>> change)
+        public static IBatch<GeneralChange<T>> AsQueryingCollectionChange<T>(
+            [NotNull] this IBatch<IListOperation<T>> changes)
         {
-            return new ListChangeAdapter<T>(change);
+            return new ListChangesAdapter<T>(changes);
         }
 
         [NotNull]
-        public static IChange<CollectionOperation<T>> AsQueryingCollectionChange<T>(
-            [NotNull] this IChange<ICollectionOperation<T>> change)
+        public static IBatch<GeneralChange<T>> AsQueryingCollectionChange<T>(
+            [NotNull] this IBatch<ICollectionOperation<T>> changes)
         {
-            return new CollectionChangeAdapter<T>(change);
+            return new CollectionChangesAdapter<T>(changes);
         }
 
         [NotNull]
-        public static IObservable<IChange<ListOperation<T>>> SelectQueryingListChanges<T>(
-            [NotNull] this IObservable<IListChange<T>> observable)
+        public static IObservable<IBatch<IndexedChange<T>>> SelectQueryingListChanges<T>(
+            [NotNull] this IObservable<IListBatch<T>> observable)
         {
             return observable;
         }
 
         [NotNull]
-        public static IObservable<IChange<CollectionOperation<T>>> SelectQueryingCollectionChanges<T>(
-            [NotNull] this IObservable<IListChange<T>> observable)
+        public static IObservable<IBatch<GeneralChange<T>>> SelectQueryingCollectionChanges<T>(
+            [NotNull] this IObservable<IListBatch<T>> observable)
         {
             return observable;
         }
 
-        private sealed class ListChangeAdapter<T> :
-            IChange<ListOperation<T>>,
-            IChange<CollectionOperation<T>>
+        private sealed class ListChangesAdapter<T> :
+            IBatch<IndexedChange<T>>,
+            IBatch<GeneralChange<T>>
         {
-            [NotNull] private readonly IChange<IListOperation<T>> _adaptee;
+            [NotNull] private readonly IBatch<IListOperation<T>> _adaptee;
 
-            public ListChangeAdapter([NotNull] IChange<IListOperation<T>> adaptee)
+            public ListChangesAdapter([NotNull] IBatch<IListOperation<T>> adaptee)
             {
                 _adaptee = adaptee;
             }
 
             public void MakeImmutable() => _adaptee.MakeImmutable();
 
-            IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+            IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
             {
                 foreach (var i in _adaptee.GetIterations())
                 {
@@ -68,7 +68,7 @@ namespace ObservableData.Structures
                 }
             }
 
-            IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
+            IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
             {
                 foreach (var i in _adaptee.GetIterations())
                 {
@@ -81,19 +81,19 @@ namespace ObservableData.Structures
             }
         }
 
-        private sealed class CollectionChangeAdapter<T> :
-            IChange<CollectionOperation<T>>
+        private sealed class CollectionChangesAdapter<T> :
+            IBatch<GeneralChange<T>>
         {
-            [NotNull] private readonly IChange<ICollectionOperation<T>> _adaptee;
+            [NotNull] private readonly IBatch<ICollectionOperation<T>> _adaptee;
 
-            public CollectionChangeAdapter([NotNull] IChange<ICollectionOperation<T>> adaptee)
+            public CollectionChangesAdapter([NotNull] IBatch<ICollectionOperation<T>> adaptee)
             {
                 _adaptee = adaptee;
             }
 
             public void MakeImmutable() => _adaptee.MakeImmutable();
 
-            IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+            IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
             {
                 foreach (var i in _adaptee.GetIterations())
                 {

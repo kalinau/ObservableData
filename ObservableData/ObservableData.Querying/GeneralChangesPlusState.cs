@@ -3,35 +3,34 @@ using JetBrains.Annotations;
 
 namespace ObservableData.Querying
 {
-    public struct CollectionChangePlusState<T>
+    public struct GeneralChangesPlusState<T>
     {
-        [NotNull] private readonly IChange<CollectionOperation<T>> _change;
+        [NotNull] private readonly IBatch<GeneralChange<T>> _change;
         [NotNull] private readonly IReadOnlyCollection<T> _reachedState;
 
-        public CollectionChangePlusState(
-            [NotNull] IChange<CollectionOperation<T>> change,
+        public GeneralChangesPlusState(
+            [NotNull] IBatch<GeneralChange<T>> changes,
             [NotNull] IReadOnlyCollection<T> reachedState)
         {
             _reachedState = reachedState;
-            _change = change;
+            _change = changes;
         }
 
         [NotNull]
         public IReadOnlyCollection<T> ReachedState => _reachedState;
 
         [NotNull]
-        public IChange<CollectionOperation<T>> Change => _change;
+        public IBatch<GeneralChange<T>> Changes => _change;
     }
 
-
     [PublicAPI]
-    public static class CollectionChangePlusStateExtensions
+    public static class GeneralChangesPlusStateExtensions
     {
         public static void ApplyTo<T>(
-            this CollectionChangePlusState<T> changePlusState,
+            this GeneralChangesPlusState<T> changesPlusState,
             [NotNull] ICollection<T> collection)
         {
-            changePlusState.Change.ApplyTo(collection);
+            changesPlusState.Changes.ApplyTo(collection);
         }
     }
 }

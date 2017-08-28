@@ -4,11 +4,11 @@ using ObservableData.Querying;
 namespace ObservableData.Structures.Lists
 {
     [SuppressMessage("ReSharper", "PossibleInterfaceMemberAmbiguity")]
-    public interface IListChange<T> :
-        IChange<ListOperation<T>>,
-        IChange<CollectionOperation<T>>,
-        IChange<IListOperation<T>>,
-        IChange<ICollectionOperation<T>>
+    public interface IListBatch<T> :
+        IBatch<IndexedChange<T>>,
+        IBatch<GeneralChange<T>>,
+        IBatch<IListOperation<T>>,
+        IBatch<ICollectionOperation<T>>
     {
     }
 }

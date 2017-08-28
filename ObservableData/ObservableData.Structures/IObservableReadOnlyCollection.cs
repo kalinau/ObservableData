@@ -9,6 +9,6 @@ namespace ObservableData.Structures
     public interface IObservableReadOnlyCollection<out T> : IReadOnlyCollection<T>
     {
         [NotNull]
-        IObservable<IChange<ICollectionOperation<T>>> WhenUpdated { get; }
+        IObservable<IBatch<ICollectionOperation<T>>> WhenUpdated { get; }
     }
 }

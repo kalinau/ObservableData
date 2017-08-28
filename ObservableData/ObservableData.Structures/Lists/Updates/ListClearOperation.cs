@@ -19,22 +19,22 @@ namespace ObservableData.Structures.Lists.Updates
 
         public void MakeImmutable() { }
 
-        IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
+        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
         {
-            yield return ListOperation<T>.OnClear();
+            yield return IndexedChange<T>.OnClear();
         }
 
-        IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
         {
-            yield return CollectionOperation<T>.OnClear();
+            yield return GeneralChange<T>.OnClear();
         }
 
-        IEnumerable<IListOperation<T>> IChange<IListOperation<T>>.GetIterations()
+        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetIterations()
         {
             yield return this;
         }
 
-        IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.GetIterations()
+        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetIterations()
         {
             yield return this;
         }

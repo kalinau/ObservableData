@@ -1,6 +1,6 @@
 ﻿namespace ObservableData.Querying
 {
-    public enum CollectionOperationType
+    public enum GeneralChangeType
     {
         Add,
         Remove,

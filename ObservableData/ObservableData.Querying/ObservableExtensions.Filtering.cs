@@ -11,11 +11,11 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IChange<CollectionOperation<T>>> Where<T>(
-            [NotNull] this IObservable<IChange<CollectionOperation<T>>> previous,
+        public static IObservable<IBatch<GeneralChange<T>>> Where<T>(
+            [NotNull] this IObservable<IBatch<GeneralChange<T>>> previous,
             [NotNull] Func<T, bool> criterion)
         {
-            return Observable.Create<IChange<CollectionOperation<T>>>(o =>
+            return Observable.Create<IBatch<GeneralChange<T>>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
@@ -25,11 +25,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> Where<T>(
-            [NotNull] this IObservable<CollectionChangePlusState<T>> previous,
+        public static IObservable<GeneralChangesPlusState<T>> Where<T>(
+            [NotNull] this IObservable<GeneralChangesPlusState<T>> previous,
             [NotNull] Func<T, bool> criterion)
         {
-            return Observable.Create<CollectionChangePlusState<T>>(o =>
+            return Observable.Create<GeneralChangesPlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 

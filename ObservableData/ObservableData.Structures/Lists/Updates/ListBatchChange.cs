@@ -3,7 +3,7 @@ using ObservableData.Querying;
 
 namespace ObservableData.Structures.Lists.Updates
 {
-    internal class ListBatchChange<T> : IListChange<T>
+    internal class ListBatchChange<T> : IListBatch<T>
     {
         private IListChangeNode<T> _first;
         private IListChangeNode<T> _last;
@@ -30,57 +30,57 @@ namespace ObservableData.Structures.Lists.Updates
             _first = null;
         }
 
-        void IChange<ICollectionOperation<T>>.MakeImmutable()
+        void IBatch<ICollectionOperation<T>>.MakeImmutable()
         {
             var next = _first;
             while (next != null)
             {
-                IChange<ICollectionOperation<T>> change = next;
-                change.MakeImmutable();
+                IBatch<ICollectionOperation<T>> changes = next;
+                changes.MakeImmutable();
                 next = next.Next;
             }
         }
 
-        void IChange<IListOperation<T>>.MakeImmutable()
+        void IBatch<IListOperation<T>>.MakeImmutable()
         {
             var next = _first;
             while (next != null)
             {
-                IChange<IListOperation<T>> change = next;
-                change.MakeImmutable();
+                IBatch<IListOperation<T>> changes = next;
+                changes.MakeImmutable();
                 next = next.Next;
             }
         }
 
-        void IChange<CollectionOperation<T>>.MakeImmutable()
+        void IBatch<GeneralChange<T>>.MakeImmutable()
         {
             var next = _first;
             while (next != null)
             {
-                IChange<CollectionOperation<T>> change = next;
-                change.MakeImmutable();
+                IBatch<GeneralChange<T>> changes = next;
+                changes.MakeImmutable();
                 next = next.Next;
             }
         }
 
-        void IChange<ListOperation<T>>.MakeImmutable()
+        void IBatch<IndexedChange<T>>.MakeImmutable()
         {
             var next = _first;
             while (next != null)
             {
-                IChange<ListOperation<T>> change = next;
-                change.MakeImmutable();
+                IBatch<IndexedChange<T>> changes = next;
+                changes.MakeImmutable();
                 next = next.Next;
             }
         }
 
-        IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.GetIterations()
+        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetIterations()
         {
             var next = _first;
             while (next != null)
             {
-                IChange<ICollectionOperation<T>> change = next;
-                foreach (var i in change.GetIterations())
+                IBatch<ICollectionOperation<T>> changes = next;
+                foreach (var i in changes.GetIterations())
                 {
                     yield return i;
                 }
@@ -88,13 +88,13 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<IListOperation<T>> IChange<IListOperation<T>>.GetIterations()
+        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetIterations()
         {
             var next = _first;
             while (next != null)
             {
-                IChange<IListOperation<T>> change = next;
-                foreach (var i in change.GetIterations())
+                IBatch<IListOperation<T>> changes = next;
+                foreach (var i in changes.GetIterations())
                 {
                     yield return i;
                 }
@@ -102,13 +102,13 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
+        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
         {
             var next = _first;
             while (next != null)
             {
-                IChange<ListOperation<T>> change = next;
-                foreach (var i in change.GetIterations())
+                IBatch<IndexedChange<T>> changes = next;
+                foreach (var i in changes.GetIterations())
                 {
                     yield return i;
                 }
@@ -116,13 +116,13 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
         {
             var next = _first;
             while (next != null)
             {
-                IChange<CollectionOperation<T>> change = next;
-                foreach (var i in change.GetIterations())
+                IBatch<GeneralChange<T>> changes = next;
+                foreach (var i in changes.GetIterations())
                 {
                     yield return i;
                 }

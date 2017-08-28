@@ -3,35 +3,34 @@ using JetBrains.Annotations;
 
 namespace ObservableData.Querying
 {
-    public struct ListChangePlusState<T>
+    public struct IndexedChangesPlusState<T>
     {
         [NotNull] private readonly IReadOnlyList<T> _reachedState;
-        [NotNull] private readonly IChange<ListOperation<T>> _change;
+        [NotNull] private readonly IBatch<IndexedChange<T>> _change;
 
-        public ListChangePlusState(
-            [NotNull] IChange<ListOperation<T>> change,
+        public IndexedChangesPlusState(
+            [NotNull] IBatch<IndexedChange<T>> changes,
             [NotNull] IReadOnlyList<T> reachedState)
         {
             _reachedState = reachedState;
-            _change = change;
+            _change = changes;
         }
 
         [NotNull]
         public IReadOnlyList<T> ReachedState => _reachedState;
 
         [NotNull]
-        public IChange<ListOperation<T>> Change => _change;
+        public IBatch<IndexedChange<T>> Changes => _change;
     }
 
-
     [PublicAPI]
-    public static class ListChangePlusStateExtensions
+    public static class IndexedChangesPlusStateExtensions
     {
         public static void ApplyTo<T>(
-            this ListChangePlusState<T> changePlusState,
+            this IndexedChangesPlusState<T> changesPlusState,
             [NotNull] IList<T> list)
         {
-            changePlusState.Change.ApplyTo(list);
+            changesPlusState.Changes.ApplyTo(list);
         }
     }
 }

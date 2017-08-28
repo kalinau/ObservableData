@@ -32,7 +32,7 @@ namespace ObservableData.Tests.Visual
 
             this.SourceList.ItemsSource = _source;
 
-            _source.Add(new [] {new TestEntity(12),new TestEntity(21)  });
+            _source.Add(new[] {new TestEntity(12), new TestEntity(21)});
 
             _source.WhenUpdated
                 .SelectQueryingListChanges()

@@ -26,12 +26,12 @@ namespace ObservableData.Structures.Lists
 
         public int Count => _list.Count;
 
-        IObservable<IChange<IListOperation<T>>> IObservableReadOnlyList<T>.WhenUpdated => this.WhenUpdated;
+        IObservable<IBatch<IListOperation<T>>> IObservableReadOnlyList<T>.WhenUpdated => this.WhenUpdated;
 
-        IObservable<IChange<ICollectionOperation<T>>> IObservableReadOnlyCollection<T>.WhenUpdated => this.WhenUpdated;
+        IObservable<IBatch<ICollectionOperation<T>>> IObservableReadOnlyCollection<T>.WhenUpdated => this.WhenUpdated;
 
         [NotNull]
-        public IObservable<IListChange<T>> WhenUpdated =>_subject;
+        public IObservable<IListBatch<T>> WhenUpdated =>_subject;
 
         public bool IsReadOnly => false;
 

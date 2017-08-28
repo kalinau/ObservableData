@@ -51,29 +51,29 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
+        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
         {
             int i = _index;
             foreach (var item in this.Items)
             {
-                yield return ListOperation<T>.OnAdd(item, i++);
+                yield return IndexedChange<T>.OnAdd(item, i++);
             }
         }
 
-        IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
         {
             foreach (var item in this.Items)
             {
-                yield return CollectionOperation<T>.OnAdd(item);
+                yield return GeneralChange<T>.OnAdd(item);
             }
         }
 
-        IEnumerable<IListOperation<T>> IChange<IListOperation<T>>.GetIterations()
+        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetIterations()
         {
             yield return this;
         }
 
-        IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.GetIterations()
+        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetIterations()
         {
             yield return this;
         }

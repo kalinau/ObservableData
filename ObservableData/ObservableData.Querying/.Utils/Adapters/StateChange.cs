@@ -6,8 +6,8 @@ namespace ObservableData.Querying.Utils.Adapters
 {
     [UsedImplicitly]
     public class StateChange<T> : 
-        IChange<CollectionOperation<T>>,
-        IChange<ListOperation<T>>
+        IBatch<GeneralChange<T>>,
+        IBatch<IndexedChange<T>>
     {
         [NotNull] private readonly IEnumerable<T> _state;
 
@@ -16,20 +16,20 @@ namespace ObservableData.Querying.Utils.Adapters
             _state = state;
         }
 
-        IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
+        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
         {
             var i = 0;
             foreach (var item in _state)
             {
-                yield return ListOperation<T>.OnAdd(item, i++);
+                yield return IndexedChange<T>.OnAdd(item, i++);
             }
         }
 
-        IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
         {
             foreach (var item in _state)
             {
-                yield return CollectionOperation<T>.OnAdd(item);
+                yield return GeneralChange<T>.OnAdd(item);
             }
         }
 

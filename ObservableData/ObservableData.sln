@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservableData.Tests.Core",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObservableData.Querying", "ObservableData.Querying\ObservableData.Querying.csproj", "{4C4844CE-4E96-4115-AA57-3E4A69588AAD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservableData.Structures", "ObservableData.Structures\ObservableData.Structures.csproj", "{EFADF919-75A5-4660-8D50-63F0C8C0569B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ObservableData.Structures", "ObservableData.Structures\ObservableData.Structures.csproj", "{EFADF919-75A5-4660-8D50-63F0C8C0569B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ObservableData.Tests.Visual.WPF", "ObservableData.Tests.Visual.WPF\ObservableData.Tests.Visual.WPF.csproj", "{078F037E-D5B3-4E2C-8EC8-D41B10666C1F}"
 EndProject

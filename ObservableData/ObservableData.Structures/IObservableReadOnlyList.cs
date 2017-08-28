@@ -11,6 +11,6 @@ namespace ObservableData.Structures
         new int Count { get; }
 
         [NotNull]
-        new IObservable<IChange<IListOperation<T>>> WhenUpdated { get; }
+        new IObservable<IBatch<IListOperation<T>>> WhenUpdated { get; }
     }
 }

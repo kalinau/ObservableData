@@ -24,9 +24,9 @@ namespace ObservableData.Structures.Lists.Updates
 
         IReadOnlyCollection<T>
     {
-        private readonly ListOperation<T> _adaptee;
+        private readonly IndexedChange<T> _adaptee;
 
-        public QueryingOperationAdapter(ListOperation<T> adaptee)
+        public QueryingOperationAdapter(IndexedChange<T> adaptee)
         {
             _adaptee = adaptee;
         }
@@ -35,32 +35,32 @@ namespace ObservableData.Structures.Lists.Updates
 
         public void MakeImmutable() { }
 
-        IEnumerable<IListOperation<T>> IChange<IListOperation<T>>.GetIterations()
+        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetIterations()
         {
             yield return this;
         }
 
-        IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.GetIterations()
+        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetIterations()
         {
             switch (_adaptee.Type)
             {
-                case ListOperationType.Add:
+                case IndexedChangeType.Add:
                     yield return this;
                     break;
 
-                case ListOperationType.Remove:
+                case IndexedChangeType.Remove:
                     yield return this;
                     break;
 
-                case ListOperationType.Move:
+                case IndexedChangeType.Move:
                     break;
 
-                case ListOperationType.Replace:
+                case IndexedChangeType.Replace:
                     yield return new CollectionRemoveOperation {Item = _adaptee.Item};
                     yield return new CollectionInsertOperation(this);
                     break;
 
-                case ListOperationType.Clear:
+                case IndexedChangeType.Clear:
                     yield return this;
                     break;
 
@@ -69,12 +69,12 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<CollectionOperation<T>> IChange<CollectionOperation<T>>.GetIterations()
+        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
         {
             return _adaptee.AsCollectionOpperations();
         }
 
-        IEnumerable<ListOperation<T>> IChange<ListOperation<T>>.GetIterations()
+        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
         {
             yield return _adaptee;
         }
@@ -88,19 +88,19 @@ namespace ObservableData.Structures.Lists.Updates
         {
             switch (_adaptee.Type)
             {
-                case ListOperationType.Add:
+                case IndexedChangeType.Add:
                     return onInsert(this);
 
-                case ListOperationType.Remove:
+                case IndexedChangeType.Remove:
                     return onRemove(this);
 
-                case ListOperationType.Move:
+                case IndexedChangeType.Move:
                     return onMove(this);
 
-                case ListOperationType.Replace:
+                case IndexedChangeType.Replace:
                     return onReplace(this);
 
-                case ListOperationType.Clear:
+                case IndexedChangeType.Clear:
                     return onClear(this);
 
                 default:
@@ -117,23 +117,23 @@ namespace ObservableData.Structures.Lists.Updates
         {
             switch (_adaptee.Type)
             {
-                case ListOperationType.Add:
+                case IndexedChangeType.Add:
                     onInsert?.Invoke(this);
                     break;
 
-                case ListOperationType.Remove:
+                case IndexedChangeType.Remove:
                     onRemove?.Invoke(this);
                     break;
 
-                case ListOperationType.Move:
+                case IndexedChangeType.Move:
                     onMove?.Invoke(this);
                     break;
 
-                case ListOperationType.Replace:
+                case IndexedChangeType.Replace:
                     onReplace?.Invoke(this);
                     break;
 
-                case ListOperationType.Clear:
+                case IndexedChangeType.Clear:
                     onClear?.Invoke(this);
                     break;
 
@@ -150,17 +150,17 @@ namespace ObservableData.Structures.Lists.Updates
         {
             switch (_adaptee.Type)
             {
-                case ListOperationType.Add:
+                case IndexedChangeType.Add:
                     return onInsert(this);
 
-                case ListOperationType.Remove:
+                case IndexedChangeType.Remove:
                     return onRemove(this);
 
-                case ListOperationType.Clear:
+                case IndexedChangeType.Clear:
                     return onClear(this);
 
-                case ListOperationType.Replace:
-                case ListOperationType.Move:
+                case IndexedChangeType.Replace:
+                case IndexedChangeType.Move:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -174,48 +174,48 @@ namespace ObservableData.Structures.Lists.Updates
         {
             switch (_adaptee.Type)
             {
-                case ListOperationType.Add:
+                case IndexedChangeType.Add:
                     onInsert?.Invoke(this);
                     break;
 
-                case ListOperationType.Remove:
+                case IndexedChangeType.Remove:
                     onRemove?.Invoke(this);
                     break;
 
-                case ListOperationType.Clear:
+                case IndexedChangeType.Clear:
                     onClear?.Invoke(this);
                     break;
 
-                case ListOperationType.Replace:
-                case ListOperationType.Move:
+                case IndexedChangeType.Replace:
+                case IndexedChangeType.Move:
                 default:
                     throw new ArgumentOutOfRangeException();
             }
         }
 
-        int IListInsertOperation<T>.Index => this.Get(_adaptee.Index, ListOperationType.Add);
+        int IListInsertOperation<T>.Index => this.Get(_adaptee.Index, IndexedChangeType.Add);
 
-        IReadOnlyCollection<T> IListInsertOperation<T>.Items => this.Get(this, ListOperationType.Add);
+        IReadOnlyCollection<T> IListInsertOperation<T>.Items => this.Get(this, IndexedChangeType.Add);
 
-        int IListRemoveOperation<T>.Index => this.Get(_adaptee.Index, ListOperationType.Remove);
+        int IListRemoveOperation<T>.Index => this.Get(_adaptee.Index, IndexedChangeType.Remove);
 
-        T IListRemoveOperation<T>.Item => this.Get(_adaptee.Item, ListOperationType.Remove);
+        T IListRemoveOperation<T>.Item => this.Get(_adaptee.Item, IndexedChangeType.Remove);
 
-        int IListMoveOperation<T>.From => this.Get(_adaptee.OriginalIndex, ListOperationType.Move);
+        int IListMoveOperation<T>.From => this.Get(_adaptee.OriginalIndex, IndexedChangeType.Move);
 
-        int IListMoveOperation<T>.To => this.Get(_adaptee.Index, ListOperationType.Move);
+        int IListMoveOperation<T>.To => this.Get(_adaptee.Index, IndexedChangeType.Move);
 
-        T IListMoveOperation<T>.Item => this.Get(_adaptee.Item, ListOperationType.Move);
+        T IListMoveOperation<T>.Item => this.Get(_adaptee.Item, IndexedChangeType.Move);
 
-        int IListReplaceOperation<T>.Index => this.Get(_adaptee.Index, ListOperationType.Replace);
+        int IListReplaceOperation<T>.Index => this.Get(_adaptee.Index, IndexedChangeType.Replace);
 
-        T IListReplaceOperation<T>.ReplacedItem => this.Get(_adaptee.ChangedItem, ListOperationType.Replace);
+        T IListReplaceOperation<T>.ReplacedItem => this.Get(_adaptee.ChangedItem, IndexedChangeType.Replace);
 
-        T IListReplaceOperation<T>.Item => this.Get(_adaptee.Item, ListOperationType.Replace);
+        T IListReplaceOperation<T>.Item => this.Get(_adaptee.Item, IndexedChangeType.Replace);
 
-        IReadOnlyCollection<T> ICollectionInsertOperation<T>.Items => this.Get(this, ListOperationType.Add);
+        IReadOnlyCollection<T> ICollectionInsertOperation<T>.Items => this.Get(this, IndexedChangeType.Add);
 
-        T ICollectionRemoveOperation<T>.Item => this.Get(_adaptee.Item, ListOperationType.Remove);
+        T ICollectionRemoveOperation<T>.Item => this.Get(_adaptee.Item, IndexedChangeType.Remove);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
@@ -268,7 +268,7 @@ namespace ObservableData.Structures.Lists.Updates
         }
 
         [Conditional("DEBUG")]
-        private void CheckType(ListOperationType type)
+        private void CheckType(IndexedChangeType type)
         {
             if (_adaptee.Type != type)
             {
@@ -279,7 +279,7 @@ namespace ObservableData.Structures.Lists.Updates
         [AssertionMethod]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [ContractAnnotation("value:null=>null; value:notnull=>notnull")]
-        private TValue Get<TValue>(TValue value, ListOperationType type)
+        private TValue Get<TValue>(TValue value, IndexedChangeType type)
         {
             this.CheckType(type);
             return value;

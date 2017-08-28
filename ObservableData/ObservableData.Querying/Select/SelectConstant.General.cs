@@ -9,76 +9,76 @@ namespace ObservableData.Querying.Select
 {
     internal static partial class SelectConstant
     {
-        public sealed class CollectionChangesObserver<T, TAdaptee> : CollectionChangesObserverAdapter<T, TAdaptee>
+        public sealed class GeneralChangesObserver<T, TAdaptee> : CollectionChangesObserverAdapter<T, TAdaptee>
         {
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
-            public CollectionChangesObserver(
-                [NotNull] IObserver<IChange<CollectionOperation<TAdaptee>>> adaptee,
+            public GeneralChangesObserver(
+                [NotNull] IObserver<IBatch<GeneralChange<TAdaptee>>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
                 : base(adaptee)
             {
                 _selector = selector;
             }
 
-            public override void OnNext(IChange<CollectionOperation<T>> value)
+            public override void OnNext(IBatch<GeneralChange<T>> value)
             {
                 if (value == null) return;
 
-                var adapter = new CollectionChange<T, TAdaptee>(value, _selector);
+                var adapter = new GeneralChanges<T, TAdaptee>(value, _selector);
                 this.Adaptee.OnNext(adapter);
             }
         }
 
-        public sealed class CollectionDataObserver<T, TAdaptee> : CollectionDataObserverAdapter<T, TAdaptee>
+        public sealed class GeneralChangesPlusStateObserver<T, TAdaptee> : CollectionDataObserverAdapter<T, TAdaptee>
         {
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
-            public CollectionDataObserver(
-                [NotNull] IObserver<CollectionChangePlusState<TAdaptee>> adaptee,
+            public GeneralChangesPlusStateObserver(
+                [NotNull] IObserver<GeneralChangesPlusState<TAdaptee>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
                 : base(adaptee)
             {
                 _selector = selector;
             }
 
-            public override void OnNext(CollectionChangePlusState<T> value)
+            public override void OnNext(GeneralChangesPlusState<T> value)
             {
-                var change = new CollectionChange<T, TAdaptee>(value.Change, _selector);
+                var change = new GeneralChanges<T, TAdaptee>(value.Changes, _selector);
                 var state = new CollectionAdapter<T, TAdaptee>(value.ReachedState, _selector);
-                this.Adaptee.OnNext(new CollectionChangePlusState<TAdaptee>(change, state));
+                this.Adaptee.OnNext(new GeneralChangesPlusState<TAdaptee>(change, state));
             }
         }
 
-        private sealed class CollectionChange<T, TAdaptee> : IChange<CollectionOperation<TAdaptee>>
+        private sealed class GeneralChanges<T, TAdaptee> : IBatch<GeneralChange<TAdaptee>>
         {
-            [NotNull] private readonly IChange<CollectionOperation<T>> _adaptee;
+            [NotNull] private readonly IBatch<GeneralChange<T>> _adaptee;
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
-            public CollectionChange(
-                [NotNull] IChange<CollectionOperation<T>> adaptee,
+            public GeneralChanges(
+                [NotNull] IBatch<GeneralChange<T>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
             {
                 _adaptee = adaptee;
                 _selector = selector;
             }
 
-            public IEnumerable<CollectionOperation<TAdaptee>> GetIterations()
+            public IEnumerable<GeneralChange<TAdaptee>> GetIterations()
             {
                 foreach (var u in _adaptee.GetIterations())
                 {
                     switch (u.Type)
                     {
-                        case CollectionOperationType.Add:
-                            yield return CollectionOperation<TAdaptee>.OnAdd(_selector(u.Item));
+                        case GeneralChangeType.Add:
+                            yield return GeneralChange<TAdaptee>.OnAdd(_selector(u.Item));
                             break;
 
-                        case CollectionOperationType.Remove:
-                            yield return CollectionOperation<TAdaptee>.OnRemove(_selector(u.Item));
+                        case GeneralChangeType.Remove:
+                            yield return GeneralChange<TAdaptee>.OnRemove(_selector(u.Item));
                             break;
 
-                        case CollectionOperationType.Clear:
-                            yield return CollectionOperation<TAdaptee>.OnClear();
+                        case GeneralChangeType.Clear:
+                            yield return GeneralChange<TAdaptee>.OnClear();
                             break;
 
                         default:

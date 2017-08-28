@@ -16,27 +16,27 @@ namespace ObservableData.Querying.Compatibility
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnOperation(ListOperation<T> value)
+        public void OnOperation(IndexedChange<T> value)
         {
             switch (value.Type)
             {
-                case ListOperationType.Add:
+                case IndexedChangeType.Add:
                     this.OnAdd(value);
                     break;
 
-                case ListOperationType.Remove:
+                case IndexedChangeType.Remove:
                     this.OnRemove(value);
                     break;
 
-                case ListOperationType.Move:
+                case IndexedChangeType.Move:
                     this.OnMove(value);
                     break;
 
-                case ListOperationType.Replace:
+                case IndexedChangeType.Replace:
                     this.OnReplace(value);
                     break;
 
-                case ListOperationType.Clear:
+                case IndexedChangeType.Clear:
                     this.OnClear();
                     return;
 
@@ -45,27 +45,27 @@ namespace ObservableData.Querying.Compatibility
             }
         }
 
-        private void OnMove(ListOperation<T> update)
+        private void OnMove(IndexedChange<T> update)
         {
             var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, update.Item, update.Index, update.OriginalIndex);
             this.CollectionChanged?.Invoke(this, args);
         }
 
-        private void OnRemove(ListOperation<T> update)
+        private void OnRemove(IndexedChange<T> update)
         {
             var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, update.Item, update.Index);
             this.CollectionChanged?.Invoke(this, args);
             this.OnPropertyChanged(nameof(IReadOnlyCollection<T>.Count));
         }
 
-        private void OnAdd(ListOperation<T> update)
+        private void OnAdd(IndexedChange<T> update)
         {
             var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, update.Item, update.Index);
             this.CollectionChanged?.Invoke(this, args);
             this.OnPropertyChanged(nameof(IReadOnlyCollection<T>.Count));
         }
 
-        private void OnReplace(ListOperation<T> update)
+        private void OnReplace(IndexedChange<T> update)
         {
             var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, update.Item, update.ChangedItem, update.Index);
             this.CollectionChanged?.Invoke(this, args);

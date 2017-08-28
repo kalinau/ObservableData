@@ -10,39 +10,39 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IChange<CollectionOperation<T>>> SelectConstant<TPrevious, T>(
-            [NotNull] this IObservable<IChange<CollectionOperation<TPrevious>>> previous,
+        public static IObservable<IBatch<GeneralChange<T>>> SelectConstant<TPrevious, T>(
+            [NotNull] this IObservable<IBatch<GeneralChange<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<IChange<CollectionOperation<T>>>(o =>
+            return Observable.Create<IBatch<GeneralChange<T>>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new SelectConstant.CollectionChangesObserver<TPrevious, T>(o, func);
+                var adapter = new SelectConstant.GeneralChangesObserver<TPrevious, T>(o, func);
                 return previous.Subscribe(adapter);
             }).NotNull();
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> SelectConstant<TPrevious, T>(
-            [NotNull] this IObservable<CollectionChangePlusState<TPrevious>> previous,
+        public static IObservable<GeneralChangesPlusState<T>> SelectConstant<TPrevious, T>(
+            [NotNull] this IObservable<GeneralChangesPlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<CollectionChangePlusState<T>>(o =>
+            return Observable.Create<GeneralChangesPlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new SelectConstant.CollectionDataObserver<TPrevious, T>(o, func);
+                var adapter = new SelectConstant.GeneralChangesPlusStateObserver<TPrevious, T>(o, func);
                 return previous.Subscribe(adapter);
             }).NotNull();
         }
 
         [NotNull]
-        public static IObservable<IChange<ListOperation<T>>> SelectConstant<TPrevious, T>(
-            [NotNull] this IObservable<IChange<ListOperation<TPrevious>>> previous,
+        public static IObservable<IBatch<IndexedChange<T>>> SelectConstant<TPrevious, T>(
+            [NotNull] this IObservable<IBatch<IndexedChange<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<IChange<ListOperation<T>>>(o =>
+            return Observable.Create<IBatch<IndexedChange<T>>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
@@ -52,11 +52,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ListChangePlusState<T>> SelectConstant<TPrevious, T>(
-            [NotNull] this IObservable<ListChangePlusState<TPrevious>> previous,
+        public static IObservable<IndexedChangesPlusState<T>> SelectConstant<TPrevious, T>(
+            [NotNull] this IObservable<IndexedChangesPlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<ListChangePlusState<T>>(o =>
+            return Observable.Create<IndexedChangesPlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
@@ -66,11 +66,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> Select<TPrevious, T>(
-            [NotNull] this IObservable<IChange<CollectionOperation<TPrevious>>> previous,
+        public static IObservable<GeneralChangesPlusState<T>> Select<TPrevious, T>(
+            [NotNull] this IObservable<IBatch<GeneralChange<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<CollectionChangePlusState<T>>(o =>
+            return Observable.Create<GeneralChangesPlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
@@ -80,19 +80,19 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<CollectionChangePlusState<T>> Select<TPrevious, T>(
-            [NotNull] this IObservable<CollectionChangePlusState<TPrevious>> previous,
+        public static IObservable<GeneralChangesPlusState<T>> Select<TPrevious, T>(
+            [NotNull] this IObservable<GeneralChangesPlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return previous.Select(x => x.Change).NotNull().Select(func);
+            return previous.Select(x => x.Changes).NotNull().Select(func);
         }
 
         [NotNull]
-        public static IObservable<IChange<ListOperation<T>>> Select<TPrevious, T>(
-            [NotNull] this IObservable<IChange<ListOperation<TPrevious>>> previous,
+        public static IObservable<IBatch<IndexedChange<T>>> Select<TPrevious, T>(
+            [NotNull] this IObservable<IBatch<IndexedChange<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<IChange<ListOperation<T>>>(o =>
+            return Observable.Create<IBatch<IndexedChange<T>>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
@@ -102,11 +102,11 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<ListChangePlusState<T>> Select<TPrevious, T>(
-            [NotNull] this IObservable<ListChangePlusState<TPrevious>> previous,
+        public static IObservable<IndexedChangesPlusState<T>> Select<TPrevious, T>(
+            [NotNull] this IObservable<IndexedChangesPlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return Observable.Create<ListChangePlusState<T>>(o =>
+            return Observable.Create<IndexedChangesPlusState<T>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 

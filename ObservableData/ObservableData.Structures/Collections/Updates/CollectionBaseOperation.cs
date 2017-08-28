@@ -6,11 +6,11 @@ namespace ObservableData.Structures.Collections.Updates
 {
     public abstract class CollectionBaseOperation<T> : 
         ICollectionOperation<T>, 
-        IChange<ICollectionOperation<T>>
+        IBatch<ICollectionOperation<T>>
     {
         public abstract void MakeImmutable();
 
-        IEnumerable<ICollectionOperation<T>> IChange<ICollectionOperation<T>>.GetIterations()
+        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetIterations()
         {
             yield return this;
         }

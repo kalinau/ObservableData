@@ -14,18 +14,18 @@ namespace ObservableData.Querying.Select
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
             public ListChangesObserver(
-                [NotNull] IObserver<IChange<ListOperation<TAdaptee>>> adaptee,
+                [NotNull] IObserver<IBatch<IndexedChange<TAdaptee>>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
                 : base(adaptee)
             {
                 _selector = selector;
             }
 
-            public override void OnNext(IChange<ListOperation<T>> value)
+            public override void OnNext(IBatch<IndexedChange<T>> value)
             {
                 if (value == null) return;
 
-                var adapter = new ListChange<T, TAdaptee>(value, _selector);
+                var adapter = new ListChanges<T, TAdaptee>(value, _selector);
                 this.Adaptee.OnNext(adapter);
             }
         }
@@ -35,68 +35,68 @@ namespace ObservableData.Querying.Select
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
             public ListDataObserver(
-                [NotNull] IObserver<ListChangePlusState<TAdaptee>> adaptee,
+                [NotNull] IObserver<IndexedChangesPlusState<TAdaptee>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
                 : base(adaptee)
             {
                 _selector = selector;
             }
 
-            public override void OnNext(ListChangePlusState<T> value)
+            public override void OnNext(IndexedChangesPlusState<T> value)
             {
-                var change = new ListChange<T, TAdaptee>(value.Change, _selector);
+                var change = new ListChanges<T, TAdaptee>(value.Changes, _selector);
                 var state = new ListAdapter<T, TAdaptee>(value.ReachedState, _selector);
-                this.Adaptee.OnNext(new ListChangePlusState<TAdaptee>(change, state));
+                this.Adaptee.OnNext(new IndexedChangesPlusState<TAdaptee>(change, state));
             }
         }
 
-        private sealed class ListChange<T, TAdaptee> : IChange<ListOperation<TAdaptee>>
+        private sealed class ListChanges<T, TAdaptee> : IBatch<IndexedChange<TAdaptee>>
         {
-            [NotNull] private readonly IChange<ListOperation<T>> _adaptee;
+            [NotNull] private readonly IBatch<IndexedChange<T>> _adaptee;
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
-            public ListChange(
-                [NotNull] IChange<ListOperation<T>> adaptee,
+            public ListChanges(
+                [NotNull] IBatch<IndexedChange<T>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
             {
                 _adaptee = adaptee;
                 _selector = selector;
             }
 
-            public IEnumerable<ListOperation<TAdaptee>> GetIterations()
+            public IEnumerable<IndexedChange<TAdaptee>> GetIterations()
             {
                 foreach (var update in _adaptee.GetIterations())
                 {
                     switch (update.Type)
                     {
-                        case ListOperationType.Add:
-                            yield return ListOperation<TAdaptee>.OnAdd(
+                        case IndexedChangeType.Add:
+                            yield return IndexedChange<TAdaptee>.OnAdd(
                                 _selector(update.Item),
                                 update.Index);
                             break;
 
-                        case ListOperationType.Remove:
-                            yield return ListOperation<TAdaptee>.OnRemove(
+                        case IndexedChangeType.Remove:
+                            yield return IndexedChange<TAdaptee>.OnRemove(
                                 _selector(update.Item),
                                 update.Index);
                             break;
 
-                        case ListOperationType.Move:
-                            yield return ListOperation<TAdaptee>.OnMove(
+                        case IndexedChangeType.Move:
+                            yield return IndexedChange<TAdaptee>.OnMove(
                                 _selector(update.Item),
                                 update.Index,
                                 update.OriginalIndex);
                             break;
 
-                        case ListOperationType.Replace:
-                            yield return ListOperation<TAdaptee>.OnReplace(
+                        case IndexedChangeType.Replace:
+                            yield return IndexedChange<TAdaptee>.OnReplace(
                                 _selector(update.Item),
                                 _selector(update.ChangedItem),
                                 update.Index);
                             break;
 
-                        case ListOperationType.Clear:
-                            yield return ListOperation<TAdaptee>.OnClear();
+                        case IndexedChangeType.Clear:
+                            yield return IndexedChange<TAdaptee>.OnClear();
                             break;
 
                         default:
