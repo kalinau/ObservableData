@@ -48,19 +48,32 @@ namespace ObservableData.Structures
     public static class CollectionOperationExtensions
     {
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
+            [NotNull, ItemNotNull] this IEnumerable<ICollectionOperation<T>> changes)
+        {
+            foreach (var i in changes)
+            {
+                foreach (var o in i.ToGeneralChanges())
+                {
+                    yield return o;
+                }
+            }
+        }
+
+        [NotNull]
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this ICollectionOperation<T> operation)
         {
             return operation.Match(
-                AsQueryingCollectionOperations,
-                AsQueryingCollectionOperations,
-                AsQueryingCollectionOperations,
-                AsQueryingCollectionOperations
+                ToGeneralChanges,
+                ToGeneralChanges,
+                ToGeneralChanges,
+                ToGeneralChanges
             ).NotNull();
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this ICollectionInsertOperation<T> insert)
         {
             foreach (var item in insert.Items)
@@ -70,14 +83,14 @@ namespace ObservableData.Structures
 }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this ICollectionRemoveOperation<T> remove)
         {
             yield return GeneralChange<T>.OnRemove(remove.Item);
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this ICollectionReplaceOperation<T> replace)
         {
             yield return GeneralChange<T>.OnRemove(replace.ReplacedItem);
@@ -85,7 +98,7 @@ namespace ObservableData.Structures
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this ICollectionClearOperation<T> clear)
         {
             yield return GeneralChange<T>.OnClear();

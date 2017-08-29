@@ -9,11 +9,11 @@ namespace ObservableData.Querying.Select
 {
     internal static partial class SelectConstant
     {
-        public sealed class ListChangesObserver<T, TAdaptee> : ListChangesObserverAdapter<T, TAdaptee>
+        public sealed class IndexedChangesObserver<T, TAdaptee> : ListChangesObserverAdapter<T, TAdaptee>
         {
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
-            public ListChangesObserver(
+            public IndexedChangesObserver(
                 [NotNull] IObserver<IBatch<IndexedChange<TAdaptee>>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
                 : base(adaptee)
@@ -25,16 +25,16 @@ namespace ObservableData.Querying.Select
             {
                 if (value == null) return;
 
-                var adapter = new ListChanges<T, TAdaptee>(value, _selector);
+                var adapter = new IndexedChanges<T, TAdaptee>(value, _selector);
                 this.Adaptee.OnNext(adapter);
             }
         }
 
-        public sealed class ListDataObserver<T, TAdaptee> : ListDataObserverAdapter<T, TAdaptee>
+        public sealed class IndexedChangesPlusStateObserver<T, TAdaptee> : ListDataObserverAdapter<T, TAdaptee>
         {
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
-            public ListDataObserver(
+            public IndexedChangesPlusStateObserver(
                 [NotNull] IObserver<IndexedChangesPlusState<TAdaptee>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
                 : base(adaptee)
@@ -44,18 +44,18 @@ namespace ObservableData.Querying.Select
 
             public override void OnNext(IndexedChangesPlusState<T> value)
             {
-                var change = new ListChanges<T, TAdaptee>(value.Changes, _selector);
+                var change = new IndexedChanges<T, TAdaptee>(value.Change, _selector);
                 var state = new ListAdapter<T, TAdaptee>(value.ReachedState, _selector);
                 this.Adaptee.OnNext(new IndexedChangesPlusState<TAdaptee>(change, state));
             }
         }
 
-        private sealed class ListChanges<T, TAdaptee> : IBatch<IndexedChange<TAdaptee>>
+        private sealed class IndexedChanges<T, TAdaptee> : IBatch<IndexedChange<TAdaptee>>
         {
             [NotNull] private readonly IBatch<IndexedChange<T>> _adaptee;
             [NotNull] private readonly Func<T, TAdaptee> _selector;
 
-            public ListChanges(
+            public IndexedChanges(
                 [NotNull] IBatch<IndexedChange<T>> adaptee,
                 [NotNull] Func<T, TAdaptee> selector)
             {
@@ -63,9 +63,9 @@ namespace ObservableData.Querying.Select
                 _selector = selector;
             }
 
-            public IEnumerable<IndexedChange<TAdaptee>> GetIterations()
+            public IEnumerable<IndexedChange<TAdaptee>> GetPeaces()
             {
-                foreach (var update in _adaptee.GetIterations())
+                foreach (var update in _adaptee.GetPeaces())
                 {
                     switch (update.Type)
                     {

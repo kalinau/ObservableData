@@ -14,18 +14,18 @@ namespace ObservableData.Querying.Utils.Adapters
             _threadId = ThreadId.FromCurrent();
         }
 
+        public IEnumerable<T> GetPeaces()
+        {
+            if (_locked != null) return _locked;
+            _threadId.CheckIsCurrent();
+            return this.Enumerate();
+        }
+
         public void MakeImmutable()
         {
             if (_locked != null) return;
             _threadId.CheckIsCurrent();
             _locked = this.Enumerate().ToArray();
-        }
-
-        public IEnumerable<T> GetIterations()
-        {
-            if (_locked != null) return _locked;
-            _threadId.CheckIsCurrent();
-            return this.Enumerate();
         }
 
         [NotNull]

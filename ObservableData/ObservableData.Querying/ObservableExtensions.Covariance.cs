@@ -17,50 +17,48 @@ namespace ObservableData.Querying
                 _adaptee = adaptee;
             }
 
-            public IEnumerable<GeneralChange<T>> GetIterations()
-            {
-                foreach (var i in _adaptee.GetIterations())
-                {
-                    foreach (var operation in i.AsCollectionOpperations())
-                    {
-                        yield return operation;
-                    }
-                }
-            }
-
             public void MakeImmutable()
             {
                 _adaptee.MakeImmutable();
             }
+
+            public IEnumerable<GeneralChange<T>> GetPeaces()
+            {
+                foreach (var i in _adaptee.GetPeaces())
+                {
+                    foreach (var change in i.ToGeneralChanges())
+                    {
+                        yield return change;
+                    }
+                }
+            }
         }
 
         [NotNull]
-        public static IObservable<IBatch<GeneralChange<T>>> AsCollectionChanges<T>(
+        public static IObservable<IBatch<GeneralChange<T>>> SelectGeneralChanges<T>(
             [NotNull] this IObservable<IBatch<IndexedChange<T>>> previous)
         {
             return previous.Select(x => x == null ? null : new ListChangesAdapter<T>(x)).NotNull();
         }
 
         [NotNull]
-        public static IObservable<GeneralChangesPlusState<T>> AsCollectionData<T>(
+        public static IObservable<GeneralChangesPlusState<T>> SelectGeneralChangesPlusState<T>(
             [NotNull] this IObservable<IndexedChangesPlusState<T>> previous)
         {
             return previous.Select(x =>
-                    new GeneralChangesPlusState<T>(
-                        new ListChangesAdapter<T>(x.Changes),
-                        x.ReachedState))
+                    new GeneralChangesPlusState<T>(new ListChangesAdapter<T>(x.Change),x.ReachedState))
                 .NotNull();
         }
 
         [NotNull]
-        public static IObservable<IBatch<IndexedChange<T>>> AsChanges<T>(
+        public static IObservable<IBatch<IndexedChange<T>>> SelectChanges<T>(
             [NotNull] this IObservable<IndexedChangesPlusState<T>> previous)
         {
-            return previous.Select(x => x.Changes).NotNull();
+            return previous.Select(x => x.Change).NotNull();
         }
 
         [NotNull]
-        public static IObservable<IBatch<GeneralChange<T>>> AsChanges<T>(
+        public static IObservable<IBatch<GeneralChange<T>>> SelectChanges<T>(
             [NotNull] this IObservable<GeneralChangesPlusState<T>> previous)
         {
             return previous.Select(x => x.Changes).NotNull();

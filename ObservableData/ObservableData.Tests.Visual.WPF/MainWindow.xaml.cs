@@ -35,27 +35,27 @@ namespace ObservableData.Tests.Visual
             _source.Add(new[] {new TestEntity(12), new TestEntity(21)});
 
             _source.WhenUpdated
-                .SelectQueryingListChanges()
+                .SelectIndexedChanges()
                 .WithState(_source)
-                .ToBindableStateProxy(out var bindableSource);
+                .SubscribeBindableProxy(out var bindableSource);
 
             this.AddListView(bindableSource);
 
             _source.WhenUpdated
-                .SelectQueryingListChanges()
-                .StartWith(_source)
+                .SelectIndexedChanges()
+                .StartWithAdd(_source)
                 .WithState(_source)
-                .Select(x => x.Value)
-                .ToBindableStateProxy(out var projection);
+                .AsForSelect(x => x.Value)
+                .SubscribeBindableProxy(out var projection);
 
             this.AddListView(projection);
 
             var result = new ObservableCollection<TestEntity>();
             this.AddListView(result);
             _source.WhenUpdated
-                .SelectQueryingCollectionChanges()
-                .StartWith(_source)
-                .Where(x => x.Value > 5)
+                .SelectGeneralChanges()
+                .StartWithAdd(_source)
+                .AsForWhere(x => x.Value > 5)
                 .Subscribe(x => x.ApplyTo(result));
         }
 

@@ -58,7 +58,7 @@ namespace ObservableData.Querying
     public static class IndexedChangeExtensions
     {
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsCollectionOpperations<T>(this IndexedChange<T> change)
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(this IndexedChange<T> change)
         {
             switch (change.Type)
             {
@@ -147,22 +147,22 @@ namespace ObservableData.Querying
         }
 
         public static void ApplyTo<T>(
-            [NotNull] this IBatch<IndexedChange<T>> changes,
+            [NotNull] this IBatch<IndexedChange<T>> batch,
             [NotNull] IList<T> list)
         {
-            foreach (var o in changes.GetIterations())
+            foreach (var change in batch.GetPeaces())
             {
-                o.ApplyTo(list);
+                change.ApplyTo(list);
             }
         }
 
         public static void ApplyTo<T>(
-            [NotNull] this IBatch<IndexedChange<T>> changes,
+            [NotNull] this IBatch<IndexedChange<T>> batch,
             [NotNull] ICollection<T> collection)
         {
-            foreach (var o in changes.GetIterations())
+            foreach (var change in batch.GetPeaces())
             {
-                o.ApplyTo(collection);
+                change.ApplyTo(collection);
             }
         }
     }

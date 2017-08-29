@@ -10,6 +10,6 @@ namespace ObservableData.Structures
         [NotNull]
         IDisposable StartBatchUpdate();
 
-        void Add([NotNull, InstantHandle] IReadOnlyCollection<T> items);
+        void Add([NotNull] IReadOnlyCollection<T> items);
     }
 }

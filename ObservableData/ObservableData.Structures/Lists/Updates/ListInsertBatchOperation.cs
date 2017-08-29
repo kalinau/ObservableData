@@ -51,7 +51,7 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
+        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetPeaces()
         {
             int i = _index;
             foreach (var item in this.Items)
@@ -60,7 +60,7 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
+        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetPeaces()
         {
             foreach (var item in this.Items)
             {
@@ -68,12 +68,12 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetIterations()
+        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetPeaces()
         {
             yield return this;
         }
 
-        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetIterations()
+        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetPeaces()
         {
             yield return this;
         }

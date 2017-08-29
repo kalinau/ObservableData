@@ -8,7 +8,7 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IDisposable ToBindableStateProxy<T>(
+        public static IDisposable SubscribeBindableProxy<T>(
             [NotNull] this IObservable<IndexedChangesPlusState<T>> observable,
             [NotNull] out BindableList<T> state)
         {
@@ -17,9 +17,9 @@ namespace ObservableData.Querying
             return observable.Subscribe(x =>
             {
                 list.Subject = x.ReachedState;
-                foreach (var update in x.Changes.GetIterations())
+                foreach (var update in x.Change.GetPeaces())
                 {
-                    list.Events.OnOperation(update);
+                    list.Events.OnChange(update);
                     if (update.Type == IndexedChangeType.Clear)
                     {
                         break;

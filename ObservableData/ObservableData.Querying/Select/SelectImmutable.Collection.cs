@@ -27,16 +27,16 @@ namespace ObservableData.Querying.Select
 
                 Dictionary<T, TAdaptee> removedOnChange = null;
 
-                foreach (var update in value.GetIterations())
+                foreach (var change in value.GetPeaces())
                 {
-                    switch (update.Type)
+                    switch (change.Type)
                     {
                         case GeneralChangeType.Add:
-                            _state.OnAdd(update.Item, _func, removedOnChange);
+                            _state.OnAdd(change.Item, _func, removedOnChange);
                             break;
 
                         case GeneralChangeType.Remove:
-                            _state.OnRemove(update.Item, ref removedOnChange);
+                            _state.OnRemove(change.Item, ref removedOnChange);
                             break;
 
                         case GeneralChangeType.Clear:
@@ -72,17 +72,17 @@ namespace ObservableData.Querying.Select
 
             protected override IEnumerable<GeneralChange<TAdaptee>> Enumerate()
             {
-                foreach (var update in _adaptee.GetIterations())
+                foreach (var change in _adaptee.GetPeaces())
                 {
-                    switch (update.Type)
+                    switch (change.Type)
                     {
                         case GeneralChangeType.Add:
-                            var added = _state.Get(update.Item, _removedOnChange);
+                            var added = _state.Get(change.Item, _removedOnChange);
                             yield return GeneralChange<TAdaptee>.OnAdd(added);
                             break;
 
                         case GeneralChangeType.Remove:
-                            var removed = _state.Get(update.Item, _removedOnChange);
+                            var removed = _state.Get(change.Item, _removedOnChange);
                             yield return GeneralChange<TAdaptee>.OnRemove(removed);
                             break;
 

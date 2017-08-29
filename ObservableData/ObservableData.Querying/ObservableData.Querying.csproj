@@ -5,17 +5,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include=".Utils\Adapters\CurrentStateChange.cs" />
     <Compile Include=".Utils\Adapters\ObserverAdapter.cs" />
-    <Compile Include=".Utils\Adapters\StateChange.cs" />
     <Compile Include=".Utils\Adapters\ThreadSensitiveChange.cs" />
     <Compile Include=".Utils\Annotations.cs" />
+    <Compile Include=".Utils\CollectionProxy.cs" />
     <Compile Include=".Utils\Efficiency\InefficientUsageException.cs" />
     <Compile Include=".Utils\Efficiency\Inneficient.cs" />
     <Compile Include=".Utils\KeedAliveDisposableAdapter.cs" />
+    <Compile Include=".Utils\ListProxy.cs" />
     <Compile Include=".Utils\ObservableExtensions.cs" />
     <Compile Include=".Utils\ThreadId.cs" />
     <Compile Include=".Utils\WeakObserver.cs" />
     <Compile Include=".Utils\WeakReferenceExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Select\SelectConstant.Indexed.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -33,29 +33,29 @@ namespace ObservableData.Querying.Select
         [NotNull]
         private static IBatch<IndexedChange<TAdaptee>> Apply<T, TAdaptee>(
             [NotNull] this SelectState<T, TAdaptee> state,
-            [NotNull] IBatch<IndexedChange<T>> value,
+            [NotNull] IBatch<IndexedChange<T>> changes,
             [NotNull] Func<T, TAdaptee> func)
         {
             Dictionary<T, TAdaptee> removedOnChange = null;
 
-            foreach (var update in value.GetIterations())
+            foreach (var change in changes.GetPeaces())
             {
-                switch (update.Type)
+                switch (change.Type)
                 {
                     case IndexedChangeType.Add:
-                        state.OnAdd(update.Item, func, removedOnChange);
+                        state.OnAdd(change.Item, func, removedOnChange);
                         break;
 
                     case IndexedChangeType.Remove:
-                        state.OnRemove(update.Item, ref removedOnChange);
+                        state.OnRemove(change.Item, ref removedOnChange);
                         break;
 
                     case IndexedChangeType.Move:
                         break;
 
                     case IndexedChangeType.Replace:
-                        state.OnRemove(update.ChangedItem, ref removedOnChange);
-                        state.OnAdd(update.Item, func, removedOnChange);
+                        state.OnRemove(change.ChangedItem, ref removedOnChange);
+                        state.OnAdd(change.Item, func, removedOnChange);
                         break;
 
                     case IndexedChangeType.Clear:
@@ -67,7 +67,7 @@ namespace ObservableData.Querying.Select
                 }
             }
 
-            var adapter = new ListChanges<T, TAdaptee>(value, state, removedOnChange);
+            var adapter = new ListChanges<T, TAdaptee>(changes, state, removedOnChange);
             return adapter;
         }
 
@@ -87,7 +87,7 @@ namespace ObservableData.Querying.Select
 
             public override void OnNext(IndexedChangesPlusState<T> value)
             {
-                var change = _state.Apply(value.Changes, _func);
+                var change = _state.Apply(value.Change, _func);
                 var list = new StateAdapter(value.ReachedState, _state);
                 this.Adaptee.OnNext(new IndexedChangesPlusState<TAdaptee>(change, list));
             }
@@ -139,34 +139,34 @@ namespace ObservableData.Querying.Select
 
             protected override IEnumerable<IndexedChange<TAdaptee>> Enumerate()
             {
-                foreach (var update in _adaptee.GetIterations())
+                foreach (var change in _adaptee.GetPeaces())
                 {
-                    switch (update.Type)
+                    switch (change.Type)
                     {
                         case IndexedChangeType.Add:
                             yield return IndexedChange<TAdaptee>.OnAdd(
-                                _state.Get(update.Item, _removed),
-                                update.Index);
+                                _state.Get(change.Item, _removed),
+                                change.Index);
                             break;
 
                         case IndexedChangeType.Remove:
                             yield return IndexedChange<TAdaptee>.OnRemove(
-                                _state.Get(update.Item, _removed),
-                                update.Index);
+                                _state.Get(change.Item, _removed),
+                                change.Index);
                             break;
 
                         case IndexedChangeType.Move:
                             yield return IndexedChange<TAdaptee>.OnMove(
-                                _state.Get(update.Item, _removed),
-                                update.Index,
-                                update.OriginalIndex);
+                                _state.Get(change.Item, _removed),
+                                change.Index,
+                                change.OriginalIndex);
                             break;
 
                         case IndexedChangeType.Replace:
                             yield return IndexedChange<TAdaptee>.OnReplace(
-                                _state.Get(update.Item, _removed),
-                                _state.Get(update.ChangedItem, _removed),
-                                update.Index);
+                                _state.Get(change.Item, _removed),
+                                _state.Get(change.ChangedItem, _removed),
+                                change.Index);
                             break;
 
                         case IndexedChangeType.Clear:

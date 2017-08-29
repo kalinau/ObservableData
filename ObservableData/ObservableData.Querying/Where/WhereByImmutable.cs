@@ -60,11 +60,10 @@ namespace ObservableData.Querying.Where
                 _adaptee = adaptee;
                 _criterion = criterion;
             }
-            public void MakeImmutable() => _adaptee.MakeImmutable();
 
-            public IEnumerable<GeneralChange<T>> GetIterations()
+            public IEnumerable<GeneralChange<T>> GetPeaces()
             {
-                foreach (var update in _adaptee.GetIterations())
+                foreach (var update in _adaptee.GetPeaces())
                 {
                     if (update.Type == GeneralChangeType.Clear)
                     {
@@ -76,6 +75,8 @@ namespace ObservableData.Querying.Where
                     }
                 }
             }
+
+            public void MakeImmutable() => _adaptee.MakeImmutable();
         }
 
         private sealed class CollectionAdapter<T> : IReadOnlyCollection<T>

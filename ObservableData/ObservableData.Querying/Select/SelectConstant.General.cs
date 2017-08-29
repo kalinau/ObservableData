@@ -63,9 +63,9 @@ namespace ObservableData.Querying.Select
                 _selector = selector;
             }
 
-            public IEnumerable<GeneralChange<TAdaptee>> GetIterations()
+            public IEnumerable<GeneralChange<TAdaptee>> GetPeaces()
             {
-                foreach (var u in _adaptee.GetIterations())
+                foreach (var u in _adaptee.GetPeaces())
                 {
                     switch (u.Type)
                     {

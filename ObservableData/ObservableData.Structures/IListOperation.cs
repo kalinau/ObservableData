@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying;
 using ObservableData.Structures.Utils;
@@ -71,20 +70,36 @@ namespace ObservableData.Structures
     public static class ListOperationExtensions
     {
         [NotNull]
-        public static IEnumerable<IndexedChange<T>> AsQueryingListOperations<T>(
+        public static IEnumerable<IndexedChange<T>> ToIndexedChanges<T>(
+            [NotNull, ItemNotNull] this IEnumerable<IListOperation<T>> changes)
+        {
+            foreach (var i in changes)
+            {
+                var operations = i.ToIndexedChanges();
+                foreach (var o in operations)
+                {
+                    {
+                        yield return o;
+                    }
+                }
+            }
+        }
+
+        [NotNull]
+        public static IEnumerable<IndexedChange<T>> ToIndexedChanges<T>(
             [NotNull] this IListOperation<T> operation)
         {
             return operation.Match(
-                AsQueryingListOperations,
-                AsQueryingListOperations,
-                AsQueryingListOperations,
-                AsQueryingListOperations,
-                AsQueryingListOperations
+                ToIndexedChanges,
+                ToIndexedChanges,
+                ToIndexedChanges,
+                ToIndexedChanges,
+                ToIndexedChanges
             ).NotNull();
         }
 
         [NotNull]
-        public static IEnumerable<IndexedChange<T>> AsQueryingListOperations<T>(
+        public static IEnumerable<IndexedChange<T>> ToIndexedChanges<T>(
             [NotNull] this IListInsertOperation<T> insert)
         {
             var index = insert.Index;
@@ -95,48 +110,61 @@ namespace ObservableData.Structures
         }
 
         [NotNull]
-        public static IEnumerable<IndexedChange<T>> AsQueryingListOperations<T>(
+        public static IEnumerable<IndexedChange<T>> ToIndexedChanges<T>(
             [NotNull] this IListRemoveOperation<T> remove)
         {
             yield return IndexedChange<T>.OnRemove(remove.Item, remove.Index);
         }
 
         [NotNull]
-        public static IEnumerable<IndexedChange<T>> AsQueryingListOperations<T>(
+        public static IEnumerable<IndexedChange<T>> ToIndexedChanges<T>(
             [NotNull] this IListReplaceOperation<T> replace)
         {
             yield return IndexedChange<T>.OnReplace(replace.Item, replace.ReplacedItem, replace.Index);
         }
 
         [NotNull]
-        public static IEnumerable<IndexedChange<T>> AsQueryingListOperations<T>(
+        public static IEnumerable<IndexedChange<T>> ToIndexedChanges<T>(
             [NotNull] this IListMoveOperation<T> move)
         {
             yield return IndexedChange<T>.OnMove(move.Item, move.To, move.From);
         }
 
         [NotNull]
-        public static IEnumerable<IndexedChange<T>> AsQueryingListOperations<T>(
+        public static IEnumerable<IndexedChange<T>> ToIndexedChanges<T>(
             [NotNull] this IListClearOperation<T> clear)
         {
             yield return IndexedChange<T>.OnClear();
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
+            [NotNull, ItemNotNull] this IEnumerable<IListOperation<T>> changes)
+        {
+            foreach (var i in changes)
+            {
+                foreach (var o in i.ToGeneralChanges())
+                {
+                    yield return o;
+                }
+            }
+        }
+
+        [NotNull]
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this IListOperation<T> operation)
         {
             return operation.Match(
-                AsQueryingCollectionOperations,
-                AsQueryingCollectionOperations,
-                AsQueryingCollectionOperations,
-                AsQueryingCollectionOperations,
-                AsQueryingCollectionOperations
+                ToGeneralChanges,
+                ToGeneralChanges,
+                ToGeneralChanges,
+                ToGeneralChanges,
+                ToGeneralChanges
             ).NotNull();
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this IListInsertOperation<T> insert)
         {
             foreach (var item in insert.Items)
@@ -146,14 +174,14 @@ namespace ObservableData.Structures
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this IListRemoveOperation<T> remove)
         {
             yield return GeneralChange<T>.OnRemove(remove.Item);
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this IListReplaceOperation<T> replace)
         {
             yield return GeneralChange<T>.OnRemove(replace.ReplacedItem);
@@ -161,14 +189,14 @@ namespace ObservableData.Structures
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this IListMoveOperation<T> move)
         {
-            return Enumerable.Empty<GeneralChange<T>>().NotNull();
+            yield break;
         }
 
         [NotNull]
-        public static IEnumerable<GeneralChange<T>> AsQueryingCollectionOperations<T>(
+        public static IEnumerable<GeneralChange<T>> ToGeneralChanges<T>(
             [NotNull] this IListClearOperation<T> clear)
         {
             yield return GeneralChange<T>.OnClear();

@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 
-namespace ObservableData.Querying.Compatibility
+namespace ObservableData.Querying.Utils
 {
     [PublicAPI]
-    public class ListProxy<T> : IReadOnlyList<T>
+    public abstract class CollectionProxy<T> : IReadOnlyCollection<T>
     {
-        [NotNull] private static readonly IReadOnlyList<T> Default = new List<T>(0);
-        [NotNull] private IReadOnlyList<T> _subject = Default;
+        [NotNull] private static readonly IReadOnlyCollection<T> Default = new List<T>(0);
+        [NotNull] private IReadOnlyCollection<T> _subject = Default;
 
         [NotNull]
-        public IReadOnlyList<T> Subject
+        public IReadOnlyCollection<T> Subject
         {
             get => _subject;
             set => _subject = value;
@@ -22,7 +22,5 @@ namespace ObservableData.Querying.Compatibility
         IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
         public int Count => _subject.Count;
-
-        public T this[int index] => _subject[index];
     }
 }

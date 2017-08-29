@@ -16,7 +16,7 @@ namespace ObservableData.Querying.Compatibility
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnOperation(IndexedChange<T> value)
+        public void OnChange(IndexedChange<T> value)
         {
             switch (value.Type)
             {

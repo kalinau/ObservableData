@@ -20,7 +20,7 @@ namespace ObservableData.Querying
         public IReadOnlyList<T> ReachedState => _reachedState;
 
         [NotNull]
-        public IBatch<IndexedChange<T>> Changes => _change;
+        public IBatch<IndexedChange<T>> Change => _change;
     }
 
     [PublicAPI]
@@ -30,7 +30,7 @@ namespace ObservableData.Querying
             this IndexedChangesPlusState<T> changesPlusState,
             [NotNull] IList<T> list)
         {
-            changesPlusState.Changes.ApplyTo(list);
+            changesPlusState.Change.ApplyTo(list);
         }
     }
 }

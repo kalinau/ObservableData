@@ -7,7 +7,6 @@ using ObservableData.Querying.Utils;
 namespace ObservableData.Structures.Collections.Updates
 {
     public class CollectionInsertBatchOperation<T> :
-        CollectionBaseOperation<T>, 
         ICollectionInsertOperation<T>
     {
         [NotNull] private readonly IReadOnlyCollection<T> _items;
@@ -34,7 +33,7 @@ namespace ObservableData.Structures.Collections.Updates
             }
         }
 
-        public override void MakeImmutable()
+        public void MakeImmutable()
         {
             if (_locked == null)
             {
@@ -42,12 +41,12 @@ namespace ObservableData.Structures.Collections.Updates
             }
         }
 
-        public override TResult Match<TResult>(Func<ICollectionInsertOperation<T>, TResult> onInsert, Func<ICollectionRemoveOperation<T>, TResult> onRemove, Func<ICollectionReplaceOperation<T>, TResult> onReplace, Func<ICollectionClearOperation<T>, TResult> onClear)
+        public TResult Match<TResult>(Func<ICollectionInsertOperation<T>, TResult> onInsert, Func<ICollectionRemoveOperation<T>, TResult> onRemove, Func<ICollectionReplaceOperation<T>, TResult> onReplace, Func<ICollectionClearOperation<T>, TResult> onClear)
         {
             return onInsert.Invoke(this);
         }
 
-        public override void Match(Action<ICollectionInsertOperation<T>> onInsert, Action<ICollectionRemoveOperation<T>> onRemove, Action<ICollectionReplaceOperation<T>> onReplace, Action<ICollectionClearOperation<T>> onClear)
+        public void Match(Action<ICollectionInsertOperation<T>> onInsert, Action<ICollectionRemoveOperation<T>> onRemove, Action<ICollectionReplaceOperation<T>> onReplace, Action<ICollectionClearOperation<T>> onClear)
         {
             onInsert?.Invoke(this);
         }

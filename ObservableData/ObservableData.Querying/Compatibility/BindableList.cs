@@ -1,6 +1,7 @@
 using System.Collections.Specialized;
 using System.ComponentModel;
 using JetBrains.Annotations;
+using ObservableData.Querying.Utils;
 
 namespace ObservableData.Querying.Compatibility
 {

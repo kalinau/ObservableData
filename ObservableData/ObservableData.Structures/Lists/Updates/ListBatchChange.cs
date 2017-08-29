@@ -74,13 +74,13 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetIterations()
+        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetPeaces()
         {
             var next = _first;
             while (next != null)
             {
-                IBatch<ICollectionOperation<T>> changes = next;
-                foreach (var i in changes.GetIterations())
+                IBatch<ICollectionOperation<T>> nextBatch = next;
+                foreach (var i in nextBatch.GetPeaces())
                 {
                     yield return i;
                 }
@@ -88,13 +88,13 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetIterations()
+        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetPeaces()
         {
             var next = _first;
             while (next != null)
             {
-                IBatch<IListOperation<T>> changes = next;
-                foreach (var i in changes.GetIterations())
+                IBatch<IListOperation<T>> nextBatch = next;
+                foreach (var i in nextBatch.GetPeaces())
                 {
                     yield return i;
                 }
@@ -102,13 +102,13 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
+        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetPeaces()
         {
             var next = _first;
             while (next != null)
             {
-                IBatch<IndexedChange<T>> changes = next;
-                foreach (var i in changes.GetIterations())
+                IBatch<IndexedChange<T>> nextBatch = next;
+                foreach (var i in nextBatch.GetPeaces())
                 {
                     yield return i;
                 }
@@ -116,13 +116,13 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
+        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetPeaces()
         {
             var next = _first;
             while (next != null)
             {
-                IBatch<GeneralChange<T>> changes = next;
-                foreach (var i in changes.GetIterations())
+                IBatch<GeneralChange<T>> nextBatch = next;
+                foreach (var i in nextBatch.GetPeaces())
                 {
                     yield return i;
                 }

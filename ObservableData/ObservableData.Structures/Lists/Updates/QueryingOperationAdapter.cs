@@ -35,12 +35,12 @@ namespace ObservableData.Structures.Lists.Updates
 
         public void MakeImmutable() { }
 
-        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetIterations()
+        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetPeaces()
         {
             yield return this;
         }
 
-        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetIterations()
+        IEnumerable<ICollectionOperation<T>> IBatch<ICollectionOperation<T>>.GetPeaces()
         {
             switch (_adaptee.Type)
             {
@@ -69,12 +69,12 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetIterations()
+        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetPeaces()
         {
-            return _adaptee.AsCollectionOpperations();
+            return _adaptee.ToGeneralChanges();
         }
 
-        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetIterations()
+        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetPeaces()
         {
             yield return _adaptee;
         }

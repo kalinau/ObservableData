@@ -60,10 +60,10 @@ namespace ObservableData.Querying
         }
 
         public static void ApplyTo<T>(
-            [NotNull] this IBatch<GeneralChange<T>> changes,
+            [NotNull] this IBatch<GeneralChange<T>> change,
             [NotNull] ICollection<T> collection)
         {
-            foreach (var o in changes.GetIterations())
+            foreach (var o in change.GetPeaces())
             {
                 o.ApplyTo(collection);
             }
