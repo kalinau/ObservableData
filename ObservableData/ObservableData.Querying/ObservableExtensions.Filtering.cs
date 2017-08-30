@@ -19,7 +19,7 @@ namespace ObservableData.Querying
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new WhereByImmutable.CollectionChangesObserver<T>(o, criterion);
+                var adapter = new WhereByImmutable.GeneralChangesObserver<T>(o, criterion);
                 return previous.Subscribe(adapter);
             }).NotNull();
         }
@@ -33,7 +33,7 @@ namespace ObservableData.Querying
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new WhereByImmutable.CollectionDataObserver<T>(o, criterion);
+                var adapter = new WhereByImmutable.GeneralChangesPlusStateObserver<T>(o, criterion);
                 return previous.Subscribe(adapter);
             }).NotNull();
         }

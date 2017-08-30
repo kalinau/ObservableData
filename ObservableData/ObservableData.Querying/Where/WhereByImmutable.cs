@@ -3,57 +3,94 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using ObservableData.Querying.Utils.Adapters;
 
 namespace ObservableData.Querying.Where
 {
     internal static class WhereByImmutable
     {
-        public sealed class CollectionChangesObserver<T> : CollectionChangesObserverAdapter<T>
+        public sealed class GeneralChangesObserver<T> : IObserver<IBatch<GeneralChange<T>>>
         {
+            [NotNull] private readonly IObserver<IBatch<GeneralChange<T>>> _adaptee;
             [NotNull] private readonly Func<T, bool> _criterion;
 
-            public CollectionChangesObserver(
-                [NotNull] IObserver<IBatch<GeneralChange<T>>> previous,
-                [NotNull] Func<T, bool> criterion) 
-                : base(previous)
+            public GeneralChangesObserver(
+                [NotNull] IObserver<IBatch<GeneralChange<T>>> adaptee,
+                [NotNull] Func<T, bool> criterion)
             {
+                _adaptee = adaptee;
                 _criterion = criterion;
             }
 
-            public override void OnNext(IBatch<GeneralChange<T>> value)
+            public void OnNext(IBatch<GeneralChange<T>> value)
             {
                 if (value == null) return;
 
-                this.Adaptee.OnNext(new CollectionChanges<T>(value, _criterion));
+                _adaptee.OnNext(new GeneralChanges<T>(value, _criterion));
             }
+
+            public void OnCompleted() => _adaptee.OnCompleted();
+
+            public void OnError(Exception error) => _adaptee.OnError(error);
         }
 
-        public sealed class CollectionDataObserver<T> : CollectionDataObserverAdapter<T>
+        public sealed class GeneralChangesPlusStateObserver<T> : IObserver<GeneralChangesPlusState<T>>
         {
+            [NotNull] private readonly IObserver<GeneralChangesPlusState<T>> _adaptee;
             [NotNull] private readonly Func<T, bool> _criterion;
 
-            public CollectionDataObserver(
-                [NotNull] IObserver<GeneralChangesPlusState<T>> previous,
+            private int? _count;
+
+            public GeneralChangesPlusStateObserver(
+                [NotNull] IObserver<GeneralChangesPlusState<T>> adaptee,
                 [NotNull] Func<T, bool> criterion)
-                : base(previous)
             {
+                _adaptee = adaptee;
                 _criterion = criterion;
             }
-            public override void OnNext(GeneralChangesPlusState<T> value)
+
+            public void OnNext(GeneralChangesPlusState<T> value)
             {
-                var change = new CollectionChanges<T>(value.Changes, _criterion);
-                var state = new CollectionAdapter<T>(value.ReachedState, _criterion);
-                this.Adaptee.OnNext(new GeneralChangesPlusState<T>(change, state));
+                if (_count == null)
+                {
+                    _count = value.ReachedState.Where(_criterion).Count();
+                }
+                else
+                {
+                    foreach (var peace in value.Changes.GetPeaces())
+                    {
+                        switch (peace.Type)
+                        {
+                            case GeneralChangeType.Add:
+                                _count++;
+                                break;
+                            case GeneralChangeType.Remove:
+                                _count--;
+                                break;
+                            case GeneralChangeType.Clear:
+                                _count = 0;
+                                break;
+
+                            default:
+                                throw new ArgumentOutOfRangeException();
+                        }
+                    }
+                }
+                var change = new GeneralChanges<T>(value.Changes, _criterion);
+                var state = new CollectionAdapter<T>(value.ReachedState, _count.Value, _criterion);
+                _adaptee.OnNext(new GeneralChangesPlusState<T>(change, state));
             }
+
+            public void OnCompleted() => _adaptee.OnCompleted();
+
+            public void OnError(Exception error) => _adaptee.OnError(error);
         }
 
-        private sealed class CollectionChanges<T> : IBatch<GeneralChange<T>>
+        private sealed class GeneralChanges<T> : IBatch<GeneralChange<T>>
         {
             [NotNull] private readonly IBatch<GeneralChange<T>> _adaptee;
             [NotNull] private readonly Func<T, bool> _criterion;
 
-            public CollectionChanges(
+            public GeneralChanges(
                 [NotNull] IBatch<GeneralChange<T>> adaptee,
                 [NotNull] Func<T, bool> criterion)
             {
@@ -83,15 +120,19 @@ namespace ObservableData.Querying.Where
         {
             [NotNull] private readonly IReadOnlyCollection<T> _source;
             [NotNull] private readonly Func<T, bool> _criterion;
+            private readonly int _count;
 
-            public CollectionAdapter([NotNull] IReadOnlyCollection<T> source,
+            public CollectionAdapter(
+                [NotNull] IReadOnlyCollection<T> source,
+                int count,
                 [NotNull] Func<T, bool> criterion)
             {
                 _source = source;
                 _criterion = criterion;
+                _count = count;
             }
 
-            public int Count => _source.Count;
+            public int Count => _count;
 
             public IEnumerator<T> GetEnumerator()
             {
