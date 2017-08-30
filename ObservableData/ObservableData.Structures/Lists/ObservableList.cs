@@ -3,13 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using ObservableData.Querying;
-using ObservableData.Structures.Lists.Updates;
+using ObservableData.Structures.Lists.Utils;
 using ObservableData.Structures.Utils;
 
 namespace ObservableData.Structures.Lists
 {
-    public class ObservableList<T> : 
-        IObservableList<T>
+    public class ObservableList<T> : IObservableList<T>
     {
         [NotNull] private readonly List<T> _list;
         [NotNull] private readonly ListChangesSubject<T> _subject = new ListChangesSubject<T>();
@@ -31,7 +30,7 @@ namespace ObservableData.Structures.Lists
         IObservable<IBatch<ICollectionOperation<T>>> IObservableReadOnlyCollection<T>.WhenUpdated => this.WhenUpdated;
 
         [NotNull]
-        public IObservable<IListBatch<T>> WhenUpdated =>_subject;
+        public IObservable<IListBatchChange<T>> WhenUpdated =>_subject;
 
         public bool IsReadOnly => false;
 

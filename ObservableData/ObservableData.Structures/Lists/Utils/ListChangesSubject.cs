@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using JetBrains.Annotations;
-using ObservableData.Querying;
+using ObservableData.Structures.Lists.Operations;
 using ObservableData.Structures.Utils;
 
-namespace ObservableData.Structures.Lists.Updates
+namespace ObservableData.Structures.Lists.Utils
 {
-    internal class ListChangesSubject<T> : IObservable<IListBatch<T>>
+    internal class ListChangesSubject<T> : IObservable<IListBatchChange<T>>
     {
-        [NotNull] private readonly Subject<IListBatch<T>> _subject = new Subject<IListBatch<T>>();
+        [NotNull] private readonly Subject<IListBatchChange<T>> _subject = new Subject<IListBatchChange<T>>();
         [CanBeNull] private ListBatchChange<T> _batch;
 
         private bool ShouldTrackChange
@@ -35,7 +35,7 @@ namespace ObservableData.Structures.Lists.Updates
 
             if (list.Count == 0)
             {
-                current.Add(new ListInsertBatchOperation<T>(list, 0));
+                current.Add(new InsertBatchOperation<T>(list, 0));
                 current.IsReadOnly = true;
             }
 
@@ -53,29 +53,45 @@ namespace ObservableData.Structures.Lists.Updates
         {
             if (this.ShouldTrackChange)
             {
-                var update = new ListInsertBatchOperation<T>(items, index);
+                var update = new InsertBatchOperation<T>(items, index);
                 this.OnNext(update);
             }
         }
 
         public void OnAdd(T item, int index)
         {
-            this.OnOperation(IndexedChange<T>.OnAdd(item, index));
+            if (this.ShouldTrackChange)
+            {
+                var update = new InsertItemOperation<T>(index, item);
+                this.OnNext(update);
+            }
         }
 
         public void OnRemove(T item, int index)
         {
-            this.OnOperation(IndexedChange<T>.OnRemove(item, index));
+            if (this.ShouldTrackChange)
+            {
+                var update = new RemoveItemOperation<T>(index, item);
+                this.OnNext(update);
+            }
         }
 
         public void OnMove(T item, int from, int to)
         {
-            this.OnOperation(IndexedChange<T>.OnMove(item, to, from));
+            if (this.ShouldTrackChange)
+            {
+                var update = new MoveOperation<T>(item, from, to);
+                this.OnNext(update);
+            }
         }
 
         public void OnReplace(T value, T changedItem, int index)
         {
-            this.OnOperation(IndexedChange<T>.OnReplace(value, changedItem, index));
+            if (this.ShouldTrackChange)
+            {
+                var update = new ReplaceOperation<T>(index, value, changedItem);
+                this.OnNext(update);
+            }
         }
 
         public void OnClear([NotNull] IReadOnlyList<T> state)
@@ -85,27 +101,18 @@ namespace ObservableData.Structures.Lists.Updates
                 if (!_batch.IsReadOnly)
                 {
                     _batch?.Clear();
-                    _batch.Add(ListClearOperation<T>.Instance);
-                    _batch.Add(new ListInsertBatchOperation<T>(state, 0));
+                    _batch.Add(ClearOperation<T>.Instance);
+                    _batch.Add(new InsertBatchOperation<T>(state, 0));
                     _batch.IsReadOnly = true;
                 }
             }
-            else
+            else if (this.ShouldTrackChange)
             {
-                this.OnOperation(IndexedChange<T>.OnClear());
+                this.OnNext(ClearOperation<T>.Instance);
             }
         }
 
-        private void OnOperation(IndexedChange<T> change)
-        {
-            if (this.ShouldTrackChange)
-            {
-                var update = new QueryingOperationAdapter<T>(change);
-                this.OnNext(update);
-            }
-        }
-
-        private void OnNext(IListChangeNode<T> update)
+        private void OnNext(IListBatchChangeNode<T> update)
         {
             if (_batch != null)
             {
@@ -117,7 +124,7 @@ namespace ObservableData.Structures.Lists.Updates
             }
         }
 
-        public IDisposable Subscribe(IObserver<IListBatch<T>> observer)
+        public IDisposable Subscribe(IObserver<IListBatchChange<T>> observer)
         {
             return _subject.Subscribe(observer);
         }

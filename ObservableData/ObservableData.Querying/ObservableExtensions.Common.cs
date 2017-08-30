@@ -10,7 +10,7 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IBatch<IndexedChange<T>>> StartWithAdd<T>(
+        public static IObservable<IBatch<IndexedChange<T>>> StartWith<T>(
             [NotNull] this IObservable<IBatch<IndexedChange<T>>> observable,
             [NotNull] IReadOnlyCollection<T> state)
         {
@@ -18,7 +18,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<IBatch<GeneralChange<T>>> StartWithAdd<T>(
+        public static IObservable<IBatch<GeneralChange<T>>> StartWith<T>(
             [NotNull] this IObservable<IBatch<GeneralChange<T>>> observable,
             [NotNull] IReadOnlyCollection<T> state)
         {

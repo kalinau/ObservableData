@@ -146,9 +146,7 @@ namespace ObservableData.Querying
             }
         }
 
-        public static void ApplyTo<T>(
-            [NotNull] this IBatch<IndexedChange<T>> batch,
-            [NotNull] IList<T> list)
+        public static void ApplyTo<T>([NotNull] this IBatch<IndexedChange<T>> batch, [NotNull] IList<T> list)
         {
             foreach (var change in batch.GetPeaces())
             {
@@ -156,9 +154,7 @@ namespace ObservableData.Querying
             }
         }
 
-        public static void ApplyTo<T>(
-            [NotNull] this IBatch<IndexedChange<T>> batch,
-            [NotNull] ICollection<T> collection)
+        public static void ApplyTo<T>([NotNull] this IBatch<IndexedChange<T>> batch, [NotNull] ICollection<T> collection)
         {
             foreach (var change in batch.GetPeaces())
             {

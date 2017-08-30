@@ -10,7 +10,7 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IBatch<GeneralChange<T>>> AsForSelectConstant<TPrevious, T>(
+        public static IObservable<IBatch<GeneralChange<T>>> SelectConstantFromItems<TPrevious, T>(
             [NotNull] this IObservable<IBatch<GeneralChange<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -24,7 +24,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<GeneralChangesPlusState<T>> AsForSelectConstant<TPrevious, T>(
+        public static IObservable<GeneralChangesPlusState<T>> SelectConstantFromItems<TPrevious, T>(
             [NotNull] this IObservable<GeneralChangesPlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -38,7 +38,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<IBatch<IndexedChange<T>>> AsForSelectConstant<TPrevious, T>(
+        public static IObservable<IBatch<IndexedChange<T>>> SelectConstantFromItems<TPrevious, T>(
             [NotNull] this IObservable<IBatch<IndexedChange<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -52,7 +52,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<IndexedChangesPlusState<T>> AsForSelectConstant<TPrevious, T>(
+        public static IObservable<IndexedChangesPlusState<T>> SelectConstantFromItems<TPrevious, T>(
             [NotNull] this IObservable<IndexedChangesPlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -66,7 +66,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<GeneralChangesPlusState<T>> AsForSelect<TPrevious, T>(
+        public static IObservable<GeneralChangesPlusState<T>> SelectFromItems<TPrevious, T>(
             [NotNull] this IObservable<IBatch<GeneralChange<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -80,15 +80,15 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<GeneralChangesPlusState<T>> AsForSelect<TPrevious, T>(
+        public static IObservable<GeneralChangesPlusState<T>> SelectFromItems<TPrevious, T>(
             [NotNull] this IObservable<GeneralChangesPlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
-            return previous.Select(x => x.Changes).NotNull().AsForSelect(func);
+            return previous.Select(x => x.Changes).NotNull().SelectFromItems(func);
         }
 
         [NotNull]
-        public static IObservable<IBatch<IndexedChange<T>>> AsForSelect<TPrevious, T>(
+        public static IObservable<IBatch<IndexedChange<T>>> SelectFromItems<TPrevious, T>(
             [NotNull] this IObservable<IBatch<IndexedChange<TPrevious>>> previous,
             [NotNull] Func<TPrevious, T> func)
         {
@@ -102,7 +102,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<IndexedChangesPlusState<T>> AsForSelect<TPrevious, T>(
+        public static IObservable<IndexedChangesPlusState<T>> SelectFromItems<TPrevious, T>(
             [NotNull] this IObservable<IndexedChangesPlusState<TPrevious>> previous,
             [NotNull] Func<TPrevious, T> func)
         {

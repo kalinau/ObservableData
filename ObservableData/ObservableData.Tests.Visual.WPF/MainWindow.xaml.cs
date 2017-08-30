@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using ObservableData.Structures;
 using ObservableData.Querying;
+using ObservableData.Querying.Compatibility;
 using ObservableData.Structures.Lists;
 using ObservableData.Tests.Core;
 
@@ -32,30 +33,38 @@ namespace ObservableData.Tests.Visual
 
             this.SourceList.ItemsSource = _source;
 
+            _source.WhenUpdated
+                .SelectGeneralChanges()
+                .SumItems(x => x.Value)
+                .Subscribe(x => this.Sum.Text = x.ToString());
+
             _source.Add(new[] {new TestEntity(12), new TestEntity(21)});
 
-            _source.WhenUpdated
-                .SelectIndexedChanges()
-                .WithState(_source)
-                .SubscribeBindableProxy(out var bindableSource);
+            var bindableSource = new BindableProxy<TestEntity>(_source);
+            _source.WhenUpdated.Subscribe(x => x.ApplyTo(bindableSource.Events));
 
             this.AddListView(bindableSource);
 
+            var bindableValues = new BindableProxy<int>();
             _source.WhenUpdated
                 .SelectIndexedChanges()
-                .StartWithAdd(_source)
+                .StartWith(_source)
                 .WithState(_source)
-                .AsForSelect(x => x.Value)
-                .SubscribeBindableProxy(out var projection);
+                .SelectFromItems(x => x.Value)
+                .Subscribe(x =>
+                {
+                    bindableValues.UnderlyingList = x.ReachedState;
+                    x.Change.ApplyTo(bindableValues.Events); 
+                });
 
-            this.AddListView(projection);
+            this.AddListView(bindableValues);
 
             var result = new ObservableCollection<TestEntity>();
             this.AddListView(result);
             _source.WhenUpdated
                 .SelectGeneralChanges()
-                .StartWithAdd(_source)
-                .AsForWhere(x => x.Value > 5)
+                .StartWith(_source)
+                .WhereItems(x => x.Value > 5)
                 .Subscribe(x => x.ApplyTo(result));
         }
 

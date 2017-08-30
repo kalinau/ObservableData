@@ -12,6 +12,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0" MouseUp="OnHeaderTap" Background="#F0F0F0">
@@ -84,13 +85,15 @@
                 </WrapPanel>
             </StackPanel>
         </Grid>
-        <Grid Grid.Row="1" x:Name="ListsPanel">
+        <WrapPanel Grid.Row="1" >
+            <TextBlock x:Name="Sum"/>
+        </WrapPanel>
+        <Grid Grid.Row="2" x:Name="ListsPanel">
             <ListView
                 x:Name="SourceList"
                 Grid.Column="0"
                 HorizontalContentAlignment="Center"
                 SelectionChanged="OnSelected" />
-
         </Grid>
     </Grid>
 </Window>

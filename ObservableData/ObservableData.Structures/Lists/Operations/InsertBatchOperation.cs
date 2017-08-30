@@ -4,11 +4,12 @@ using System.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying;
 using ObservableData.Querying.Utils;
+using ObservableData.Structures.Lists.Utils;
 
-namespace ObservableData.Structures.Lists.Updates
+namespace ObservableData.Structures.Lists.Operations
 {
-    internal sealed class ListInsertBatchOperation<T> :
-        IListChangeNode<T>,
+    internal sealed class InsertBatchOperation<T> :
+        IListBatchChangeNode<T>,
         IListInsertOperation<T>, 
         ICollectionInsertOperation<T>
     {
@@ -18,14 +19,14 @@ namespace ObservableData.Structures.Lists.Updates
 
         private readonly ThreadId _threadId;
 
-        public ListInsertBatchOperation([NotNull] IReadOnlyCollection<T> items, int index)
+        public InsertBatchOperation([NotNull] IReadOnlyCollection<T> items, int index)
         {
             _items = items;
             _index = index;
             _threadId = ThreadId.FromCurrent();
         }
 
-        IListChangeNode<T> IListChangeNode<T>.Next { get; set; }
+        IListBatchChangeNode<T> IListBatchChangeNode<T>.Next { get; set; }
 
         int IListInsertOperation<T>.Index => _index;
 
@@ -53,16 +54,16 @@ namespace ObservableData.Structures.Lists.Updates
 
         IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetPeaces()
         {
-            int i = _index;
-            foreach (var item in this.Items)
+            var index = _index;
+            foreach (var item in _items)
             {
-                yield return IndexedChange<T>.OnAdd(item, i++);
+                yield return IndexedChange<T>.OnAdd(item, index++);
             }
         }
 
         IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetPeaces()
         {
-            foreach (var item in this.Items)
+            foreach (var item in _items)
             {
                 yield return GeneralChange<T>.OnAdd(item);
             }

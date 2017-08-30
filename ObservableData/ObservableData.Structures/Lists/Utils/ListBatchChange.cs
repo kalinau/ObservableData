@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using ObservableData.Querying;
 
-namespace ObservableData.Structures.Lists.Updates
+namespace ObservableData.Structures.Lists.Utils
 {
-    internal class ListBatchChange<T> : IListBatch<T>
+    internal class ListBatchChange<T> : IListBatchChange<T>
     {
-        private IListChangeNode<T> _first;
-        private IListChangeNode<T> _last;
+        private IListBatchChangeNode<T> _first;
+        private IListBatchChangeNode<T> _last;
 
         public bool IsReadOnly { get; set; }
 
-        public void Add(IListChangeNode<T> update)
+        public void Add(IListBatchChangeNode<T> update)
         {
             if (_last == null)
             {

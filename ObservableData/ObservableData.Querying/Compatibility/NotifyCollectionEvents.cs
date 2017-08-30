@@ -12,6 +12,8 @@ namespace ObservableData.Querying.Compatibility
         INotifyCollectionChanged,
         INotifyPropertyChanged
     {
+        public bool HasObservers => this.CollectionChanged != null || this.PropertyChanged != null;
+
         public event NotifyCollectionChangedEventHandler CollectionChanged;
 
         public event PropertyChangedEventHandler PropertyChanged;

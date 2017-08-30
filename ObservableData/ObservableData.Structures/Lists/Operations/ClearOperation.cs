@@ -1,21 +1,22 @@
 using System;
 using System.Collections.Generic;
 using ObservableData.Querying;
+using ObservableData.Structures.Lists.Utils;
 
-namespace ObservableData.Structures.Lists.Updates
+namespace ObservableData.Structures.Lists.Operations
 {
-    public class ListClearOperation<T> :
-        IListChangeNode<T>,
+    public class ClearOperation<T> :
+        IListBatchChangeNode<T>,
         IListClearOperation<T>, 
         ICollectionClearOperation<T>
     {
-        public static ListClearOperation<T> Instance { get; } = new ListClearOperation<T>();
+        public static ClearOperation<T> Instance { get; } = new ClearOperation<T>();
 
-        private ListClearOperation()
+        private ClearOperation()
         {
         }
 
-        IListChangeNode<T> IListChangeNode<T>.Next { get; set; }
+        IListBatchChangeNode<T> IListBatchChangeNode<T>.Next { get; set; }
 
         public void MakeImmutable() { }
 

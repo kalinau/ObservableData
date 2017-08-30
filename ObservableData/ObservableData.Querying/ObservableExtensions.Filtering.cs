@@ -11,7 +11,7 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IBatch<GeneralChange<T>>> AsForWhere<T>(
+        public static IObservable<IBatch<GeneralChange<T>>> WhereItems<T>(
             [NotNull] this IObservable<IBatch<GeneralChange<T>>> previous,
             [NotNull] Func<T, bool> criterion)
         {
@@ -25,7 +25,7 @@ namespace ObservableData.Querying
         }
 
         [NotNull]
-        public static IObservable<GeneralChangesPlusState<T>> AsForWhere<T>(
+        public static IObservable<GeneralChangesPlusState<T>> WhereItems<T>(
             [NotNull] this IObservable<GeneralChangesPlusState<T>> previous,
             [NotNull] Func<T, bool> criterion)
         {

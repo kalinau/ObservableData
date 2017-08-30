@@ -12,14 +12,14 @@ namespace ObservableData.Structures
     {
         [NotNull]
         public static IObservable<IBatch<IndexedChange<T>>> SelectIndexedChanges<T>(
-            [NotNull] this IObservable<IListBatch<T>> observable)
+            [NotNull] this IObservable<IListBatchChange<T>> observable)
         {
             return observable;
         }
 
         [NotNull]
         public static IObservable<IBatch<GeneralChange<T>>> SelectGeneralChanges<T>(
-            [NotNull] this IObservable<IListBatch<T>> observable)
+            [NotNull] this IObservable<IListBatchChange<T>> observable)
         {
             return observable;
         }
