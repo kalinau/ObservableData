@@ -7,7 +7,6 @@ using ObservableData.Querying.Where;
 
 namespace ObservableData.Querying
 {
-    [PublicAPI]
     public static partial class ObservableExtensions
     {
         [NotNull]

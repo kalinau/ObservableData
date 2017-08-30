@@ -7,6 +7,7 @@ using ObservableData.Querying.Utils.Adapters;
 
 namespace ObservableData.Querying
 {
+    [PublicAPI]
     public static partial class ObservableExtensions
     {
         [NotNull]

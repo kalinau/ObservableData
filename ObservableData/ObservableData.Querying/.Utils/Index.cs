@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace ObservableData.Structures.Utils
+namespace ObservableData.Querying.Utils
 {
     public static class Index
     {

@@ -146,11 +146,11 @@ namespace ObservableData.Querying
             }
         }
 
-        public static void ApplyTo<T>([NotNull] this IBatch<IndexedChange<T>> batch, [NotNull] IList<T> list)
+        public static void ApplyTo<T>([NotNull] this IBatch<IndexedChange<T>> change, [NotNull] IList<T> list)
         {
-            foreach (var change in batch.GetPeaces())
+            foreach (var peace in change.GetPeaces())
             {
-                change.ApplyTo(list);
+                peace.ApplyTo(list);
             }
         }
 
@@ -160,6 +160,26 @@ namespace ObservableData.Querying
             {
                 change.ApplyTo(collection);
             }
+        }
+
+        public static void Apply<T>([NotNull] this IList<T> list, IndexedChange<T> change)
+        {
+            change.ApplyTo(list);
+        }
+
+        public static void Apply<T>([NotNull] this ICollection<T> collection, IndexedChange<T> change)
+        {
+            change.ApplyTo(collection);
+        }
+
+        public static void Apply<T>([NotNull] this IList<T> list, [NotNull] IBatch<IndexedChange<T>> change)
+        {
+            change.ApplyTo(list);
+        }
+
+        public static void Apply<T>([NotNull] this ICollection<T> collection, [NotNull] IBatch<IndexedChange<T>> change)
+        {
+            change.ApplyTo(collection);
         }
     }
 }

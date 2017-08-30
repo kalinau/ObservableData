@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <Compile Include=".Utils\Annotations.cs" />
-    <Compile Include=".Utils\Index.cs" />
   </ItemGroup>
 
   <ItemGroup>

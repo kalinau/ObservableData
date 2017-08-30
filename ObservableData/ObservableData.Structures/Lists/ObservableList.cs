@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using ObservableData.Querying;
+using ObservableData.Querying.Utils;
 using ObservableData.Structures.Lists.Utils;
 using ObservableData.Structures.Utils;
 

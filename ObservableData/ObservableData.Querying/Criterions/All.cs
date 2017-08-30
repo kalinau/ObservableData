@@ -1,9 +1,9 @@
 ﻿using System;
 using JetBrains.Annotations;
 
-namespace ObservableData.Querying.Boolean
+namespace ObservableData.Querying.Criterions
 {
-    public static class Any
+    internal static class All
     {
         public sealed class GeneralChangesObserver<TSum> :
             IObserver<IBatch<GeneralChange<TSum>>>
@@ -11,6 +11,7 @@ namespace ObservableData.Querying.Boolean
             [NotNull] private readonly IObserver<bool> _adaptee;
             [NotNull] private readonly Func<TSum, bool> _criterion;
 
+            private int _count;
             private int _satisfyCount;
 
             public GeneralChangesObserver(
@@ -30,6 +31,7 @@ namespace ObservableData.Querying.Boolean
                     switch (peace.Type)
                     {
                         case GeneralChangeType.Add:
+                            _count++;
                             if (_criterion(peace.Item))
                             {
                                 _satisfyCount++;
@@ -37,6 +39,7 @@ namespace ObservableData.Querying.Boolean
                             break;
 
                         case GeneralChangeType.Remove:
+                            _count--;
                             if (_criterion(peace.Item))
                             {
                                 _satisfyCount--;
@@ -44,14 +47,14 @@ namespace ObservableData.Querying.Boolean
                             break;
 
                         case GeneralChangeType.Clear:
-                            _satisfyCount = 0;
+                            _count = _satisfyCount = 0;
                             break;
 
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 }
-                _adaptee.OnNext(_satisfyCount > 0);
+                _adaptee.OnNext(_satisfyCount == _count);
             }
 
             public void OnCompleted() => _adaptee.OnCompleted();

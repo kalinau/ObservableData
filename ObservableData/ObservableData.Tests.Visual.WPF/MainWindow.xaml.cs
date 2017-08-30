@@ -34,7 +34,8 @@ namespace ObservableData.Tests.Visual
 
             this.SourceList.ItemsSource = _source;
 
-            _source.Add(new[] {new TestEntity(12), new TestEntity(21)});
+            var first = new TestEntity(12);
+            _source.Add(new[] {first, new TestEntity(21)});
 
             var bindableSource = new BindableProxy<TestEntity>(_source);
             _source.WhenUpdated.Subscribe(x => x.ApplyTo(bindableSource.Events));
@@ -54,6 +55,15 @@ namespace ObservableData.Tests.Visual
             generalObservable
                 .AllItems(x => x.Value > 5)
                 .Subscribe(x => this.All.Text = x.ToString());
+
+            generalObservable
+                .CountItems()
+                .Subscribe(x => this.Count.Text = x.ToString());
+
+            generalObservable
+                .ContainsItem(first)
+                .Subscribe(x => this.Contains.Text = x.ToString());
+
 
             this.AddListView(bindableSource);
 
