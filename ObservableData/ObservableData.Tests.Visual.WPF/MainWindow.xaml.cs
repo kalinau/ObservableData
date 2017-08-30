@@ -33,15 +33,27 @@ namespace ObservableData.Tests.Visual
 
             this.SourceList.ItemsSource = _source;
 
-            _source.WhenUpdated
-                .SelectGeneralChanges()
-                .SumItems(x => x.Value)
-                .Subscribe(x => this.Sum.Text = x.ToString());
-
             _source.Add(new[] {new TestEntity(12), new TestEntity(21)});
 
             var bindableSource = new BindableProxy<TestEntity>(_source);
             _source.WhenUpdated.Subscribe(x => x.ApplyTo(bindableSource.Events));
+
+            var generalObservable = _source.WhenUpdated
+                .SelectGeneralChanges()
+                .StartWith(_source)
+                .Do(x => x.MakeImmutable());
+
+            generalObservable
+                .SumItems(x => x.Value)
+                .Subscribe(x => this.Sum.Text = x.ToString());
+
+            generalObservable
+                .AnyItem(x => x.Value > 5)
+                .Subscribe(x => this.Any.Text = x.ToString());
+
+            generalObservable
+                .AllItems(x => x.Value > 5)
+                .Subscribe(x => this.All.Text = x.ToString());
 
             this.AddListView(bindableSource);
 
@@ -50,11 +62,11 @@ namespace ObservableData.Tests.Visual
                 .SelectIndexedChanges()
                 .StartWith(_source)
                 .WithState(_source)
-                .SelectFromItems(x => x.Value)
+                .SelectConstantFromItems(x => x.Value)
                 .Subscribe(x =>
                 {
                     bindableValues.UnderlyingList = x.ReachedState;
-                    x.Change.ApplyTo(bindableValues.Events); 
+                    x.Change.ApplyTo(bindableValues.Events);
                 });
 
             this.AddListView(bindableValues);
