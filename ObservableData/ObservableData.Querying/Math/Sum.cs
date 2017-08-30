@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace ObservableData.Querying.Math
 {
-    public static class Sum
+    internal static class Sum
     {
         public sealed class GeneralChangesObserver<TSum> :
             IObserver<IBatch<GeneralChange<TSum>>>

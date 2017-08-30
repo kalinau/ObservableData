@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
@@ -40,9 +41,8 @@ namespace ObservableData.Tests.Visual
 
             var generalObservable = _source.WhenUpdated
                 .SelectGeneralChanges()
-                .StartWith(_source)
-                .Do(x => x.MakeImmutable());
-
+                .StartWith(_source);
+            
             generalObservable
                 .SumItems(x => x.Value)
                 .Subscribe(x => this.Sum.Text = x.ToString());
