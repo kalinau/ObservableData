@@ -9,6 +9,7 @@ namespace ObservableData.Querying.Select
 {
     internal static partial class SelectConstant
     {
+
         public sealed class IndexedChangesObserver<T, TAdaptee> : ListChangesObserverAdapter<T, TAdaptee>
         {
             [NotNull] private readonly Func<T, TAdaptee> _selector;
@@ -109,29 +110,6 @@ namespace ObservableData.Querying.Select
             {
                 _adaptee.MakeImmutable();
             }
-        }
-
-        private sealed class ListAdapter<T, TAdaptee> : IReadOnlyList<TAdaptee>
-        {
-            [NotNull] private readonly IReadOnlyList<T> _source;
-            [NotNull] private readonly Func<T, TAdaptee> _selector;
-
-            public ListAdapter([NotNull] IReadOnlyList<T> source, [NotNull] Func<T, TAdaptee> selector)
-            {
-                _source = source;
-                _selector = selector;
-            }
-
-            public int Count => _source.Count;
-
-            public IEnumerator<TAdaptee> GetEnumerator()
-            {
-                return _source.Select(_selector).GetEnumerator();
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-
-            public TAdaptee this[int index] => _selector(_source[index]);
         }
     }
 }

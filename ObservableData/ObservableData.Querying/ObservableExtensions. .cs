@@ -43,6 +43,5 @@ namespace ObservableData.Querying
             return observable.Select(x => new GeneralChangesPlusState<T>(x.NotNull(), state))
                 .NotNull();
         }
-
     }
 }

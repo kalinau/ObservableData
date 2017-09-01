@@ -10,59 +10,58 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IBatch<GeneralChange<T>>> SelectConstantFromItems<TPrevious, T>(
-            [NotNull] this IObservable<IBatch<GeneralChange<TPrevious>>> previous,
-            [NotNull] Func<TPrevious, T> func)
+        public static IObservable<ICollectionChange<TOut>> SelectConstantFromItems<TIn, TOut>(
+            [NotNull] this IObservable<ICollectionChange<TIn>> source,
+            [NotNull] Func<TIn, TOut> selector)
         {
-            return Observable.Create<IBatch<GeneralChange<T>>>(o =>
+            return Observable.Create<ICollectionChange<TOut>>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new SelectConstant.GeneralChangesObserver<TPrevious, T>(o, func);
-                return previous.Subscribe(adapter);
+                var adapter = new SelectConstant.CollectionObserver<TIn, TOut>(o, selector);
+                return source.Subscribe(adapter);
             }).NotNull();
         }
 
-        [NotNull]
-        public static IObservable<GeneralChangesPlusState<T>> SelectConstantFromItems<TPrevious, T>(
-            [NotNull] this IObservable<GeneralChangesPlusState<TPrevious>> previous,
-            [NotNull] Func<TPrevious, T> func)
-        {
-            return Observable.Create<GeneralChangesPlusState<T>>(o =>
-            {
-                if (o == null) return Disposable.Empty;
 
-                var adapter = new SelectConstant.GeneralChangesPlusStateObserver<TPrevious, T>(o, func);
-                return previous.Subscribe(adapter);
-            }).NotNull();
-        }
+        //[NotNull]
+        //public static IObservable<ICollectionChange<TOut>> SelectConstantFromItems<TIn, TOut>(
+        //    [NotNull] this IObservable<ICollectionChange<TIn>> source,
+        //    [NotNull] Func<TIn, TOut> selector)
+        //{
+        //    return Observable.Create<ICollectionChange<TOut>>(o =>
+        //    {
+        //        if (o == null) return Disposable.Empty;
 
-        [NotNull]
-        public static IObservable<IBatch<IndexedChange<T>>> SelectConstantFromItems<TPrevious, T>(
-            [NotNull] this IObservable<IBatch<IndexedChange<TPrevious>>> previous,
-            [NotNull] Func<TPrevious, T> func)
-        {
-            return Observable.Create<IBatch<IndexedChange<T>>>(o =>
-            {
-                if (o == null) return Disposable.Empty;
+        //        return source.Subscribe(
+        //            value =>
+        //            {
+        //                if (value == null) return;
+        //                o.OnNext(new SelectConstant.CollectionChange<TIn, TOut>(value, selector));
+        //            },
+        //            o.OnError,
+        //            o.OnCompleted);
+        //    }).NotNull();
+        //}
 
-                var adapter = new SelectConstant.IndexedChangesObserver<TPrevious, T>(o, func);
-                return previous.Subscribe(adapter);
-            }).NotNull();
-        }
+        //[NotNull]
+        //public static IObservable<IListChange<TOut>> SelectConstantFromItems<TIn, TOut>(
+        //    [NotNull] this IObservable<IListChange<TIn>> source,
+        //    [NotNull] Func<TIn, TOut> selector)
+        //{
+        //    return Observable.Create<IListChange<TOut>>(o =>
+        //    {
+        //        if (o == null) return Disposable.Empty;
 
-        [NotNull]
-        public static IObservable<IndexedChangesPlusState<T>> SelectConstantFromItems<TPrevious, T>(
-            [NotNull] this IObservable<IndexedChangesPlusState<TPrevious>> previous,
-            [NotNull] Func<TPrevious, T> func)
-        {
-            return Observable.Create<IndexedChangesPlusState<T>>(o =>
-            {
-                if (o == null) return Disposable.Empty;
-
-                var adapter = new SelectConstant.IndexedChangesPlusStateObserver<TPrevious, T>(o, func);
-                return previous.Subscribe(adapter);
-            }).NotNull();
-        }
+        //        return source.Subscribe(
+        //            value =>
+        //            {
+        //                if (value == null) return;
+        //                o.OnNext(new SelectConstant.ListChange<TIn, TOut>(value, selector));
+        //            },
+        //            o.OnError,
+        //            o.OnCompleted);
+        //    }).NotNull();
+        //}
     }
 }

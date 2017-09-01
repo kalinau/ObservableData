@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Select\SelectConstant.Indexed.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include=".Utils\Adapters\CurrentStateChange.cs" />
     <Compile Include=".Utils\Adapters\ObserverAdapter.cs" />
     <Compile Include=".Utils\Adapters\ThreadSensitiveChange.cs" />
@@ -19,10 +23,6 @@
     <Compile Include=".Utils\ThreadId.cs" />
     <Compile Include=".Utils\WeakObserver.cs" />
     <Compile Include=".Utils\WeakReferenceExtensions.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Select\SelectConstant.Indexed.cs" />
   </ItemGroup>
 
   <ItemGroup>

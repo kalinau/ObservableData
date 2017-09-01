@@ -1,45 +1,34 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reactive.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying.Compatibility;
 
 namespace ObservableData.Querying
 {
-    public interface INextValue<out TState, out TChange>
+    /// <summary>
+    /// Tricky abstraction to enumerate items and do not allocation IEnumerable and/or IEnumerator
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface ITrickyEnumerable<out T>
     {
-        void Match(Action<TState> onState, Action<TChange> onChange);
-
-        T Match<T>([NotNull] Func<TState, T> onState, [NotNull] Func<TChange, T> onChange);
+        void Enumerate([NotNull] Func<T, bool> handle);
     }
 
-    public interface IGeneralNextValue<T> : INextValue<IReadOnlyCollection<T>, IBatch<GeneralChange<T>>>
+    public interface ICollectionChange<TItem>
     {
+        IReadOnlyCollection<TItem> TryGetState();
+
+        ITrickyEnumerable<GeneralChange<TItem>> TryGetDelta();
     }
 
-    //public interface IGeneralChange<T> : IGeneralNextValue<T>, IBatch<GeneralChange<T>>
-    //{
-    //}
-
-    //public interface IGeneralState<T> : IGeneralNextValue<T>, IReadOnlyCollection<T>
-    //{
-    //}
-
-    public interface IIndexedNextValue<T> : 
-        INextValue<IReadOnlyList<T>, IBatch<IndexedChange<T>>>, 
-        IGeneralNextValue<T>
+    public interface IListChange<TItem> : ICollectionChange<TItem>
     {
+        void Match(
+            Action<IReadOnlyList<TItem>> onStateChanged,
+            Action<IndexedChange<TItem>> onDelta);
     }
-
-    //public interface IIndexedChange<T> : 
-    //    IIndexedNextValue<T>, 
-    //    IBatch<IndexedChange<T>>, 
-    //    IGeneralChange<T>
-    //{
-    //}
-
-    //public interface IIndexedState<T> : IIndexedNextValue<T>, IReadOnlyList<T>
-    //{
-    //}
 
     public interface IBatch<out T>
     {

@@ -28,7 +28,7 @@ namespace ObservableData.Structures.Lists
 
         IObservable<IBatch<IListOperation<T>>> IObservableReadOnlyList<T>.WhenUpdated => this.WhenUpdated;
 
-        IObservable<IBatch<ICollectionOperation<T>>> IObservableReadOnlyCollection<T>.WhenUpdated => this.WhenUpdated;
+        IObservable<ICollectionChange<T>> IObservableReadOnlyCollection<T>.WhenUpdated => this.WhenUpdated;
 
         [NotNull]
         public IObservable<IListBatchChange<T>> WhenUpdated =>_subject;

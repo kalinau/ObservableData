@@ -12,6 +12,11 @@ namespace ObservableData.Querying
             this.Type = type;
         }
 
+        [CanBeNull]
+        public T Item { get; }
+
+        public GeneralChangeType Type { get; }
+
         public static GeneralChange<T> OnClear()
         {
             return new GeneralChange<T>(GeneralChangeType.Clear, default(T));
@@ -26,11 +31,6 @@ namespace ObservableData.Querying
         {
             return new GeneralChange<T>(GeneralChangeType.Remove, item);
         }
-
-        public GeneralChangeType Type { get; }
-
-        [CanBeNull]
-        public T Item { get; }
     }
 
     [PublicAPI]

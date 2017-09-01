@@ -1,53 +1,60 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿//using System;
+//using JetBrains.Annotations;
 
-namespace ObservableData.Querying.Math
-{
-    internal static class Count
-    {
-        public sealed class GeneralChangesObserver<T> :
-            IObserver<IBatch<GeneralChange<T>>>
-        {
-            [NotNull] private readonly IObserver<int> _adaptee;
+//namespace ObservableData.Querying.Math
+//{
+//    internal static class Count
+//    {
+//        public sealed class Obsever<T> :
+//            IObserver<ICollectionChange<T>>
+//        {
+//            [NotNull] private readonly IObserver<int> _adaptee;
 
-            private int _count;
+//            private int? _count;
 
-            public GeneralChangesObserver(
-                [NotNull] IObserver<int> adaptee)
-            {
-                _adaptee = adaptee;
-            }
+//            public Obsever(
+//                [NotNull] IObserver<int> adaptee)
+//            {
+//                _adaptee = adaptee;
+//            }
 
-            public void OnNext(IBatch<GeneralChange<T>> change)
-            {
-                if (change == null) return;
+//            public void OnCompleted() => _adaptee.OnCompleted();
 
-                foreach (var peace in change.GetPeaces())
-                {
-                    switch (peace.Type)
-                    {
-                        case GeneralChangeType.Add:
-                            _count++;
-                            break;
+//            public void OnError(Exception error) => _adaptee.OnError(error);
 
-                        case GeneralChangeType.Remove:
-                            _count--;
-                            break;
+//            public void OnNext(ICollectionChange<T> change)
+//            {
+//                if (change == null) return;
 
-                        case GeneralChangeType.Clear:
-                            _count = 0;
-                            break;
+//                var before = _count;
+//                change.Match(
+//                    state => _count = state?.Count ?? 0,
+//                    delta =>
+//                    {
+//                        switch (delta.Type)
+//                        {
+//                            case GeneralChangeType.Add:
+//                                _count++;
+//                                break;
 
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
-                _adaptee.OnNext(_count);
-            }
+//                            case GeneralChangeType.Remove:
+//                                _count--;
+//                                break;
 
-            public void OnCompleted() => _adaptee.OnCompleted();
+//                            case GeneralChangeType.Clear:
+//                                _count = 0;
+//                                break;
 
-            public void OnError(Exception error) => _adaptee.OnError(error);
-        }
-    }
-}
+//                            default:
+//                                throw new ArgumentOutOfRangeException();
+//                        }
+//                    }
+//                );
+//                if (_count != null && _count != before)
+//                {
+//                    _adaptee.OnNext(_count.Value);
+//                }
+//            }
+//        }
+//    }
+//}
