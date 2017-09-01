@@ -1,20 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace ObservableData.Querying.Math
 {
     internal static class Sum
     {
-        public sealed class Observer<T> : IObserver<ICollectionChange<T>>
+        public sealed class Observer<T> : 
+            IObserver<ICollectionChange<T>>, 
+            ITrickyEnumerator<GeneralChange<T>>
         {
             [NotNull] private readonly IObserver<T> _adaptee;
             [NotNull] private readonly Func<T, T, T> _plus;
             [NotNull] private readonly Func<T, T, T> _minus;
             [NotNull] private readonly T _zero;
 
+            private IReadOnlyCollection<T> _currentState;
             private T _currentSum;
-            
-            [NotNull] private readonly Func<GeneralChange<T>, bool> _onChange;
 
             public Observer(
                 [NotNull] IObserver<T> adaptee,
@@ -26,41 +28,34 @@ namespace ObservableData.Querying.Math
                 _plus = plus;
                 _minus = minus;
                 _zero = zero;
-
-                _onChange = this.OnChange;
             }
 
-            public void OnNext(ICollectionChange<T> change)
+            void IObserver<ICollectionChange<T>>.OnCompleted() => _adaptee.OnCompleted();
+
+            void IObserver<ICollectionChange<T>>.OnError(Exception error) => _adaptee.OnError(error);
+
+            void IObserver<ICollectionChange<T>>.OnNext(ICollectionChange<T> change)
             {
                 if (change == null) return;
 
-                var state = change.TryGetState();
-                if (state != null)
+                if (!this.TryChangeState(change.State))
                 {
-                    _currentSum = _zero;
-                    foreach (var item in state)
-                    {
-                        _currentSum = _plus(_currentSum, item);
-                    }
+                    change.Enumerate(this);
                 }
-                else
-                {
-                    var delta = change.TryGetDelta();
-                    delta?.Enumerate(_onChange);
-                }
+
                 _adaptee.OnNext(_currentSum);
             }
 
-            private bool OnChange(GeneralChange<T> delta)
+            bool ITrickyEnumerator<GeneralChange<T>>.OnNext(GeneralChange<T> item)
             {
-                switch (delta.Type)
+                switch (item.Type)
                 {
                     case GeneralChangeType.Add:
-                        _currentSum = _plus(_currentSum, delta.Item);
+                        _currentSum = _plus(_currentSum, item.Item);
                         break;
 
                     case GeneralChangeType.Remove:
-                        _currentSum = _minus(_currentSum, delta.Item);
+                        _currentSum = _minus(_currentSum, item.Item);
                         break;
 
                     case GeneralChangeType.Clear:
@@ -73,9 +68,24 @@ namespace ObservableData.Querying.Math
                 return true;
             }
 
-            public void OnCompleted() => _adaptee.OnCompleted();
+            private bool TryChangeState(IReadOnlyCollection<T> state)
+            {
+                if (!ReferenceEquals(_currentState, state))
+                {
+                    _currentState = state;
+                    _currentSum = _zero;
+                    if (state != null)
+                    {
+                        foreach (var item in state)
+                        {
+                            _currentSum = _plus(_currentSum, item);
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
 
-            public void OnError(Exception error) => _adaptee.OnError(error);
         }
     }
 }

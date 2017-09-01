@@ -61,7 +61,7 @@ namespace ObservableData.Tests.MemoryProfiler
 
         private static void Emulate([NotNull] Subject<ICollectionChange<int>> subject)
         {
-            var state = new StateChange<int>(new[] {1, 2, 3, 4});
+            //var state = new StateChange<int>(new[] {1, 2, 3, 4});
             var add = new DeltaChange<int>(new[] { GeneralChange<int>.OnAdd(10) });
             var remove = new DeltaChange<int>(new[] { GeneralChange<int>.OnRemove(10) });
             var clear = new DeltaChange<int>(
@@ -84,60 +84,63 @@ namespace ObservableData.Tests.MemoryProfiler
         {
             if (change == null) throw new ArgumentNullException();
 
-            var state = change.TryGetState();
-            if (state != null)
-            {
-                if (state.Count < 0) throw new Exception();
-            }
-            else
-            {
-                var delta = change.TryGetDelta();
-                delta?.Enumerate(UseChange);
-            }
+            change?.Enumerate(UseChange);
+
+            //var state = change.TryGetState();
+            //if (state != null)
+            //{
+            //    if (state.Count < 0) throw new Exception();
+            //}
+            //else
+            //{
+            //    var delta = change.TryGetDelta();
+            //    delta?.Enumerate(UseChange);
+            //}
         }
 
         [NotNull] private static readonly Func<GeneralChange<int>, bool> UseChange = Use;
+
         private static bool Use(GeneralChange<int> change)
         {
             return true;
         }
     }
 
-    public sealed class StateChange<T> : ICollectionChange<T>
-    {
-        private readonly IReadOnlyList<T> _list;
+    //public sealed class StateChange<T> : ICollectionChange<T>
+    //{
+    //    private readonly IReadOnlyList<T> _list;
 
-        public StateChange(IReadOnlyList<T> list)
-        {
-            _list = list;
-        }
+    //    public StateChange(IReadOnlyList<T> list)
+    //    {
+    //        _list = list;
+    //    }
 
-        public void Match(
-            Action<IReadOnlyCollection<T>> onStateChanged, 
-            Action<ITrickyEnumerable<GeneralChange<int>>> onDelta)
-        {
-            onStateChanged?.Invoke(_list);
-        }
+    //    public void Match(
+    //        Action<IReadOnlyCollection<T>> onStateChanged, 
+    //        Action<ITrickyEnumerable<GeneralChange<int>>> onDelta)
+    //    {
+    //        onStateChanged?.Invoke(_list);
+    //    }
 
-        public IReadOnlyCollection<T> TryGetState() => _list;
+    //    public IReadOnlyCollection<T> TryGetState() => _list;
 
-        public ITrickyEnumerable<GeneralChange<T>> TryGetDelta() => null;
-    }
+    //    public ITrickyEnumerable<GeneralChange<T>> TryGetDelta() => null;
 
-    public sealed class DeltaChange<T> : ICollectionChange<T>, ITrickyEnumerable<GeneralChange<T>>
+    //    public void Enumerate(Func<GeneralChange<T>, bool> handle)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+
+    //    public IReadOnlyCollection<T> State { get; }
+    //}
+
+    public sealed class DeltaChange<T> : ICollectionChange<T>
     {
         [NotNull] private readonly GeneralChange<T>[] _changes;
 
         public DeltaChange([NotNull] GeneralChange<T>[] changes)
         {
             _changes = changes;
-        }
-
-        public void Match(
-            Action<IReadOnlyCollection<T>> onStateChanged,
-            Action<ITrickyEnumerable<GeneralChange<T>>> onDelta)
-        {
-            onDelta?.Invoke(this);
         }
 
         public void Enumerate(Func<GeneralChange<T>, bool> handle)
@@ -148,8 +151,6 @@ namespace ObservableData.Tests.MemoryProfiler
             }
         }
 
-        public IReadOnlyCollection<T> TryGetState() => null;
-
-        public ITrickyEnumerable<GeneralChange<T>> TryGetDelta() => this;
+        public IReadOnlyCollection<T> State => null;
     }
 }

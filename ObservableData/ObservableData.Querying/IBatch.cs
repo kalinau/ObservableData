@@ -1,33 +1,44 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reactive.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying.Compatibility;
 
 namespace ObservableData.Querying
 {
     /// <summary>
-    /// Tricky abstraction to enumerate items and do not allocation IEnumerable and/or IEnumerator
+    /// Tricky abstraction to enumerate items and do not allocate IEnumerable and/or IEnumerator
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public interface ITrickyEnumerable<out T>
     {
-        void Enumerate([NotNull] Func<T, bool> handle);
+        void Enumerate([NotNull] ITrickyEnumerator<T> handle);
     }
 
-    public interface ICollectionChange<TItem>
+    public interface ITrickyEnumerator<in T>
     {
-        IReadOnlyCollection<TItem> TryGetState();
-
-        ITrickyEnumerable<GeneralChange<TItem>> TryGetDelta();
+        bool OnNext(T item);
     }
 
-    public interface IListChange<TItem> : ICollectionChange<TItem>
+
+    public interface ICollectionChange<TItem> : ITrickyEnumerable<GeneralChange<TItem>>
     {
-        void Match(
-            Action<IReadOnlyList<TItem>> onStateChanged,
-            Action<IndexedChange<TItem>> onDelta);
+        [CanBeNull]
+        IReadOnlyCollection<TItem> State { get; }
+    }
+
+    public interface IListChange<TItem> : ITrickyEnumerable<IndexedChange<TItem>>
+    {
+        [CanBeNull]
+        IReadOnlyList<TItem> State { get; }
+
+        //void Match(
+        //    Action<IReadOnlyList<TItem>> onStateChanged,
+        //    Action<IndexedChange<TItem>> onDelta);
+    }
+
+    public interface ICollectionObserver<T> : IObserver<ICollectionChange<T>>
+    {
+        void OnStart(IReadOnlyCollection<T> collection);
     }
 
     public interface IBatch<out T>

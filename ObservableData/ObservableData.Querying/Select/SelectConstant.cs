@@ -12,18 +12,17 @@ namespace ObservableData.Querying.Select
         public class CollectionObserver<TIn, TOut> :
           IObserver<ICollectionChange<TIn>>,
           ICollectionChange<TOut>,
-          ITrickyEnumerable<GeneralChange<TOut>>,
-          IReadOnlyCollection<TOut>
+            ITrickyEnumerator<GeneralChange<TIn>>
+            //IReadOnlyCollection<TOut>
         {
-            [NotNull] private readonly Func<GeneralChange<TIn>, bool> _onChange;
             [NotNull] private readonly IObserver<ICollectionChange<TOut>> _adaptee;
             [NotNull] private readonly Func<TIn, TOut> _selector;
 
-            private IReadOnlyCollection<TIn> _state;
+            private CollectionState<TIn, TOut> _state;
 
             private ThreadId? _currentChangeThread;
             private ICollectionChange<TIn> _currentChange;
-            private Func<GeneralChange<TOut>, bool> _currentEnumerator;
+            private ITrickyEnumerator<GeneralChange<TOut>> _currentEnumerator;
 
             public CollectionObserver(
                 [NotNull] IObserver<ICollectionChange<TOut>> adaptee,
@@ -31,7 +30,6 @@ namespace ObservableData.Querying.Select
             {
                 _adaptee = adaptee;
                 _selector = selector;
-                _onChange = this.OnChange;
             }
 
             void IObserver<ICollectionChange<TIn>>.OnCompleted() => _adaptee.OnCompleted();
@@ -43,59 +41,137 @@ namespace ObservableData.Querying.Select
                 if (value == null) return;
 
                 _currentChangeThread = ThreadId.FromCurrent();
-
                 _currentChange = value;
-                _state = value.TryGetState() ?? _state;
+
+                var state = value.State;
+                if (!ReferenceEquals(_state?.Source, state))
+                {
+                    _state = state == null
+                        ? null
+                        : new CollectionState<TIn, TOut>(state, _selector);
+                }
                 _adaptee.OnNext(this);
 
                 _currentChangeThread = null;
             }
 
-            IReadOnlyCollection<TOut> ICollectionChange<TOut>.TryGetState()
+            void ITrickyEnumerable<GeneralChange<TOut>>.Enumerate(ITrickyEnumerator<GeneralChange<TOut>> enumerator)
             {
                 var change = _currentChange.GetSafety(_currentChangeThread);
-
-                var state = change.TryGetState();
-                if (state != null)
-                {
-                    return this;
-                }
-                return null;
+                _currentEnumerator = enumerator;
+                change.Enumerate(this);
             }
 
-            ITrickyEnumerable<GeneralChange<TOut>> ICollectionChange<TOut>.TryGetDelta()
-            {
-                var change = _currentChange.GetSafety(_currentChangeThread);
-
-                var delta = change.TryGetDelta();
-                if (delta != null)
-                {
-                    return this;
-                }
-                return null;
-            }
-
-            void ITrickyEnumerable<GeneralChange<TOut>>.Enumerate(Func<GeneralChange<TOut>, bool> handle)
-            {
-                _currentChangeThread.CheckIsCurrent();
-
-                _currentEnumerator = handle;
-                _currentChange?.TryGetDelta()?.Enumerate(_onChange);
-            }
-
-            private bool OnChange(GeneralChange<TIn> change)
+            bool ITrickyEnumerator<GeneralChange<TIn>>.OnNext(GeneralChange<TIn> item)
             {
                 var enumerator = _currentEnumerator.GetSafety(_currentChangeThread);
-                return enumerator.Invoke(change.Select(_selector));
+                return enumerator.OnNext(item.Select(_selector));
             }
 
-            public int Count => _state.GetSafety().Count;
+            public IReadOnlyCollection<TOut> State => _state.GetSafety(_currentChangeThread);
 
-            public IEnumerator<TOut> GetEnumerator() => _state.GetSafety().Select(_selector).GetEnumerator();
+            //public int Count => _state.GetSafety().Count;
 
-            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+            //public IEnumerator<TOut> GetEnumerator() => _state.GetSafety().Select(_selector).GetEnumerator();
+
+            //IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+            //public IReadOnlyCollection<TOut> State { get; }
+            //public IReadOnlyCollection<TOut> State { get; }
         }
 
+        //public class ListObserver<TIn, TOut> :
+        //  IObserver<ICollectionChange<TIn>>,
+        //  IListChange<TOut>,
+        //  ITrickyEnumerable<GeneralChange<TOut>>,
+        //  IReadOnlyList<TOut>
+        //{
+        //    [NotNull] private readonly Func<IndexedChange<TIn>, bool> _onChange;
+        //    [NotNull] private readonly IObserver<IListChange<TOut>> _adaptee;
+        //    [NotNull] private readonly Func<TIn, TOut> _selector;
+
+        //    private IReadOnlyList<TIn> _state;
+
+        //    private ThreadId? _currentChangeThread;
+        //    private IListChange<TIn> _currentChange;
+        //    private Func<IndexedChange<TOut>, bool> _currentEnumerator;
+
+        //    public ListObserver(
+        //        [NotNull] IObserver<IListChange<TOut>> adaptee,
+        //        [NotNull] Func<TIn, TOut> selector)
+        //    {
+        //        _adaptee = adaptee;
+        //        _selector = selector;
+        //        _onChange = this.OnChange;
+        //    }
+
+        //    void IObserver<ICollectionChange<TIn>>.OnCompleted() => _adaptee.OnCompleted();
+
+        //    void IObserver<ICollectionChange<TIn>>.OnError(Exception error) => _adaptee.OnError(error);
+
+        //    void IObserver<ICollectionChange<TIn>>.OnNext(ICollectionChange<TIn> value)
+        //    {
+        //        if (value == null) return;
+
+        //        _currentChangeThread = ThreadId.FromCurrent();
+
+        //        _currentChange = value;
+        //        _state = value.TryGetState() ?? _state;
+        //        _adaptee.OnNext(this);
+
+        //        _currentChangeThread = null;
+        //    }
+
+
+        //    public ITrickyEnumerable<IndexedChange<TOut>> TryGetDelta()
+        //    {
+        //        var change = _currentChange.GetSafety(_currentChangeThread);
+
+        //        var delta = change.TryGetDelta();
+        //        if (delta != null)
+        //        {
+        //            return this;
+        //        }
+        //        return null;
+        //    }
+
+        //    public IReadOnlyList<TOut> TryGetState()
+        //    {
+        //        var change = _currentChange.GetSafety(_currentChangeThread);
+
+        //        var state = change.TryGetState();
+        //        if (state != null)
+        //        {
+        //            return this;
+        //        }
+        //        return null;
+        //    }
+
+        //    IReadOnlyCollection<TOut> ICollectionChange<TOut>.TryGetState() => this.TryGetState();
+
+        //    ITrickyEnumerable<GeneralChange<TOut>> ICollectionChange<TOut>.TryGetDelta()
+
+        //    void ITrickyEnumerable<GeneralChange<TOut>>.Enumerate(Func<GeneralChange<TOut>, bool> handle)
+        //    {
+        //        _currentChangeThread.CheckIsCurrent();
+
+        //        _currentEnumerator = handle;
+        //        _currentChange?.TryGetDelta()?.Enumerate(_onChange);
+        //    }
+
+        //    private bool OnChange(IndexedChange<TIn> change)
+        //    {
+        //        var enumerator = _currentEnumerator.GetSafety(_currentChangeThread);
+        //        return enumerator.Invoke(change.Select(_selector));
+        //    }
+
+        //    public int Count => _state.GetSafety().Count;
+
+        //    public IEnumerator<TOut> GetEnumerator() => _state.GetSafety().Select(_selector).GetEnumerator();
+
+        //    IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        //    public TOut this[int index] => _selector(_state.GetSafety()[index]);
+        //}
 
 
         //public class CollectionChange<TIn, TOut> : ICollectionChange<TOut>
@@ -126,25 +202,27 @@ namespace ObservableData.Querying.Select
         //    }
         //}
 
-        //private class CollectionState<TIn, TOut> : IReadOnlyCollection<TOut>
-        //{
-        //    [NotNull] private readonly IReadOnlyCollection<TIn> _source;
-        //    [NotNull] private readonly Func<TIn, TOut> _selector;
+        private class CollectionState<TIn, TOut> : IReadOnlyCollection<TOut>
+        {
+            [NotNull] private readonly IReadOnlyCollection<TIn> _source;
+            [NotNull] private readonly Func<TIn, TOut> _selector;
 
-        //    public CollectionState(
-        //        [NotNull] IReadOnlyCollection<TIn> source,
-        //        [NotNull] Func<TIn, TOut> selector)
-        //    {
-        //        _source = source;
-        //        _selector = selector;
-        //    }
+            public CollectionState(
+                [NotNull] IReadOnlyCollection<TIn> source,
+                [NotNull] Func<TIn, TOut> selector)
+            {
+                _source = source;
+                _selector = selector;
+            }
 
-        //    public int Count => _source.Count;
+            public IReadOnlyCollection<TIn> Source => _source;
 
-        //    public IEnumerator<TOut> GetEnumerator() => _source.Select(_selector).GetEnumerator();
+            public int Count => _source.Count;
 
-        //    IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-        //}
+            public IEnumerator<TOut> GetEnumerator() => _source.Select(_selector).GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+        }
 
         //public sealed class ListChange<TIn, TOut> :IListChange<TOut>
         //{
