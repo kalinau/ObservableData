@@ -9,9 +9,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include=".Utils\Adapters\CurrentStateChange.cs" />
-    <Compile Include=".Utils\Adapters\ObserverAdapter.cs" />
-    <Compile Include=".Utils\Adapters\ThreadSensitiveChange.cs" />
+    <Compile Include=".Utils\Adapters\CollectionStateChange.cs" />
+    <Compile Include=".Utils\Adapters\ListStateChange.cs" />
     <Compile Include=".Utils\Annotations.cs" />
     <Compile Include=".Utils\CollectionProxy.cs" />
     <Compile Include=".Utils\Efficiency\InefficientUsageException.cs" />

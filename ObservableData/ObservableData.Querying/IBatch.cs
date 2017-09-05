@@ -1,47 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using JetBrains.Annotations;
-using ObservableData.Querying.Compatibility;
 
 namespace ObservableData.Querying
 {
-    public interface ICollectionChange<out T>
-    {
-        void Enumerate([NotNull] ICollectionChangeEnumerator<T> enumerator);
-    }
-
-    public interface ICollectionChangeEnumerator<in T>
-    {
-        void OnStateChanged([NotNull] IReadOnlyCollection<T> state);
-
-        void OnClear();
-
-        void OnAdd(T item);
-
-        void OnRemove(T item);
-    }
-
-    public interface IListChange<out T> : ICollectionChange<T>
-    {
-        void Enumerate([NotNull] IListChangeEnumerator<T> enumerator);
-    }
-
-    public interface IListChangeEnumerator<in T>
-    {
-        void OnStateChanged([NotNull] IReadOnlyList<T> state);
-
-        void OnClear();
-
-        void OnAdd(T item, int index);
-
-        void OnRemove(T item, int index);
-
-        void OnMove(T item, int index, int originalIndex);
-
-        void OnReplace(T item, T changedItem, int index);
-    }
-
     public sealed class ListToCollectionChangeEnumerator<T> : IListChangeEnumerator<T>
     {
         [NotNull] private ICollectionChangeEnumerator<T> _adaptee;
@@ -121,34 +83,6 @@ namespace ObservableData.Querying
         {
             enumerator.OnRemove(changedItem);
             enumerator.OnAdd(item);
-        }
-    }
-
-    public interface IBatch<out T>
-    {
-        [NotNull, ItemNotNull]
-        IEnumerable<T> GetPeaces();
-
-        void MakeImmutable();
-    }
-
-    public static class BatchExtensions
-    {
-        public static void ApplyTo<T>(
-            [NotNull] this IBatch<IndexedChange<T>> change,
-            [NotNull] NotifyCollectionEvents<T> events)
-        {
-            if (events.HasObservers)
-            {
-                foreach (var update in change.GetPeaces())
-                {
-                    events.OnChange(update);
-                    if (update.Type == IndexedChangeType.Clear)
-                    {
-                        break;
-                    }
-                }
-            }
         }
     }
 }

@@ -9,7 +9,7 @@ namespace ObservableData.Querying.Select
 {
     internal static partial class SelectImmutable
     {
-        private class FirstEnumerator<TIn, TOut> : ICollectionChangeEnumerator<TIn>
+        private class AddItemsEnumerator<TIn, TOut> : ICollectionChangeEnumerator<TIn>
         {
             [NotNull] private readonly Map<TIn, TOut> _map;
             [NotNull] private readonly Func<TIn, TOut> _selector;
@@ -19,7 +19,7 @@ namespace ObservableData.Querying.Select
             private int _removeCount;
             private int _addCount;
 
-            public FirstEnumerator(
+            public AddItemsEnumerator(
                 [NotNull] Map<TIn, TOut> map,
                 [NotNull] Func<TIn, TOut> selector)
             {
@@ -91,14 +91,14 @@ namespace ObservableData.Querying.Select
             }
         }
 
-        private class SecondEnumerator<TIn, TOut> : ICollectionChangeEnumerator<TIn>
+        private class RemoveItemsEnumerator<TIn, TOut> : ICollectionChangeEnumerator<TIn>
         {
             [CanBeNull] private Map<TIn, TOut> _startState = new Map<TIn, TOut>();
 
             [NotNull] private readonly Map<TIn, TOut> _map;
             private int _clearCount;
 
-            public SecondEnumerator([NotNull] Map<TIn, TOut> map)
+            public RemoveItemsEnumerator([NotNull] Map<TIn, TOut> map)
             {
                 _map = map;
             }
@@ -159,15 +159,12 @@ namespace ObservableData.Querying.Select
         {
             private sealed class State : IReadOnlyCollection<TOut>
             {
-                [NotNull] private IReadOnlyCollection<TIn> _source;
-                [NotNull] private readonly Map<TIn, TOut> _state;
+                [NotNull] private IReadOnlyCollection<TIn> _source = EmptyList<TIn>.Instance;
+                [NotNull] private readonly Map<TIn, TOut> _map;
 
-                public State(
-                    [NotNull] IReadOnlyCollection<TIn> source,
-                    [NotNull] Map<TIn, TOut> state)
+                public State([NotNull] Map<TIn, TOut> map)
                 {
-                    _source = source;
-                    _state = state;
+                    _map = map;
                 }
 
                 public void ChangeSource([NotNull] IReadOnlyCollection<TIn> source)
@@ -178,17 +175,16 @@ namespace ObservableData.Querying.Select
                 public int Count => _source.Count;
 
                 public IEnumerator<TOut> GetEnumerator() => 
-                    _source.Select(item => _state[item]).GetEnumerator();
+                    _source.Select(item => _map[item]).GetEnumerator();
 
                 IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
             }
 
             [NotNull] private readonly IObserver<ICollectionChange<TOut>> _adaptee;
             [NotNull] private readonly Map<TIn, TOut> _map;
-            [NotNull] private readonly FirstEnumerator<TIn, TOut> _adder;
-            [NotNull] private readonly SecondEnumerator<TIn, TOut> _remover;
-
-            [CanBeNull] private State _state;
+            [NotNull] private readonly AddItemsEnumerator<TIn, TOut> _adder;
+            [NotNull] private readonly RemoveItemsEnumerator<TIn, TOut> _remover;
+            [NotNull] private readonly State _state;
 
             private ThreadId? _thread;
             private ICollectionChange<TIn> _change;
@@ -200,8 +196,9 @@ namespace ObservableData.Querying.Select
             {
                 _adaptee = adaptee;
                 _map = new Map<TIn, TOut>();
-                _adder = new FirstEnumerator<TIn, TOut>(_map, selector);
-                _remover = new SecondEnumerator<TIn, TOut>(_map);
+                _adder = new AddItemsEnumerator<TIn, TOut>(_map, selector);
+                _remover = new RemoveItemsEnumerator<TIn, TOut>(_map);
+                _state = new State(_map);
             }
 
             void IObserver<ICollectionChange<TIn>>.OnCompleted() => _adaptee.OnCompleted();
@@ -242,14 +239,7 @@ namespace ObservableData.Querying.Select
             {
                 var e = _enumerator.Check(_thread);
                 _adder.OnStateChanged(state);
-                if (_state == null)
-                {
-                    _state = new State(state, _map);
-                }
-                else
-                {
-                    _state.ChangeSource(state);
-                }
+                _state.ChangeSource(state);
                 e.OnStateChanged(_state);
                 _enumerator = null;
             }
@@ -311,8 +301,8 @@ namespace ObservableData.Querying.Select
 
             [NotNull] private readonly IObserver<IListChange<TOut>> _adaptee;
             [NotNull] private readonly Map<TIn, TOut> _map;
-            [NotNull] private readonly FirstEnumerator<TIn, TOut> _adder;
-            [NotNull] private readonly SecondEnumerator<TIn, TOut> _remover;
+            [NotNull] private readonly AddItemsEnumerator<TIn, TOut> _adder;
+            [NotNull] private readonly RemoveItemsEnumerator<TIn, TOut> _remover;
             
             [CanBeNull] private State _state;
 
@@ -328,8 +318,8 @@ namespace ObservableData.Querying.Select
             {
                 _adaptee = adaptee;
                 _map = new Map<TIn, TOut>();
-                _adder = new FirstEnumerator<TIn, TOut>(_map, selector);
-                _remover = new SecondEnumerator<TIn, TOut>(_map);
+                _adder = new AddItemsEnumerator<TIn, TOut>(_map, selector);
+                _remover = new RemoveItemsEnumerator<TIn, TOut>(_map);
             }
 
             void IObserver<IListChange<TIn>>.OnCompleted() => _adaptee.OnCompleted();

@@ -86,20 +86,30 @@
             </StackPanel>
         </Grid>
         <WrapPanel Grid.Row="1" Margin="0,12">
-            <TextBlock Text="Sum:" Margin="12,0"></TextBlock>
-            <TextBlock x:Name="Sum"/>
+            <StackPanel Orientation="Horizontal" Background="AliceBlue" Margin="12,0" >
+                <TextBlock Text="Sum:" ></TextBlock>
+                <TextBlock x:Name="Sum"/>
+            </StackPanel>
 
-            <TextBlock Text="Any:" Margin="12,0"></TextBlock>
-            <TextBlock x:Name="Any"/>
+            <StackPanel Orientation="Horizontal" Background="LavenderBlush" Margin="12,0" >
+                <TextBlock Text="Any:" ></TextBlock>
+                <TextBlock x:Name="Any"/>
+            </StackPanel>
 
-            <TextBlock Text="All:" Margin="12,0"></TextBlock>
-            <TextBlock x:Name="All"/>
+            <StackPanel Orientation="Horizontal" Background="AliceBlue" Margin="12,0" >
+                <TextBlock Text="All:"></TextBlock>
+                <TextBlock x:Name="All"/>
+            </StackPanel>
 
-            <TextBlock Text="Count:" Margin="12,0"></TextBlock>
-            <TextBlock x:Name="Count"/>
-
-            <TextBlock Text="Contains:" Margin="12,0"></TextBlock>
-            <TextBlock x:Name="Contains"/>
+            <StackPanel Orientation="Horizontal" Background="LavenderBlush" Margin="12,0" >
+                <TextBlock Text="Count:"></TextBlock>
+                <TextBlock x:Name="Count"/>
+            </StackPanel>
+            
+            <StackPanel Orientation="Horizontal" Background="AliceBlue" Margin="12,0" >
+                <TextBlock Text="Contains:"></TextBlock>
+                <TextBlock x:Name="Contains"/>
+            </StackPanel>
         </WrapPanel>
         <Grid Grid.Row="2" x:Name="ListsPanel">
             <ListView

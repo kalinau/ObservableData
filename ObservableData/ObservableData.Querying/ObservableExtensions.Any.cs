@@ -18,7 +18,7 @@ namespace ObservableData.Querying
             {
                 if (observer == null) return Disposable.Empty;
 
-                var adapter = new All.Observer<T>(observer, criterion);
+                var adapter = new Any.Observer<T>(observer, criterion);
                 return previous.Subscribe(adapter);
             }).NotNull();
         }

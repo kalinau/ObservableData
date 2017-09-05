@@ -37,7 +37,7 @@ namespace ObservableData.Querying.Criterions
 
                 change.Enumerate(this);
 
-                var isAll = _satisfyCount == _count;
+                var isAll = _count > 0 && _satisfyCount == _count;
                 if (isAll != _isAll)
                 {
                     _isAll = isAll;
@@ -67,6 +67,7 @@ namespace ObservableData.Querying.Criterions
 
             void ICollectionChangeEnumerator<T>.OnRemove(T item)
             {
+                _count--;
                 if (_criterion(item))
                 {
                     _satisfyCount--;

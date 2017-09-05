@@ -5,7 +5,6 @@ using JetBrains.Annotations;
 using ObservableData.Querying;
 using ObservableData.Querying.Utils;
 using ObservableData.Structures.Lists.Utils;
-using ObservableData.Structures.Utils;
 
 namespace ObservableData.Structures.Lists
 {
@@ -26,12 +25,9 @@ namespace ObservableData.Structures.Lists
 
         public int Count => _list.Count;
 
-        IObservable<IBatch<IListOperation<T>>> IObservableReadOnlyList<T>.WhenUpdated => this.WhenUpdated;
-
         IObservable<ICollectionChange<T>> IObservableReadOnlyCollection<T>.WhenUpdated => this.WhenUpdated;
 
-        [NotNull]
-        public IObservable<IListBatchChange<T>> WhenUpdated =>_subject;
+        public IObservable<IListChange<T>> WhenUpdated =>_subject;
 
         public bool IsReadOnly => false;
 

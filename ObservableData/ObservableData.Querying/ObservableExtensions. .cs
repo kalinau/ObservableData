@@ -11,19 +11,19 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<IBatch<IndexedChange<T>>> StartWith<T>(
-            [NotNull] this IObservable<IBatch<IndexedChange<T>>> observable,
+        public static IObservable<ICollectionChange<T>> StartWithState<T>(
+            [NotNull] this IObservable<ICollectionChange<T>> observable,
             [NotNull] IReadOnlyCollection<T> state)
         {
-            return observable.StartWith(new CurrentStateChange<T>(state)).NotNull();
+            return observable.StartWith(new CollectionStateChange<T>(state)).NotNull();
         }
 
         [NotNull]
-        public static IObservable<IBatch<GeneralChange<T>>> StartWith<T>(
-            [NotNull] this IObservable<IBatch<GeneralChange<T>>> observable,
-            [NotNull] IReadOnlyCollection<T> state)
+        public static IObservable<IListChange<T>> StartWithState<T>(
+            [NotNull] this IObservable<IListChange<T>> observable,
+            [NotNull] IReadOnlyList<T> state)
         {
-            return observable.StartWith(new CurrentStateChange<T>(state)).NotNull();
+            return observable.StartWith(new ListStateChange<T>(state)).NotNull();
         }
     }
 }

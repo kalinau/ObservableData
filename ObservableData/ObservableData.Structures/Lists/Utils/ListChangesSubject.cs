@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using JetBrains.Annotations;
+using ObservableData.Querying;
 using ObservableData.Structures.Lists.Operations;
 using ObservableData.Structures.Utils;
 
 namespace ObservableData.Structures.Lists.Utils
 {
-    internal class ListChangesSubject<T> : IObservable<IListBatchChange<T>>
+    internal class ListChangesSubject<T> : IObservable<IListChange<T>>
     {
-        [NotNull] private readonly Subject<IListBatchChange<T>> _subject = new Subject<IListBatchChange<T>>();
+        [NotNull] private readonly Subject<IListChange<T>> _subject = new Subject<IListChange<T>>();
         [CanBeNull] private ListBatchChange<T> _batch;
 
         private bool ShouldTrackChange
@@ -124,7 +125,7 @@ namespace ObservableData.Structures.Lists.Utils
             }
         }
 
-        public IDisposable Subscribe(IObserver<IListBatchChange<T>> observer)
+        public IDisposable Subscribe(IObserver<IListChange<T>> observer)
         {
             return _subject.Subscribe(observer);
         }

@@ -6,8 +6,7 @@ using ObservableData.Structures.Lists.Utils;
 namespace ObservableData.Structures.Lists.Operations
 {
     internal sealed class MoveOperation<T> : 
-        IListBatchChangeNode<T>,
-        IListMoveOperation<T>
+        IListBatchChangeNode<T>
     {
         private readonly int _to;
         private readonly T _item;
@@ -22,54 +21,10 @@ namespace ObservableData.Structures.Lists.Operations
 
         IListBatchChangeNode<T> IListBatchChangeNode<T>.Next { get; set; }
 
-        T IListMoveOperation<T>.Item => _item;
+        public void Enumerate(ICollectionChangeEnumerator<T> enumerator) =>
+            enumerator.OnMove(_item, _to, _from);
 
-        int IListMoveOperation<T>.From => _from;
-
-        int IListMoveOperation<T>.To => _to;
-
-        TResult IListOperation<T>.Match<TResult>(
-            Func<IListInsertOperation<T>, TResult> onInsert,
-            Func<IListRemoveOperation<T>, TResult> onRemove,
-            Func<IListReplaceOperation<T>, TResult> onReplace,
-            Func<IListMoveOperation<T>, TResult> onMove,
-            Func<IListClearOperation<T>, TResult> onClear)
-        {
-            return onMove(this);
-        }
-
-        void IListOperation<T>.Match(
-            Action<IListInsertOperation<T>> onInsert,
-            Action<IListRemoveOperation<T>> onRemove,
-            Action<IListReplaceOperation<T>> onReplace,
-            Action<IListMoveOperation<T>> onMove,
-            Action<IListClearOperation<T>> onClear)
-        {
-            onMove?.Invoke(this);
-        }
-
-        public void MakeImmutable()
-        {
-        }
-
-        IEnumerable<GeneralChange<T>> IBatch<GeneralChange<T>>.GetPeaces()
-        {
-            yield break;
-        }
-
-        IEnumerable<IndexedChange<T>> IBatch<IndexedChange<T>>.GetPeaces()
-        {
-            yield return IndexedChange<T>.OnMove(_item, _to, _from);
-        }
-
-        IEnumerable<IListOperation<T>> IBatch<IListOperation<T>>.GetPeaces()
-        {
-            yield return this;
-        }
-
-        public IEnumerable<ICollectionOperation<T>> GetPeaces()
-        {
-            yield break;
-        }
+        public void Enumerate(IListChangeEnumerator<T> enumerator) =>
+            enumerator.OnMove(_item, _to, _from);
     }
 }

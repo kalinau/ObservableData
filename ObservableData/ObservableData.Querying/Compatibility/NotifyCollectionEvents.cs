@@ -18,67 +18,49 @@ namespace ObservableData.Querying.Compatibility
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public void OnChange(IndexedChange<T> value)
-        {
-            switch (value.Type)
-            {
-                case IndexedChangeType.Add:
-                    this.OnAdd(value);
-                    break;
-
-                case IndexedChangeType.Remove:
-                    this.OnRemove(value);
-                    break;
-
-                case IndexedChangeType.Move:
-                    this.OnMove(value);
-                    break;
-
-                case IndexedChangeType.Replace:
-                    this.OnReplace(value);
-                    break;
-
-                case IndexedChangeType.Clear:
-                    this.OnClear();
-                    return;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        private void OnMove(IndexedChange<T> update)
-        {
-            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, update.Item, update.Index, update.OriginalIndex);
-            this.CollectionChanged?.Invoke(this, args);
-        }
-
-        private void OnRemove(IndexedChange<T> update)
-        {
-            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, update.Item, update.Index);
-            this.CollectionChanged?.Invoke(this, args);
-            this.OnPropertyChanged(nameof(IReadOnlyCollection<T>.Count));
-        }
-
-        private void OnAdd(IndexedChange<T> update)
-        {
-            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, update.Item, update.Index);
-            this.CollectionChanged?.Invoke(this, args);
-            this.OnPropertyChanged(nameof(IReadOnlyCollection<T>.Count));
-        }
-
-        private void OnReplace(IndexedChange<T> update)
-        {
-            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, update.Item, update.ChangedItem, update.Index);
-            this.CollectionChanged?.Invoke(this, args);
-        }
-
-        private void OnClear()
+        public void OnReset()
         {
             this.CollectionChanged?.Invoke(
                 this,
                 new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
             this.OnPropertyChanged(nameof(IReadOnlyCollection<T>.Count));
+        }
+
+        public void OnAdd(T item, int index)
+        {
+            var args = new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index);
+            this.CollectionChanged?.Invoke(this, args);
+            this.OnPropertyChanged(nameof(IReadOnlyCollection<T>.Count));
+        }
+
+        public void OnRemove(T item, int index)
+        {
+            var args = new NotifyCollectionChangedEventArgs(
+                NotifyCollectionChangedAction.Remove,
+                item,
+                index);
+            this.CollectionChanged?.Invoke(this, args);
+            this.OnPropertyChanged(nameof(IReadOnlyCollection<T>.Count));
+        }
+
+        public void OnMove(T item, int index, int originalIndex)
+        {
+            var args = new NotifyCollectionChangedEventArgs(
+                NotifyCollectionChangedAction.Move,
+                item, 
+                index, 
+                originalIndex);
+            this.CollectionChanged?.Invoke(this, args);
+        }
+
+        public void OnReplace(T item, T changedItem, int index)
+        {
+            var args = new NotifyCollectionChangedEventArgs(
+                NotifyCollectionChangedAction.Replace,
+                item,
+                changedItem,
+                index);
+            this.CollectionChanged?.Invoke(this, args);
         }
 
         [NotifyPropertyChangedInvocator]

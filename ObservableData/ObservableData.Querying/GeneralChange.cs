@@ -33,40 +33,30 @@ namespace ObservableData.Querying
         }
     }
 
-    [PublicAPI]
-    public static class GeneralChangeExtensions
-    {
-        public static void ApplyTo<T>(
-            this GeneralChange<T> change,
-            [NotNull] ICollection<T> list)
-        {
-            switch (change.Type)
-            {
-                case GeneralChangeType.Add:
-                    list.Add(change.Item);
-                    break;
+    //[PublicAPI]
+    //public static class GeneralChangeExtensions
+    //{
+    //    public static void ApplyTo<T>(
+    //        this GeneralChange<T> change,
+    //        [NotNull] ICollection<T> list)
+    //    {
+    //        switch (change.Type)
+    //        {
+    //            case GeneralChangeType.Add:
+    //                list.Add(change.Item);
+    //                break;
 
-                case GeneralChangeType.Remove:
-                    list.Remove(change.Item);
-                    break;
+    //            case GeneralChangeType.Remove:
+    //                list.Remove(change.Item);
+    //                break;
 
-                case GeneralChangeType.Clear:
-                    list.Clear();
-                    break;
+    //            case GeneralChangeType.Clear:
+    //                list.Clear();
+    //                break;
 
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-        }
-
-        public static void ApplyTo<T>(
-            [NotNull] this IBatch<GeneralChange<T>> change,
-            [NotNull] ICollection<T> collection)
-        {
-            foreach (var o in change.GetPeaces())
-            {
-                o.ApplyTo(collection);
-            }
-        }
-    }
+    //            default:
+    //                throw new ArgumentOutOfRangeException();
+    //        }
+    //    }
+    //}
 }

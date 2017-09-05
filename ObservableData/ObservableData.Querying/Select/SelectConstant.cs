@@ -111,14 +111,11 @@ namespace ObservableData.Querying.Select
         {
             private sealed class State : IReadOnlyList<TOut>
             {
-                [NotNull] private IReadOnlyList<TIn> _source;
+                [NotNull] private IReadOnlyList<TIn> _source = EmptyList<TIn>.Instance;
                 [NotNull] private readonly Func<TIn, TOut> _selector;
 
-                public State(
-                    [NotNull] IReadOnlyList<TIn> source,
-                    [NotNull] Func<TIn, TOut> selector)
+                public State([NotNull] Func<TIn, TOut> selector)
                 {
-                    _source = source;
                     _selector = selector;
                 }
 
@@ -139,7 +136,7 @@ namespace ObservableData.Querying.Select
             [NotNull] private readonly IObserver<IListChange<TOut>> _adaptee;
             [NotNull] private readonly Func<TIn, TOut> _selector;
 
-            private State _state;
+            [NotNull] private readonly State _state;
 
             private ThreadId? _thread;
             private IListChange<TIn> _currentChange;
@@ -153,6 +150,7 @@ namespace ObservableData.Querying.Select
             {
                 _adaptee = adaptee;
                 _selector = selector;
+                _state = new State(selector);
             }
 
             void IObserver<IListChange<TIn>>.OnCompleted() => _adaptee.OnCompleted();
@@ -188,15 +186,9 @@ namespace ObservableData.Querying.Select
             void IListChangeEnumerator<TIn>.OnStateChanged(IReadOnlyList<TIn> state)
             {
                 var enumerator = _enumerator.Check(_thread);
-                if (_state == null)
-                {
-                    _state = new State(state, _selector);
-                }
-                else
-                {
-                    _state.ChangeSource(state);
-                }
+                _state.ChangeSource(state);
                 enumerator.OnStateChanged(_state);
+                _enumerator = null;
             }
 
             void IListChangeEnumerator<TIn>.OnClear() => 

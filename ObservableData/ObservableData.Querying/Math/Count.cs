@@ -27,9 +27,9 @@ namespace ObservableData.Querying.Math
             {
                 if (change == null) return;
 
-                change.Enumerate(this);
 
                 var before = _count;
+                change.Enumerate(this);
                 if (_count != null && _count != before)
                 {
                     _adaptee.OnNext(_count.Value);
