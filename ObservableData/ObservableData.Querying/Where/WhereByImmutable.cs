@@ -1,268 +1,148 @@
-//using System;
-//using System.Collections;
-//using System.Collections.Generic;
-//using System.Linq;
-//using JetBrains.Annotations;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using JetBrains.Annotations;
+using ObservableData.Querying.Utils;
 
-//namespace ObservableData.Querying.Where
-//{
-//    internal static class WhereByImmutable
-//    {
-//        public class CollectionObserver<T> : IObserver<ICollectionChange<T>>
-//        {
-//            [NotNull] private readonly IObserver<ICollectionChange<T>> _adaptee;
-//            [NotNull] private readonly Func<T, bool> _criterion;
-//            [CanBeNull] private CollectionState<T> _state;
+namespace ObservableData.Querying.Where
+{
+    internal static class WhereByImmutable
+    {
+        public class CollectionObserver<T> : 
+            IObserver<ICollectionChange<T>>,
+            ICollectionChange<T>,
+            ICollectionChangeEnumerator<T>
+        {
+            [NotNull] private readonly IObserver<ICollectionChange<T>> _adaptee;
+            [NotNull] private readonly Func<T, bool> _criterion;
+            [NotNull] private readonly CollectionState<T> _state;
 
-
-//            public CollectionObserver(
-//                [NotNull]  IObserver<ICollectionChange<T>> adaptee,
-//                [NotNull] Func<T, bool> criterion)
-//            {
-//                _adaptee = adaptee;
-//                _criterion = criterion;
-//            }
-
-//            [NotNull]
-//            public Func<T, bool> Criterion => _criterion;
-
-//            public CollectionState<T> State
-//            {
-//                get => _state;
-//                set => _state = value;
-//            }
+            private ThreadId? _thread;
+            private ICollectionChange<T> _change;
+            private ICollectionChangeEnumerator<T> _enumerator;
 
 
-//            public void OnNext(ICollectionChange<T> value)
-//            {
-//                if (value == null) return;
+            public CollectionObserver(
+                [NotNull]  IObserver<ICollectionChange<T>> adaptee,
+                [NotNull] Func<T, bool> criterion)
+            {
+                _adaptee = adaptee;
+                _criterion = criterion;
+                _state = new CollectionState<T>(_criterion);
+            }
 
-//                var state = _state;
-//                if (state != null)
-//                {
-//                    value.Match(x => _state = null, state.OnChange);
-//                }
+            void IObserver<ICollectionChange<T>>.OnCompleted() => _adaptee.OnCompleted();
 
-//                _adaptee.OnNext(new CollectionChange<T>(value, this));
-//            }
+            void IObserver<ICollectionChange<T>>.OnError(Exception error) => _adaptee.OnError(error);
 
-//            public void OnCompleted() => _adaptee.OnCompleted();
+            void IObserver<ICollectionChange<T>>.OnNext(ICollectionChange<T> value)
+            {
+                if (value == null) return;
 
-//            public void OnError(Exception error) => _adaptee.OnError(error);
-//        }
+                value.Enumerate(_state);
 
-//        private class CollectionChange<T> : ICollectionChange<T>
-//        {
-//            [NotNull] private readonly ICollectionChange<T> _adaptee;
-//            [NotNull] private readonly CollectionObserver<T> _observer;
+                _thread = ThreadId.FromCurrent();
+                _change = value;
+                _adaptee.OnNext(this);
+                _thread = null;
+            }
 
-//            public CollectionChange(
-//                [NotNull] ICollectionChange<T> adaptee,
-//                [NotNull] CollectionObserver<T> observer)
-//            {
-//                _adaptee = adaptee;
-//                _observer = observer;
-//            }
+            void ICollectionChange<T>.Enumerate(ICollectionChangeEnumerator<T> enumerator)
+            {
+                var change = _change.Check(_thread);
+                _enumerator = enumerator;
+                change.Enumerate(this);
+            }
 
-//            public void Match(
-//                Action<IReadOnlyCollection<TOut>> onStateChanged,
-//                Action<GeneralChange<TOut>> onDelta)
-//            {
-//                _adaptee.Match(
-//                    state =>
-//                    {
-//                        onStateChanged?.Invoke(state == null
-//                            ? null
-//                            : new CollectionState<T>(state, _observer.Criterion));
-//                    },
-//                    delta => onDelta?.Invoke(delta.Select(_observer)));
-//            }
-//        }
+            void ICollectionChangeEnumerator<T>.OnStateChanged(IReadOnlyCollection<T> state)
+            {
+                _enumerator.Check(_thread).OnStateChanged(_state);
+                _enumerator = null;
+            }
 
-//        private static GeneralChange<TOut> Select<TIn, TOut>(
-//            this GeneralChange<TIn> change,
-//            [NotNull] Func<TIn, TOut> selector)
-//        {
-//            switch (change.Type)
-//            {
-//                case GeneralChangeType.Add:
-//                    return GeneralChange<TOut>.OnAdd(selector(change.Item));
+            void ICollectionChangeEnumerator<T>.OnClear()
+            {
+                _enumerator.Check(_thread).OnClear();
+            }
 
-//                case GeneralChangeType.Remove:
-//                    return GeneralChange<TOut>.OnRemove(selector(change.Item));
+            void ICollectionChangeEnumerator<T>.OnAdd(T item)
+            {
+                if (_criterion(item))
+                {
+                    _enumerator.Check(_thread).OnAdd(item);
+                }
+            }
 
-//                case GeneralChangeType.Clear:
-//                    return GeneralChange<TOut>.OnClear();
+            void ICollectionChangeEnumerator<T>.OnRemove(T item)
+            {
+                if (_criterion(item))
+                {
+                    _enumerator.Check(_thread).OnRemove(item);
+                }
+            }
+        }
 
-//                default:
-//                    throw new ArgumentOutOfRangeException();
-//            }
-//        }
+        private sealed class CollectionState<T> : 
+            IReadOnlyCollection<T>,
+            ICollectionChangeEnumerator<T>
+        {
+            [NotNull] private IReadOnlyCollection<T> _source = EmptyList<T>.Instance;
+            [NotNull] private readonly Func<T, bool> _criterion;
 
-//        public sealed class GeneralChangesObserver<T> : IObserver<IBatch<GeneralChange<T>>>
-//        {
-//            [NotNull] private readonly IObserver<IBatch<GeneralChange<T>>> _adaptee;
-//            [NotNull] private readonly Func<T, bool> _criterion;
+            private int? _count;
 
-//            public GeneralChangesObserver(
-//                [NotNull] IObserver<IBatch<GeneralChange<T>>> adaptee,
-//                [NotNull] Func<T, bool> criterion)
-//            {
-//                _adaptee = adaptee;
-//                _criterion = criterion;
-//            }
+            public CollectionState([NotNull] Func<T, bool> criterion)
+            {
+                _criterion = criterion;
+            }
 
-//            public void OnNext(IBatch<GeneralChange<T>> value)
-//            {
-//                if (value == null) return;
+            int IReadOnlyCollection<T>.Count
+            {
+                get
+                {
+                    if (_count == null)
+                    {
+                        _count = _source.Count(_criterion);
+                    }
+                    return _count.Value;
+                }
+            }
 
-//                _adaptee.OnNext(new GeneralChanges<T>(value, _criterion));
-//            }
+            public IEnumerator<T> GetEnumerator()
+            {
+                return _source.Where(_criterion).GetEnumerator();
+            }
 
-//            public void OnCompleted() => _adaptee.OnCompleted();
+            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
 
-//            public void OnError(Exception error) => _adaptee.OnError(error);
-//        }
+            void ICollectionChangeEnumerator<T>.OnStateChanged(IReadOnlyCollection<T> state)
+            {
+                _source = state;
+                _count = null;
+            }
 
-//        public sealed class GeneralChangesPlusStateObserver<T> : IObserver<GeneralChangesPlusState<T>>
-//        {
-//            [NotNull] private readonly IObserver<GeneralChangesPlusState<T>> _adaptee;
-//            [NotNull] private readonly Func<T, bool> _criterion;
+            void ICollectionChangeEnumerator<T>.OnClear()
+            {
 
-//            private int? _count;
+                _count = 0;
+            }
 
-//            public GeneralChangesPlusStateObserver(
-//                [NotNull] IObserver<GeneralChangesPlusState<T>> adaptee,
-//                [NotNull] Func<T, bool> criterion)
-//            {
-//                _adaptee = adaptee;
-//                _criterion = criterion;
-//            }
+            void ICollectionChangeEnumerator<T>.OnAdd(T item)
+            {
+                if (_count != null && _criterion(item))
+                {
+                    _count++;
+                }
+            }
 
-//            public void OnNext(GeneralChangesPlusState<T> value)
-//            {
-//                if (_count == null)
-//                {
-//                    _count = value.ReachedState.Where(_criterion).Count();
-//                }
-//                else
-//                {
-//                    foreach (var peace in value.Changes.GetPeaces())
-//                    {
-//                        switch (peace.Type)
-//                        {
-//                            case GeneralChangeType.Add:
-//                                _count++;
-//                                break;
-//                            case GeneralChangeType.Remove:
-//                                _count--;
-//                                break;
-//                            case GeneralChangeType.Clear:
-//                                _count = 0;
-//                                break;
-
-//                            default:
-//                                throw new ArgumentOutOfRangeException();
-//                        }
-//                    }
-//                }
-//                var change = new GeneralChanges<T>(value.Changes, _criterion);
-//                var state = new CollectionState<T>(value.ReachedState, _count.Value, _criterion);
-//                _adaptee.OnNext(new GeneralChangesPlusState<T>(change, state));
-//            }
-
-//            public void OnCompleted() => _adaptee.OnCompleted();
-
-//            public void OnError(Exception error) => _adaptee.OnError(error);
-//        }
-
-//        private sealed class GeneralChanges<T> : IBatch<GeneralChange<T>>
-//        {
-//            [NotNull] private readonly IBatch<GeneralChange<T>> _adaptee;
-//            [NotNull] private readonly Func<T, bool> _criterion;
-
-//            public GeneralChanges(
-//                [NotNull] IBatch<GeneralChange<T>> adaptee,
-//                [NotNull] Func<T, bool> criterion)
-//            {
-//                _adaptee = adaptee;
-//                _criterion = criterion;
-//            }
-
-//            public IEnumerable<GeneralChange<T>> GetPeaces()
-//            {
-//                foreach (var update in _adaptee.GetPeaces())
-//                {
-//                    if (update.Type == GeneralChangeType.Clear)
-//                    {
-//                        yield return update;
-//                    }
-//                    else if (_criterion.Invoke(update.Item))
-//                    {
-//                        yield return update;
-//                    }
-//                }
-//            }
-
-//            public void MakeImmutable() => _adaptee.MakeImmutable();
-//        }
-
-//        private sealed class CollectionState<T> : IReadOnlyCollection<T>
-//        {
-//            [NotNull] private readonly IReadOnlyCollection<T> _source;
-//            [NotNull] private readonly Func<T, bool> _criterion;
-
-//            private int? _count;
-
-//            public CollectionState(
-//                [NotNull] IReadOnlyCollection<T> source,
-//                int count,
-//                [NotNull] Func<T, bool> criterion)
-//            {
-//                _source = source;
-//                _criterion = criterion;
-//                _count = count;
-//            }
-
-//            public int Count
-//            {
-//                get
-//                {
-//                    if (_count == null)
-//                    {
-//                        _count = _source.Count(_criterion);
-//                    }
-//                    return _count.Value;
-//                }
-//            }
-
-//            public void OnChange(GeneralChange<T> delta)
-//            {
-//                switch (delta.Type)
-//                {
-//                    case GeneralChangeType.Add:
-//                        if (_count != null) _count++;
-//                        break;
-
-//                    case GeneralChangeType.Remove:
-//                        if (_count != null) _count--;
-//                        break;
-
-//                    case GeneralChangeType.Clear:
-//                        _count = 0;
-//                        break;
-
-//                    default:
-//                        throw new ArgumentOutOfRangeException();
-//                }
-//            }
-
-//            public IEnumerator<T> GetEnumerator()
-//            {
-//                return _source.Where(_criterion).GetEnumerator();
-//            }
-
-//            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-//        }
-//    }
-//}
+            void ICollectionChangeEnumerator<T>.OnRemove(T item)
+            {
+                if (_count != null && _criterion(item))
+                {
+                    _count--;
+                }
+            }
+        }
+    }
+}

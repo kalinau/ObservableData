@@ -23,45 +23,18 @@ namespace ObservableData.Querying
             }).NotNull();
         }
 
+        [NotNull]
+        public static IObservable<IListChange<TOut>> SelectConstantFromItems<TIn, TOut>(
+            [NotNull] this IObservable<IListChange<TIn>> source,
+            [NotNull] Func<TIn, TOut> selector)
+        {
+            return Observable.Create<IListChange<TOut>>(o =>
+            {
+                if (o == null) return Disposable.Empty;
 
-        //[NotNull]
-        //public static IObservable<ICollectionChange<TOut>> SelectConstantFromItems<TIn, TOut>(
-        //    [NotNull] this IObservable<ICollectionChange<TIn>> source,
-        //    [NotNull] Func<TIn, TOut> selector)
-        //{
-        //    return Observable.Create<ICollectionChange<TOut>>(o =>
-        //    {
-        //        if (o == null) return Disposable.Empty;
-
-        //        return source.Subscribe(
-        //            value =>
-        //            {
-        //                if (value == null) return;
-        //                o.OnNext(new SelectConstant.CollectionChange<TIn, TOut>(value, selector));
-        //            },
-        //            o.OnError,
-        //            o.OnCompleted);
-        //    }).NotNull();
-        //}
-
-        //[NotNull]
-        //public static IObservable<IListChange<TOut>> SelectConstantFromItems<TIn, TOut>(
-        //    [NotNull] this IObservable<IListChange<TIn>> source,
-        //    [NotNull] Func<TIn, TOut> selector)
-        //{
-        //    return Observable.Create<IListChange<TOut>>(o =>
-        //    {
-        //        if (o == null) return Disposable.Empty;
-
-        //        return source.Subscribe(
-        //            value =>
-        //            {
-        //                if (value == null) return;
-        //                o.OnNext(new SelectConstant.ListChange<TIn, TOut>(value, selector));
-        //            },
-        //            o.OnError,
-        //            o.OnCompleted);
-        //    }).NotNull();
-        //}
+                var adapter = new SelectConstant.ListObserver<TIn,TOut>(o, selector);
+                return source.Subscribe(adapter);
+            }).NotNull();
+        }
     }
 }

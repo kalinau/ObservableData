@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using JetBrains.Annotations;
 
@@ -19,12 +20,37 @@ namespace ObservableData.Tests.MemoryProfiler
                 var sw = Stopwatch.StartNew();
                 switch (line)
                 {
+
+                    case "all":
+                        All();
+                        break;
+
+                    case "any":
+                        Any();
+                        break;
+
+                    case "count":
+                        Count();
+                        break;
+
+                    case "contains":
+                        Contains();
+                        break;
+
+                    case "select-constant":
+                        SelectConstant();
+                        break;
+
+                    case "select":
+                        Select();
+                        break;
+
                     case "sum":
                         Sum();
                         break;
 
-                    case "sc":
-                        SelectConstant();
+                    case "where":
+                        Where();
                         break;
 
                     default:
@@ -38,10 +64,40 @@ namespace ObservableData.Tests.MemoryProfiler
             }
         }
 
+        private static void Where()
+        {
+            var subject = new Subject<ICollectionChange<int>>();
+            subject.WhereItems(x => x < 5).Subscribe(new SimpliestObserver<int>());
+
+            Emulate(subject);
+        }
+
+        private static void Contains()
+        {
+            var subject = new Subject<ICollectionChange<int>>();
+            subject.ContainsItem(5).Subscribe();
+            Emulate(subject);
+        }
+
         private static void Empty()
         {
             var subject = new Subject<ICollectionChange<int>>();
-            subject.Subscribe(Use);
+            subject.Subscribe(new SimpliestObserver<int>());
+
+            Emulate(subject);
+        }
+
+        private static void Any()
+        {
+            var subject = new Subject<ICollectionChange<int>>();
+            subject.AnyItem(x => x > 5).Subscribe();
+            Emulate(subject);
+        }
+
+        private static void All()
+        {
+            var subject = new Subject<ICollectionChange<int>>();
+            subject.AllItems(x => x > 5).Subscribe();
             Emulate(subject);
         }
 
@@ -52,87 +108,108 @@ namespace ObservableData.Tests.MemoryProfiler
             Emulate(subject);
         }
 
+        private static void Count()
+        {
+            var subject = new Subject<ICollectionChange<int>>();
+            subject.CountItems().Subscribe();
+            Emulate(subject);
+        }
+
+        private static void Select()
+        {
+            var subject = new Subject<ICollectionChange<int>>();
+
+            subject.SelectFromItems(x => x * 10).Subscribe(new SimpliestObserver<int>());
+            Emulate(subject);
+        }
+
         private static void SelectConstant()
         {
             var subject = new Subject<ICollectionChange<int>>();
-            subject.SelectConstantFromItems(x => x).Subscribe(Use);
+
+            subject.SelectConstantFromItems(x => x * 10).Subscribe(new SimpliestObserver<int>());
             Emulate(subject);
         }
 
         private static void Emulate([NotNull] Subject<ICollectionChange<int>> subject)
         {
             //var state = new StateChange<int>(new[] {1, 2, 3, 4});
-            var add = new DeltaChange<int>(new[] { GeneralChange<int>.OnAdd(10) });
-            var remove = new DeltaChange<int>(new[] { GeneralChange<int>.OnRemove(10) });
-            var clear = new DeltaChange<int>(
+
+            var add = new [] { GeneralChange<int>.OnAdd(10) };
+            var addChange = new DeltaChange<int>(add);
+
+            var remove = new[] { GeneralChange<int>.OnRemove(10) };
+            var removeChange = new DeltaChange<int>(remove);
+            var clearChange = new DeltaChange<int>(new[] { GeneralChange<int>.OnClear() });
+            var batchChange = new DeltaChange<int>(
                 new[] {
                     GeneralChange<int>.OnClear(),
                     GeneralChange<int>.OnAdd(1),
                     GeneralChange<int>.OnAdd(2),
                     GeneralChange<int>.OnAdd(3),
-                    GeneralChange<int>.OnAdd(4)});
+                    GeneralChange<int>.OnAdd(4),
+                    });
 
-            for (int i = 0; i < 10000000; i++)
+            var d = new Dictionary<int, int>();
+            for (int i = 0; i < 1000000; i++)
             {
-                subject.OnNext(add);
-                subject.OnNext(remove);
-                subject.OnNext(clear);
+                add[0] = GeneralChange<int>.OnAdd(i);
+                remove[0] = GeneralChange<int>.OnRemove(i);
+                //d[i] = i;
+                //d.Clear();
+                subject.OnNext(addChange);
+                subject.OnNext(removeChange);
+                //subject.OnNext(clearChange);
+                subject.OnNext(batchChange);
             }
-        }
-
-        private static void Use(ICollectionChange<int> change)
-        {
-            if (change == null) throw new ArgumentNullException();
-
-            change?.Enumerate(UseChange);
-
-            //var state = change.TryGetState();
-            //if (state != null)
-            //{
-            //    if (state.Count < 0) throw new Exception();
-            //}
-            //else
-            //{
-            //    var delta = change.TryGetDelta();
-            //    delta?.Enumerate(UseChange);
-            //}
-        }
-
-        [NotNull] private static readonly Func<GeneralChange<int>, bool> UseChange = Use;
-
-        private static bool Use(GeneralChange<int> change)
-        {
-            return true;
         }
     }
 
-    //public sealed class StateChange<T> : ICollectionChange<T>
-    //{
-    //    private readonly IReadOnlyList<T> _list;
+    public sealed class SimpliestObserver<T> : 
+        IObserver<ICollectionChange<T>>,
+        ICollectionChangeEnumerator<T>
+    {
+        public void OnStateChanged(IReadOnlyCollection<T> state)
+        {
+            if (state.Count < 0) throw new Exception();
+        }
 
-    //    public StateChange(IReadOnlyList<T> list)
-    //    {
-    //        _list = list;
-    //    }
+        public void OnClear()
+        {
+        }
 
-    //    public void Match(
-    //        Action<IReadOnlyCollection<T>> onStateChanged, 
-    //        Action<ITrickyEnumerable<GeneralChange<int>>> onDelta)
-    //    {
-    //        onStateChanged?.Invoke(_list);
-    //    }
+        public void OnAdd(T item)
+        {
+        }
 
-    //    public IReadOnlyCollection<T> TryGetState() => _list;
+        public void OnRemove(T item)
+        {
+        }
 
-    //    public ITrickyEnumerable<GeneralChange<T>> TryGetDelta() => null;
+        public void OnNext(ICollectionChange<T> value)
+        {
+            value?.Enumerate(this);
+        }
 
-    //    public void Enumerate(Func<GeneralChange<T>, bool> handle)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
+        public void OnError(Exception error) { }
 
-    //    public IReadOnlyCollection<T> State { get; }
-    //}
+        public void OnCompleted() { }
+    }
+
+    public sealed class StateChange<T> : ICollectionChange<T>
+    {
+        [NotNull] private readonly IReadOnlyList<T> _list;
+
+        public StateChange([NotNull] IReadOnlyList<T> list)
+        {
+            _list = list;
+        }
+
+        public void Enumerate(ICollectionChangeEnumerator<T> enumerator)
+        {
+            enumerator.OnStateChanged(_list);
+        }
+    }
 
     public sealed class DeltaChange<T> : ICollectionChange<T>
     {
@@ -143,14 +220,29 @@ namespace ObservableData.Tests.MemoryProfiler
             _changes = changes;
         }
 
-        public void Enumerate(Func<GeneralChange<T>, bool> handle)
+        public void Enumerate(ICollectionChangeEnumerator<T> enumerator)
         {
             for (int i = 0; i < _changes.Length; i++)
             {
-                handle(_changes[i]);
+                var change = _changes[i];
+                switch (change.Type)
+                {
+                    case GeneralChangeType.Add:
+                        enumerator.OnAdd(change.Item);
+                        break;
+
+                    case GeneralChangeType.Remove:
+                        enumerator.OnRemove(change.Item);
+                        break;
+
+                    case GeneralChangeType.Clear:
+                        enumerator.OnClear();
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
         }
-
-        public IReadOnlyCollection<T> State => null;
     }
 }

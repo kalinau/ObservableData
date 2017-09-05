@@ -46,7 +46,7 @@ namespace ObservableData.Querying.Utils
 
         [NotNull]
         [ContractAnnotation("value:null => halt;value:notnull => notnull")]
-        public static T GetSafety<T>([NoEnumeration][CanBeNull] this T value, ThreadId? thread) 
+        public static T Check<T>([NoEnumeration][CanBeNull] this T value, ThreadId? thread) 
             where T : class
         {
             thread.CheckIsCurrent();
@@ -59,7 +59,7 @@ namespace ObservableData.Querying.Utils
 
         [NotNull]
         [ContractAnnotation("value:null => halt;value:notnull => notnull")]
-        public static T GetSafety<T>([NoEnumeration][CanBeNull] this T value)
+        public static T Check<T>([NoEnumeration][CanBeNull] this T value)
             where T : class
         {
             if (value == null)

@@ -1,60 +1,49 @@
-﻿//using System;
-//using JetBrains.Annotations;
+﻿using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
 
-//namespace ObservableData.Querying.Math
-//{
-//    internal static class Count
-//    {
-//        public sealed class Obsever<T> :
-//            IObserver<ICollectionChange<T>>
-//        {
-//            [NotNull] private readonly IObserver<int> _adaptee;
+namespace ObservableData.Querying.Math
+{
+    internal static class Count
+    {
+        public sealed class Obsever<T> :
+            IObserver<ICollectionChange<T>>,
+            ICollectionChangeEnumerator<T>
+        {
+            [NotNull] private readonly IObserver<int> _adaptee;
 
-//            private int? _count;
+            private int? _count;
 
-//            public Obsever(
-//                [NotNull] IObserver<int> adaptee)
-//            {
-//                _adaptee = adaptee;
-//            }
+            public Obsever([NotNull] IObserver<int> adaptee)
+            {
+                _adaptee = adaptee;
+            }
 
-//            public void OnCompleted() => _adaptee.OnCompleted();
+            void IObserver<ICollectionChange<T>>.OnCompleted() => _adaptee.OnCompleted();
 
-//            public void OnError(Exception error) => _adaptee.OnError(error);
+            void IObserver<ICollectionChange<T>>.OnError(Exception error) => _adaptee.OnError(error);
 
-//            public void OnNext(ICollectionChange<T> change)
-//            {
-//                if (change == null) return;
+            void IObserver<ICollectionChange<T>>.OnNext(ICollectionChange<T> change)
+            {
+                if (change == null) return;
 
-//                var before = _count;
-//                change.Match(
-//                    state => _count = state?.Count ?? 0,
-//                    delta =>
-//                    {
-//                        switch (delta.Type)
-//                        {
-//                            case GeneralChangeType.Add:
-//                                _count++;
-//                                break;
+                change.Enumerate(this);
 
-//                            case GeneralChangeType.Remove:
-//                                _count--;
-//                                break;
+                var before = _count;
+                if (_count != null && _count != before)
+                {
+                    _adaptee.OnNext(_count.Value);
+                }
+            }
 
-//                            case GeneralChangeType.Clear:
-//                                _count = 0;
-//                                break;
+            void ICollectionChangeEnumerator<T>.OnStateChanged(IReadOnlyCollection<T> state) => 
+                _count = state.Count;
 
-//                            default:
-//                                throw new ArgumentOutOfRangeException();
-//                        }
-//                    }
-//                );
-//                if (_count != null && _count != before)
-//                {
-//                    _adaptee.OnNext(_count.Value);
-//                }
-//            }
-//        }
-//    }
-//}
+            void ICollectionChangeEnumerator<T>.OnClear() => _count = 0;
+
+            void ICollectionChangeEnumerator<T>.OnAdd(T item) => _count++;
+
+            void ICollectionChangeEnumerator<T>.OnRemove(T item) => _count--;
+        }
+    }
+}

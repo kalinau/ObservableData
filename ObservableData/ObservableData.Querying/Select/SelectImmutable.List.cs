@@ -12,7 +12,7 @@ namespace ObservableData.Querying.Select
         public sealed class ListChangesObserver<T, TAdaptee> :
             ObserverAdapter<IBatch<IndexedChange<T>>, IBatch<IndexedChange<TAdaptee>>>
         {
-            [NotNull] readonly SelectState<T, TAdaptee> _state = new SelectState<T, TAdaptee>();
+            [NotNull] readonly Map<T, TAdaptee> _state = new Map<T, TAdaptee>();
             [NotNull] private readonly Func<T, TAdaptee> _func;
 
             public ListChangesObserver(
@@ -30,9 +30,10 @@ namespace ObservableData.Querying.Select
                 this.Adaptee.OnNext(_state.Apply(value, _func));
             }
         }
+
         [NotNull]
         private static IBatch<IndexedChange<TAdaptee>> Apply<T, TAdaptee>(
-            [NotNull] this SelectState<T, TAdaptee> state,
+            [NotNull] this Map<T, TAdaptee> state,
             [NotNull] IBatch<IndexedChange<T>> changes,
             [NotNull] Func<T, TAdaptee> func)
         {
@@ -74,7 +75,7 @@ namespace ObservableData.Querying.Select
         public sealed class ListDataObserver<T, TAdaptee> :
             ObserverAdapter<IndexedChangesPlusState<T>, IndexedChangesPlusState<TAdaptee>>
         {
-            [NotNull] readonly SelectState<T, TAdaptee> _state = new SelectState<T, TAdaptee>();
+            [NotNull] readonly Map<T, TAdaptee> _state = new Map<T, TAdaptee>();
             [NotNull] private readonly Func<T, TAdaptee> _func;
 
             public ListDataObserver(
@@ -95,11 +96,11 @@ namespace ObservableData.Querying.Select
             private sealed class StateAdapter : IReadOnlyList<TAdaptee>
             {
                 [NotNull] private readonly IReadOnlyList<T> _adaptee;
-                [NotNull] private readonly SelectState<T, TAdaptee> _state;
+                [NotNull] private readonly Map<T, TAdaptee> _state;
 
                 public StateAdapter(
                     [NotNull] IReadOnlyList<T> adaptee,
-                    [NotNull] SelectState<T, TAdaptee> state)
+                    [NotNull] Map<T, TAdaptee> state)
                 {
                     _adaptee = adaptee;
                     _state = state;
@@ -124,12 +125,12 @@ namespace ObservableData.Querying.Select
         private sealed class ListChanges<T, TAdaptee> : ThreadSensitiveChange<IndexedChange<TAdaptee>>
         {
             [NotNull] private readonly IBatch<IndexedChange<T>> _adaptee;
-            [NotNull] private readonly SelectState<T, TAdaptee> _state;
+            [NotNull] private readonly Map<T, TAdaptee> _state;
             [CanBeNull] private readonly Dictionary<T, TAdaptee> _removed;
 
             public ListChanges(
                 [NotNull] IBatch<IndexedChange<T>> adaptee,
-                [NotNull] SelectState<T, TAdaptee> state,
+                [NotNull] Map<T, TAdaptee> state,
                 [CanBeNull] Dictionary<T, TAdaptee> removed)
             {
                 _adaptee = adaptee;

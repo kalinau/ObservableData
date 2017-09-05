@@ -16,6 +16,7 @@
     <Compile Include=".Utils\CollectionProxy.cs" />
     <Compile Include=".Utils\Efficiency\InefficientUsageException.cs" />
     <Compile Include=".Utils\Efficiency\Inneficient.cs" />
+    <Compile Include=".Utils\EmptyList.cs" />
     <Compile Include=".Utils\Index.cs" />
     <Compile Include=".Utils\KeedAliveDisposableAdapter.cs" />
     <Compile Include=".Utils\ListProxy.cs" />

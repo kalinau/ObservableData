@@ -6,16 +6,15 @@ namespace ObservableData.Querying.Math
 {
     internal static class Sum
     {
-        public sealed class Observer<T> : 
-            IObserver<ICollectionChange<T>>, 
-            ITrickyEnumerator<GeneralChange<T>>
+        public sealed class Observer<T> :
+            IObserver<ICollectionChange<T>>,
+            ICollectionChangeEnumerator<T>
         {
             [NotNull] private readonly IObserver<T> _adaptee;
             [NotNull] private readonly Func<T, T, T> _plus;
             [NotNull] private readonly Func<T, T, T> _minus;
             [NotNull] private readonly T _zero;
 
-            private IReadOnlyCollection<T> _currentState;
             private T _currentSum;
 
             public Observer(
@@ -38,54 +37,33 @@ namespace ObservableData.Querying.Math
             {
                 if (change == null) return;
 
-                if (!this.TryChangeState(change.State))
-                {
-                    change.Enumerate(this);
-                }
-
+                change.Enumerate(this);
                 _adaptee.OnNext(_currentSum);
             }
 
-            bool ITrickyEnumerator<GeneralChange<T>>.OnNext(GeneralChange<T> item)
+            void ICollectionChangeEnumerator<T>.OnStateChanged(IReadOnlyCollection<T> state)
             {
-                switch (item.Type)
+                _currentSum = _zero;
+                foreach (var item in state)
                 {
-                    case GeneralChangeType.Add:
-                        _currentSum = _plus(_currentSum, item.Item);
-                        break;
-
-                    case GeneralChangeType.Remove:
-                        _currentSum = _minus(_currentSum, item.Item);
-                        break;
-
-                    case GeneralChangeType.Clear:
-                        _currentSum = _zero;
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    _currentSum = _plus(_currentSum, item);
                 }
-                return true;
             }
 
-            private bool TryChangeState(IReadOnlyCollection<T> state)
+            void ICollectionChangeEnumerator<T>.OnAdd(T item)
             {
-                if (!ReferenceEquals(_currentState, state))
-                {
-                    _currentState = state;
-                    _currentSum = _zero;
-                    if (state != null)
-                    {
-                        foreach (var item in state)
-                        {
-                            _currentSum = _plus(_currentSum, item);
-                        }
-                    }
-                    return true;
-                }
-                return false;
+                _currentSum = _plus(_currentSum, item);
             }
 
+            void ICollectionChangeEnumerator<T>.OnRemove(T item)
+            {
+                _currentSum = _minus(_currentSum, item);
+            }
+
+            void ICollectionChangeEnumerator<T>.OnClear()
+            {
+                _currentSum = _zero;
+            }
         }
     }
 }

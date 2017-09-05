@@ -24,32 +24,33 @@ namespace ObservableData.Querying.Select
             public uint Count => _count;
         }
 
-        private sealed class SelectState<TKey, T> : IReadOnlyCollection<T>
+        private sealed class Map<TKey, T> 
         {
-            private int _count;
-            [NotNull] private readonly Dictionary<TKey, ItemCounter<T>> _state = new Dictionary<TKey, ItemCounter<T>>();
+            [NotNull] private Dictionary<TKey, ItemCounter<T>> _state;
 
-            public int Count => _count;
+            public Map() : this(new Dictionary<TKey, ItemCounter<T>>())
+            {
+            }
+
+            private Map([NotNull] Dictionary<TKey, ItemCounter<T>> dictionary)
+            {
+                _state = dictionary;
+            }
+
+            public bool IsEmpty => _state.Count == 0;
 
             public T this[TKey key] => _state[key].Item;
 
-            public IEnumerator<T> GetEnumerator()
-            {
-                foreach (var counter in _state.Values.NotNull())
-                {
-                    for (var i = 0; i < counter.Count; i++)
-                    {
-                        yield return counter.Item;
-                    }
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-
             public void Clear()
             {
-                _count = 0;
                 _state.Clear();
+            }
+
+            public Map<TKey, T> CloneAndClear()
+            {
+                var clone = new Map<TKey, T>(_state);
+                _state = new Dictionary<TKey, ItemCounter<T>>(_state.Count);
+                return clone;
             }
 
             public void Add(TKey key, T value)
@@ -73,19 +74,18 @@ namespace ObservableData.Querying.Select
                 if (_state.TryGetValue(key, out var existing))
                 {
                     _state[key] = new ItemCounter<T>(existing.Item, existing.Count + 1);
-                    _count++;
                     return true;
                 }
                 return false;
             }
 
-            public uint DecreaseCount(TKey key, out T currentValue)
+            public void DecreaseCount(TKey key)
             {
                 if (!_state.TryGetValue(key, out var existing))
                 {
                     throw new ArgumentOutOfRangeException();
                 }
-                currentValue = existing.Item;
+                //currentValue = existing.Item;
                 if (existing.Count > 1)
                 {
                     _state[key] = new ItemCounter<T>(existing.Item, existing.Count - 1);
@@ -94,13 +94,12 @@ namespace ObservableData.Querying.Select
                 {
                     _state.Remove(key);
                 }
-                _count--;
-                return existing.Count;
+                //return existing.Count;
             }
         }
 
         private static void OnAdd<TKey, T>(
-            [NotNull] this SelectState<TKey, T> state,
+            [NotNull] this Map<TKey, T> state,
             TKey item,
             [NotNull] Func<TKey, T> selector,
             [CanBeNull] Dictionary<TKey, T> removedOnChange)
@@ -116,22 +115,22 @@ namespace ObservableData.Querying.Select
         }
 
         private static void OnRemove<TKey, T>(
-            [NotNull] this SelectState<TKey, T> state,
+            [NotNull] this Map<TKey, T> state,
             TKey item,
             [CanBeNull] ref Dictionary<TKey, T> removedOnChange)
         {
-            if (state.DecreaseCount(item, out var removed) <= 1)
-            {
-                if (removedOnChange == null)
-                {
-                    removedOnChange = new Dictionary<TKey, T>();
-                }
-                removedOnChange[item] = removed;
-            }
+            //if (state.DecreaseCount(item, out var removed) <= 1)
+            //{
+            //    if (removedOnChange == null)
+            //    {
+            //        removedOnChange = new Dictionary<TKey, T>();
+            //    }
+            //    removedOnChange[item] = removed;
+            //}
         }
 
         private static T Get<TKey, T>(
-            [NotNull] this SelectState<TKey, T> state,
+            [NotNull] this Map<TKey, T> state,
             TKey key,
             [CanBeNull] IReadOnlyDictionary<TKey, T> removedOnChange)
         {

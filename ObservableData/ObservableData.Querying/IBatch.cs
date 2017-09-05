@@ -5,40 +5,93 @@ using ObservableData.Querying.Compatibility;
 
 namespace ObservableData.Querying
 {
-    /// <summary>
-    /// Tricky abstraction to enumerate items and do not allocate IEnumerable and/or IEnumerator
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface ITrickyEnumerable<out T>
+    public interface ICollectionChange<out T>
     {
-        void Enumerate([NotNull] ITrickyEnumerator<T> handle);
+        void Enumerate([NotNull] ICollectionChangeEnumerator<T> enumerator);
     }
 
-    public interface ITrickyEnumerator<in T>
+    public interface ICollectionChangeEnumerator<in T>
     {
-        bool OnNext(T item);
+        void OnStateChanged([NotNull] IReadOnlyCollection<T> state);
+
+        void OnClear();
+
+        void OnAdd(T item);
+
+        void OnRemove(T item);
+    }
+
+    public interface IListChange<out T> : ICollectionChange<T>
+    {
+        void Enumerate([NotNull] IListChangeEnumerator<T> enumerator);
+    }
+
+    public interface IListChangeEnumerator<in T>
+    {
+        void OnStateChanged([NotNull] IReadOnlyList<T> state);
+
+        void OnClear();
+
+        void OnAdd(T item, int index);
+
+        void OnRemove(T item, int index);
+
+        void OnMove(T item, int index, int originalIndex);
+
+        void OnReplace(T item, T changedItem, int index);
     }
 
 
-    public interface ICollectionChange<TItem> : ITrickyEnumerable<GeneralChange<TItem>>
+
+    public sealed class ListToCollectionChangeEnumerator<T> : IListChangeEnumerator<T>
     {
-        [CanBeNull]
-        IReadOnlyCollection<TItem> State { get; }
+        [NotNull] private ICollectionChangeEnumerator<T> _adaptee;
+
+        public ListToCollectionChangeEnumerator([NotNull] ICollectionChangeEnumerator<T> adaptee)
+        {
+            _adaptee = adaptee;
+        }
+
+        public void ChangeAdaptee([NotNull] ICollectionChangeEnumerator<T> adaptee)
+        {
+            _adaptee = adaptee;
+        }
+
+        public void OnStateChanged(IReadOnlyList<T> state) => _adaptee.OnStateChanged(state);
+
+        public void OnClear() => _adaptee.OnClear();
+
+        public void OnAdd(T item, int index) => _adaptee.OnAdd(item);
+
+        public void OnRemove(T item, int index) => _adaptee.OnRemove(item);
+
+        public void OnMove(T item, int index, int originalIndex) { }
+
+        public void OnReplace(T item, T changedItem, int index)
+        {
+            _adaptee.OnRemove(changedItem);
+            _adaptee.OnAdd(item);
+        }
     }
 
-    public interface IListChange<TItem> : ITrickyEnumerable<IndexedChange<TItem>>
-    {
-        [CanBeNull]
-        IReadOnlyList<TItem> State { get; }
 
-        //void Match(
-        //    Action<IReadOnlyList<TItem>> onStateChanged,
-        //    Action<IndexedChange<TItem>> onDelta);
-    }
-
-    public interface ICollectionObserver<T> : IObserver<ICollectionChange<T>>
+    public static class CollectionChangeEnumeratorExtensions
     {
-        void OnStart(IReadOnlyCollection<T> collection);
+        [ContractAnnotation("=>buffer:notnull; => notnull")]
+        public static IListChangeEnumerator<T> FromBuffer<T>(
+            [NotNull] this ICollectionChangeEnumerator<T> enumerator,
+            ref ListToCollectionChangeEnumerator<T> buffer)
+        {
+            if (buffer == null)
+            {
+                buffer = new ListToCollectionChangeEnumerator<T>(enumerator);
+            }
+            else
+            {
+                buffer.ChangeAdaptee(enumerator);
+            }
+            return buffer;
+        }
     }
 
     public interface IBatch<out T>

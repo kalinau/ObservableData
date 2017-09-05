@@ -1,75 +1,77 @@
-﻿//using System;
-//using JetBrains.Annotations;
-//using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
+using System.Linq;
 
-//namespace ObservableData.Querying.Criterions
-//{
-//    internal static class All
-//    {
-//        public sealed class Observer<T> : IObserver<ICollectionChange<T>>
-//        {
-//            [NotNull] private readonly IObserver<bool> _adaptee;
-//            [NotNull] private readonly Func<T, bool> _criterion;
+namespace ObservableData.Querying.Criterions
+{
+    internal static class All
+    {
+        public sealed class Observer<T> : 
+            IObserver<ICollectionChange<T>>,
+            ICollectionChangeEnumerator<T>
+        {
+            [NotNull] private readonly IObserver<bool> _adaptee;
+            [NotNull] private readonly Func<T, bool> _criterion;
 
-//            private bool? _state;
-//            private int _count;
-//            private int _satisfyCount;
+            private bool? _isAll;
 
-//            public Observer(
-//                [NotNull] IObserver<bool> adaptee,
-//                [NotNull] Func<T, bool> criterion)
-//            {
-//                _adaptee = adaptee;
-//                _criterion = criterion;
-//            }
+            private int _count;
+            private int _satisfyCount;
 
-//            public void OnNext(ICollectionChange<T> change)
-//            {
-//                if (change == null) return;
-//                change.Match(s =>
-//                {
-//                    _count = s?.Count ?? 0;
-//                    _satisfyCount = s?.Count(_criterion) ?? 0;
-//                },
-//                delta =>
-//                {
-//                    switch (delta.Type)
-//                    {
-//                        case GeneralChangeType.Add:
-//                            _count++;
-//                            if (_criterion(delta.Item))
-//                            {
-//                                _satisfyCount++;
-//                            }
-//                            break;
+            public Observer(
+                [NotNull] IObserver<bool> adaptee,
+                [NotNull] Func<T, bool> criterion)
+            {
+                _adaptee = adaptee;
+                _criterion = criterion;
+            }
 
-//                        case GeneralChangeType.Remove:
-//                            _count--;
-//                            if (_criterion(delta.Item))
-//                            {
-//                                _satisfyCount--;
-//                            }
-//                            break;
+            void IObserver<ICollectionChange<T>>.OnCompleted() => _adaptee.OnCompleted();
 
-//                        case GeneralChangeType.Clear:
-//                            _count = _satisfyCount = 0;
-//                            break;
+            void IObserver<ICollectionChange<T>>.OnError(Exception error) => _adaptee.OnError(error);
 
-//                        default:
-//                            throw new ArgumentOutOfRangeException();
-//                    }
-//                });
-//                var state = _satisfyCount == _count;
-//                if (state != _state)
-//                {
-//                    _state = state;
-//                    _adaptee.OnNext(state);
-//                }
-//            }
+            void IObserver<ICollectionChange<T>>.OnNext(ICollectionChange<T> change)
+            {
+                if (change == null) return;
 
-//            public void OnCompleted() => _adaptee.OnCompleted();
+                change.Enumerate(this);
 
-//            public void OnError(Exception error) => _adaptee.OnError(error);
-//        }
-//    }
-//}
+                var isAll = _satisfyCount == _count;
+                if (isAll != _isAll)
+                {
+                    _isAll = isAll;
+                    _adaptee.OnNext(isAll);
+                }
+            }
+
+            void ICollectionChangeEnumerator<T>.OnStateChanged(IReadOnlyCollection<T> state)
+            {
+                _count = state.Count;
+                _satisfyCount = state.Count(_criterion);
+            }
+
+            void ICollectionChangeEnumerator<T>.OnClear()
+            {
+                _count = _satisfyCount = 0;
+            }
+
+            void ICollectionChangeEnumerator<T>.OnAdd(T item)
+            {
+                _count++;
+                if (_criterion(item))
+                {
+                    _satisfyCount++;
+                }
+            }
+
+            void ICollectionChangeEnumerator<T>.OnRemove(T item)
+            {
+                if (_criterion(item))
+                {
+                    _satisfyCount--;
+                }
+            }
+        }
+    }
+}
