@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using ObservableData.Querying.Utils;
 
 namespace ObservableData.Querying.Select
 {
@@ -58,17 +56,6 @@ namespace ObservableData.Querying.Select
                 _state.Add(key, new ItemCounter<T>(value, 1));
             }
 
-            public bool TryGet(TKey key, out T result)
-            {
-                if (_state.TryGetValue(key, out var existing))
-                {
-                    result = existing.Item;
-                    return true;
-                }
-                result = default(T);
-                return false;
-            }
-
             public bool TryIncreaseCount(TKey key)
             {
                 if (_state.TryGetValue(key, out var existing))
@@ -96,53 +83,6 @@ namespace ObservableData.Querying.Select
                 }
                 //return existing.Count;
             }
-        }
-
-        private static void OnAdd<TKey, T>(
-            [NotNull] this Map<TKey, T> state,
-            TKey item,
-            [NotNull] Func<TKey, T> selector,
-            [CanBeNull] Dictionary<TKey, T> removedOnChange)
-        {
-            if (state.TryIncreaseCount(item)) return;
-
-            var result = default(T);
-            if (removedOnChange?.TryGetValue(item, out result) != true)
-            {
-                result = selector(item);
-            }
-            state.Add(item, result);
-        }
-
-        private static void OnRemove<TKey, T>(
-            [NotNull] this Map<TKey, T> state,
-            TKey item,
-            [CanBeNull] ref Dictionary<TKey, T> removedOnChange)
-        {
-            //if (state.DecreaseCount(item, out var removed) <= 1)
-            //{
-            //    if (removedOnChange == null)
-            //    {
-            //        removedOnChange = new Dictionary<TKey, T>();
-            //    }
-            //    removedOnChange[item] = removed;
-            //}
-        }
-
-        private static T Get<TKey, T>(
-            [NotNull] this Map<TKey, T> state,
-            TKey key,
-            [CanBeNull] IReadOnlyDictionary<TKey, T> removedOnChange)
-        {
-            if (!state.TryGet(key, out var item))
-            {
-                if (removedOnChange != null)
-                {
-                    return removedOnChange[key];
-                }
-                throw new ArgumentOutOfRangeException();
-            }
-            return item;
         }
     }
 }

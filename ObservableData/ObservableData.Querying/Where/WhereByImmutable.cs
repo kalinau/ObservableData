@@ -22,7 +22,6 @@ namespace ObservableData.Querying.Where
             private ICollectionChange<T> _change;
             private ICollectionChangeEnumerator<T> _enumerator;
 
-
             public CollectionObserver(
                 [NotNull]  IObserver<ICollectionChange<T>> adaptee,
                 [NotNull] Func<T, bool> criterion)

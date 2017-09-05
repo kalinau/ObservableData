@@ -23,54 +23,18 @@ namespace ObservableData.Querying
             }).NotNull();
         }
 
-        //[NotNull]
-        //public static IObservable<GeneralChangesPlusState<T>> SelectFromItems<TPrevious, T>(
-        //    [NotNull] this IObservable<IBatch<GeneralChange<TPrevious>>> previous,
-        //    [NotNull] Func<TPrevious, T> func)
-        //{
-        //    return Observable.Create<GeneralChangesPlusState<T>>(o =>
-        //    {
-        //        if (o == null) return Disposable.Empty;
+        [NotNull]
+        public static IObservable<IListChange<TOut>> SelectFromItems<TIn, TOut>(
+            [NotNull] this IObservable<IListChange<TIn>> source,
+            [NotNull] Func<TIn, TOut> selector)
+        {
+            return Observable.Create<IListChange<TOut>>(o =>
+            {
+                if (o == null) return Disposable.Empty;
 
-        //        var adapter = new SelectImmutable.CollectionObserver<TPrevious, T>(o, func);
-        //        return previous.Subscribe(adapter);
-        //    }).NotNull();
-        //}
-
-        //[NotNull]
-        //public static IObservable<GeneralChangesPlusState<T>> SelectFromItems<TPrevious, T>(
-        //    [NotNull] this IObservable<GeneralChangesPlusState<TPrevious>> previous,
-        //    [NotNull] Func<TPrevious, T> func)
-        //{
-        //    return previous.Select(x => x.Changes).NotNull().SelectFromItems(func);
-        //}
-
-        //[NotNull]
-        //public static IObservable<IBatch<IndexedChange<T>>> SelectFromItems<TPrevious, T>(
-        //    [NotNull] this IObservable<IBatch<IndexedChange<TPrevious>>> previous,
-        //    [NotNull] Func<TPrevious, T> func)
-        //{
-        //    return Observable.Create<IBatch<IndexedChange<T>>>(o =>
-        //    {
-        //        if (o == null) return Disposable.Empty;
-
-        //        var adapter = new SelectImmutable.ListChangesObserver<TPrevious, T>(o, func);
-        //        return previous.Subscribe(adapter);
-        //    }).NotNull();
-        //}
-
-        //[NotNull]
-        //public static IObservable<IndexedChangesPlusState<T>> SelectFromItems<TPrevious, T>(
-        //    [NotNull] this IObservable<IndexedChangesPlusState<TPrevious>> previous,
-        //    [NotNull] Func<TPrevious, T> func)
-        //{
-        //    return Observable.Create<IndexedChangesPlusState<T>>(o =>
-        //    {
-        //        if (o == null) return Disposable.Empty;
-
-        //        var adapter = new SelectImmutable.ListDataObserver<TPrevious, T>(o, func);
-        //        return previous.Subscribe(adapter);
-        //    }).NotNull();
-        //}
+                var adapter = new SelectImmutable.ListObserver<TIn,TOut>(o, selector);
+                return source.Subscribe(adapter);
+            }).NotNull();
+        }
     }
 }

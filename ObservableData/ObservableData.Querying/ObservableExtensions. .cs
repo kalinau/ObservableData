@@ -25,23 +25,5 @@ namespace ObservableData.Querying
         {
             return observable.StartWith(new CurrentStateChange<T>(state)).NotNull();
         }
-
-        [NotNull]
-        public static IObservable<IndexedChangesPlusState<T>> WithState<T>(
-            [NotNull] this IObservable<IBatch<IndexedChange<T>>> observable,
-            [NotNull] IReadOnlyList<T> state)
-        {
-            return observable.Select(x => new IndexedChangesPlusState<T>(x.NotNull(), state))
-                .NotNull();
-        }
-
-        [NotNull]
-        public static IObservable<GeneralChangesPlusState<T>> WithState<T>(
-            [NotNull] this IObservable<IBatch<GeneralChange<T>>> observable,
-            [NotNull] IReadOnlyCollection<T> state)
-        {
-            return observable.Select(x => new GeneralChangesPlusState<T>(x.NotNull(), state))
-                .NotNull();
-        }
     }
 }
