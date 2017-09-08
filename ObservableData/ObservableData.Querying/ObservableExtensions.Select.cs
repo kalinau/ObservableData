@@ -10,15 +10,30 @@ namespace ObservableData.Querying
     public static partial class ObservableExtensions
     {
         [NotNull]
-        public static IObservable<ICollectionChange<TOut>> SelectConstantFromItems<TIn, TOut>(
+        public static IObservableCollectionQuery<TOut> SelectConstantFromItems<TIn, TOut>(
             [NotNull] this IObservable<ICollectionChange<TIn>> source,
             [NotNull] Func<TIn, TOut> selector)
         {
-            return Observable.Create<ICollectionChange<TOut>>(o =>
+
+            return ObservableCollectionQuery.Create<TOut>(o =>
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new SelectConstant.CollectionObserver<TIn, TOut>(o, selector);
+                var adapter = new Select.Constant.CollectionObserver<TIn, TOut>(o, selector);
+                return source.Subscribe(adapter);
+            }).NotNull();
+        }
+
+        [NotNull]
+        public static IObservableCollectionQuery<TOut> SelectConstantFromItems<TIn, TOut>(
+            [NotNull] this IObservableCollectionQuery<TIn> source,
+            [NotNull] Func<TIn, TOut> selector)
+        {
+            return ObservableCollectionQuery.Create<TOut>(o =>
+            {
+                if (o == null) return Disposable.Empty;
+
+                var adapter = new Select.Constant.CollectionObserver<TIn, TOut>(o, selector);
                 return source.Subscribe(adapter);
             }).NotNull();
         }
@@ -42,13 +57,14 @@ namespace ObservableData.Querying
             [NotNull] this IObservable<ICollectionChange<TIn>> source,
             [NotNull] Func<TIn, TOut> selector)
         {
-            return Observable.Create<ICollectionChange<TOut>>(o =>
-            {
-                if (o == null) return Disposable.Empty;
+            return Observable.Create<ICollectionChange<TOut>>(
+                subscribe: o =>
+                {
+                    if (o == null) return Disposable.Empty;
 
-                var adapter = new SelectImmutable.CollectionObserver<TIn, TOut>(o, selector);
-                return source.Subscribe(adapter);
-            }).NotNull();
+                    var adapter = new SelectImmutable.CollectionObserver<TIn, TOut>(o, selector);
+                    return source.Subscribe(adapter);
+                }).NotNull();
         }
 
         [NotNull]

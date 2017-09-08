@@ -22,5 +22,19 @@ namespace ObservableData.Querying
                 return previous.Subscribe(adapter);
             }).NotNull();
         }
+
+        [NotNull]
+        public static IObservable<bool> AnyItem<T>(
+            [NotNull] this IQueryObservable<ICollectionChange<T>> previous,
+            [NotNull] Func<T, bool> criterion)
+        {
+            return Observable.Create<bool>(observer =>
+            {
+                if (observer == null) return Disposable.Empty;
+
+                var adapter = new Any.Observer<T>(observer, criterion);
+                return previous.Subscribe(adapter);
+            }).NotNull();
+        }
     }
 }

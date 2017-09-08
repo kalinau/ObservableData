@@ -13,28 +13,23 @@ namespace ObservableData.Querying
             _adaptee = adaptee;
         }
 
-        public void ChangeAdaptee([NotNull] ICollectionChangeEnumerator<T> adaptee)
+        public void ChangeEnumerator([NotNull] ICollectionChangeEnumerator<T> enumerator)
         {
-            _adaptee = adaptee;
+            _adaptee = enumerator;
         }
 
         public void OnStateChanged(IReadOnlyList<T> state) => 
             _adaptee.OnStateChanged(state);
 
-        public void OnClear() => 
-            _adaptee.OnClear();
+        public void OnClear() => _adaptee.OnClear();
 
-        public void OnAdd(T item, int index) => 
-            _adaptee.OnAdd(item, index);
+        public void OnAdd(T item, int index) => _adaptee.OnAdd(item, index);
 
-        public void OnRemove(T item, int index) => 
-            _adaptee.OnRemove(item, index);
+        public void OnRemove(T item, int index) => _adaptee.OnRemove(item, index);
 
-        public void OnMove(T item, int index, int originalIndex)
-            => _adaptee.OnMove(item,  index, originalIndex);
+        public void OnMove(T item, int index, int originalIndex) => _adaptee.OnMove(item,  index, originalIndex);
 
-        public void OnReplace(T item, T changedItem, int index)
-            => _adaptee.OnReplace(item, changedItem, index);
+        public void OnReplace(T item, T changedItem, int index) => _adaptee.OnReplace(item, changedItem, index);
     }
 
     public static class CollectionChangeEnumeratorExtensions
@@ -50,7 +45,7 @@ namespace ObservableData.Querying
             }
             else
             {
-                buffer.ChangeAdaptee(enumerator);
+                buffer.ChangeEnumerator(enumerator);
             }
             return buffer;
         }

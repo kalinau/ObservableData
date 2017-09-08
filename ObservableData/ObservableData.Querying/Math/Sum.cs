@@ -7,7 +7,7 @@ namespace ObservableData.Querying.Math
     internal static class Sum
     {
         public sealed class Observer<T> :
-            IObserver<ICollectionChange<T>>,
+            IQueryObserver<,>,
             ICollectionChangeEnumerator<T>
         {
             [NotNull] private readonly IObserver<T> _adaptee;

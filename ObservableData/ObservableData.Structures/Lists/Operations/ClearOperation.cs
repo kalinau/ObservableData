@@ -16,10 +16,8 @@ namespace ObservableData.Structures.Lists.Operations
 
         IListBatchChangeNode<T> IListBatchChangeNode<T>.Next { get; set; }
 
-        public void Enumerate(ICollectionChangeEnumerator<T> enumerator) =>
-            enumerator.OnClear();
+        public void Enumerate(ICollectionChangeEnumerator<T> enumerator) => enumerator.OnClear();
 
-        public void Enumerate(IListChangeEnumerator<T> enumerator) =>
-            enumerator.OnClear();
+        public void Enumerate(IListChangeEnumerator<T> enumerator) => enumerator.OnClear();
     }
 }

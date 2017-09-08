@@ -8,7 +8,7 @@ namespace ObservableData.Querying.Criterions
     internal static class All
     {
         public sealed class Observer<T> : 
-            IObserver<ICollectionChange<T>>,
+            IQueryObserver<,>,
             ICollectionChangeEnumerator<T>
         {
             [NotNull] private readonly IObserver<bool> _adaptee;
