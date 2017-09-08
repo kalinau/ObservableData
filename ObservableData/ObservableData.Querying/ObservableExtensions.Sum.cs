@@ -17,7 +17,7 @@ namespace ObservableData.Querying
             {
                 if (observer == null) return Disposable.Empty;
 
-                var adapter = new Sum.Observer<int>(
+                var adapter = new Sum.StateStateObserver<int>(
                     observer,
                     (x, y) => x + y,
                     (x, y) => x - y,
@@ -34,7 +34,7 @@ namespace ObservableData.Querying
             {
                 if (observer == null) return Disposable.Empty;
 
-                var adapter = new Sum.Observer<long>(
+                var adapter = new Sum.StateStateObserver<long>(
                     observer,
                     (x, y) => x + y,
                     (x, y) => x - y,
@@ -51,7 +51,7 @@ namespace ObservableData.Querying
             {
                 if (observer == null) return Disposable.Empty;
 
-                var adapter = new Sum.Observer<double>(
+                var adapter = new Sum.StateStateObserver<double>(
                     observer,
                     (x, y) => x + y,
                     (x, y) => x - y,
@@ -68,7 +68,7 @@ namespace ObservableData.Querying
             {
                 if (observer == null) return Disposable.Empty;
 
-                var adapter = new Sum.Observer<float>(
+                var adapter = new Sum.StateStateObserver<float>(
                     observer,
                     (x, y) => x + y,
                     (x, y) => x - y,
@@ -85,7 +85,7 @@ namespace ObservableData.Querying
             {
                 if (observer == null) return Disposable.Empty;
 
-                var adapter = new Sum.Observer<decimal>(
+                var adapter = new Sum.StateStateObserver<decimal>(
                     observer,
                     (x, y) => x + y,
                     (x, y) => x - y,

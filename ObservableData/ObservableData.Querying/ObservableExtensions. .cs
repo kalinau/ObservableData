@@ -32,9 +32,9 @@ namespace ObservableData.Querying
     public static class ObservableCollectionQuery
     {
         public static IObservableCollectionQuery<T> Create<T>(
-            [NotNull] Func<IQueryObserver<ICollectionChange<T>, IReadOnlyCollection<T>>, IDisposable> subscibeQuery)
+            [NotNull] Func<IQueryStateObserver<ICollectionChange<T>, IReadOnlyCollection<T>>, IDisposable> subscribe)
         {
-            return new AnonymousQueryObservable<T>(subscribe, subscibeQuery);
+            return new AnonymousQueryObservable<T>(subscribe, subscribe);
         }
 
         //public static IQueryObservable<TResult> Create<TResult>(
@@ -47,19 +47,19 @@ namespace ObservableData.Querying
     public sealed class AnonymousQueryObservable<T> : ObservableBase<T>, IQueryObservable<T>
     {
         [NotNull] private readonly Func<IObserver<T>, IDisposable> _defaultSubscribe;
-        [NotNull] private readonly Func<IQueryObserver<,>, IDisposable> _querySubscribe;
+        [NotNull] private readonly Func<IQueryStateObserver<,>, IDisposable> _querySubscribe;
 
         public AnonymousQueryObservable(
             [NotNull] Func<IObserver<T>, IDisposable> defaultSubscribe,
-            [NotNull] Func<IQueryObserver<,>, IDisposable> querySubscribe)
+            [NotNull] Func<IQueryStateObserver<,>, IDisposable> querySubscribe)
         {
             _defaultSubscribe = defaultSubscribe;
             _querySubscribe = querySubscribe;
         }
 
-        public IDisposable Subscribe(IQueryObserver<,> observer)
+        public IDisposable Subscribe(IQueryStateObserver<,> stateStateObserver)
         {
-            return _querySubscribe(observer) ?? Disposable.Empty;
+            return _querySubscribe(stateStateObserver) ?? Disposable.Empty;
         }
 
         protected override IDisposable SubscribeCore(IObserver<T> observer)

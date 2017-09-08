@@ -5,7 +5,7 @@ namespace ObservableData.Querying
 {
     public interface IListChangeEnumerator<in T>
     {
-        void OnStateChanged([NotNull] IReadOnlyList<T> state);
+        //void OnStateChanged([NotNull] IReadOnlyList<T> state);
 
         void OnClear();
 

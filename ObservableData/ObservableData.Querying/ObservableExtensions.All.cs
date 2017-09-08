@@ -18,7 +18,7 @@ namespace ObservableData.Querying
             {
                 if (observer == null) return Disposable.Empty;
 
-                var adapter = new All.Observer<T>(observer, criterion);
+                var adapter = new All.StateObserver<T>(observer, criterion);
                 return previous.Subscribe(adapter);
             }).NotNull();
         }
@@ -32,7 +32,7 @@ namespace ObservableData.Querying
             {
                 if (observer == null) return Disposable.Empty;
 
-                var adapter = new All.Observer<T>(observer, criterion);
+                var adapter = new All.StateObserver<T>(observer, criterion);
                 return previous.Subscribe(adapter);
             }).NotNull();
         }

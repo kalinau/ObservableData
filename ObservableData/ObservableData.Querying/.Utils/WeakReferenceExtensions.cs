@@ -15,7 +15,6 @@ namespace ObservableData.Querying.Utils
         }
     }
 
-
     public class ReassignableCollectionChange<T> : ICollectionChange<T>, ICollectionChangeEnumerator<T>
     {
         [NotNull] private readonly ICollectionChangeMap<T> _map;
@@ -82,9 +81,6 @@ namespace ObservableData.Querying.Utils
             change.Enumerate(this);
         }
 
-        void ICollectionChangeEnumerator<TIn>.OnStateChanged(IReadOnlyCollection<TIn> state) =>
-            _map.RouteStateChanged(_enumerator.Check(_thread), state);
-
         void ICollectionChangeEnumerator<TIn>.OnClear() =>
             _map.RouteClear(_enumerator.Check(_thread));
 
@@ -104,19 +100,6 @@ namespace ObservableData.Querying.Utils
         {
             _thread = null;
         }
-    }
-
-    public interface ICollectionChangeMap<T>
-    {
-        void RouteStateChanged(
-            [NotNull] ICollectionChangeEnumerator<T> enumerator,
-            [NotNull] IReadOnlyCollection<T> state);
-
-        void RouteClear([NotNull] ICollectionChangeEnumerator<T> enumerator);
-
-        void RouteAdd([NotNull] ICollectionChangeEnumerator<T> enumerator, T item);
-
-        void RouteRemove([NotNull] ICollectionChangeEnumerator<T> enumerator, T item);
     }
 
     public interface ICollectionChangeMap<in TIn, out TOut>

@@ -7,8 +7,8 @@ namespace ObservableData.Querying.Criterions
 {
     internal static class All
     {
-        public sealed class Observer<T> : 
-            IQueryObserver<,>,
+        public sealed class StateObserver<T> :
+            IQueryStateObserver<ICollectionChange<T>, IReadOnlyCollection<T>>,
             ICollectionChangeEnumerator<T>
         {
             [NotNull] private readonly IObserver<bool> _adaptee;
@@ -19,13 +19,15 @@ namespace ObservableData.Querying.Criterions
             private int _count;
             private int _satisfyCount;
 
-            public Observer(
+            public StateObserver(
                 [NotNull] IObserver<bool> adaptee,
                 [NotNull] Func<T, bool> criterion)
             {
                 _adaptee = adaptee;
                 _criterion = criterion;
             }
+
+            bool IQueryObserver<ICollectionChange<T>>.IsMultiTimesEnumerator => false;
 
             void IObserver<ICollectionChange<T>>.OnCompleted() => _adaptee.OnCompleted();
 
@@ -45,10 +47,14 @@ namespace ObservableData.Querying.Criterions
                 }
             }
 
-            void ICollectionChangeEnumerator<T>.OnStateChanged(IReadOnlyCollection<T> state)
+
+            public void OnStart(IReadOnlyCollection<T> state)
             {
-                _count = state.Count;
-                _satisfyCount = state.Count(_criterion);
+                if (state != null)
+                {
+                    _count = state.Count;
+                    _satisfyCount = state.Count(_criterion);
+                }
             }
 
             void ICollectionChangeEnumerator<T>.OnClear()

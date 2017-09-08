@@ -7,7 +7,7 @@ namespace ObservableData.Querying.Math
     internal static class Count
     {
         public sealed class Obsever<T> :
-            IQueryObserver<,>,
+            IQueryStateObserver<,>,
             ICollectionChangeEnumerator<T>
         {
             [NotNull] private readonly IObserver<int> _adaptee;

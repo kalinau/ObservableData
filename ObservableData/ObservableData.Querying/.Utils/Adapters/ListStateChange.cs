@@ -14,12 +14,19 @@ namespace ObservableData.Querying.Utils.Adapters
 
         void ICollectionChange<T>.Enumerate(ICollectionChangeEnumerator<T> enumerator)
         {
-            enumerator.OnStateChanged(_state);
+            foreach (var item in _state)
+            {
+                enumerator.OnAdd(item);
+            }
         }
 
         void IListChange<T>.Enumerate(IListChangeEnumerator<T> enumerator)
         {
-            enumerator.OnStateChanged(_state);
+            var i = 0;
+            foreach (var item in _state)
+            {
+                enumerator.OnAdd(item, i++);
+            }
         }
     }
 }

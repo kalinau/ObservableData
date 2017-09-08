@@ -6,8 +6,8 @@ namespace ObservableData.Querying.Math
 {
     internal static class Sum
     {
-        public sealed class Observer<T> :
-            IQueryObserver<,>,
+        public sealed class StateStateObserver<T> :
+            IQueryStateObserver<,>,
             ICollectionChangeEnumerator<T>
         {
             [NotNull] private readonly IObserver<T> _adaptee;
@@ -17,7 +17,7 @@ namespace ObservableData.Querying.Math
 
             private T _currentSum;
 
-            public Observer(
+            public StateStateObserver(
                 [NotNull] IObserver<T> adaptee,
                 [NotNull] Func<T, T, T> plus,
                 [NotNull] Func<T, T, T> minus,

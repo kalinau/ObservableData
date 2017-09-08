@@ -14,7 +14,10 @@ namespace ObservableData.Querying.Utils.Adapters
 
         public void Enumerate(ICollectionChangeEnumerator<T> enumerator)
         {
-            enumerator.OnStateChanged(_state);
+            foreach (var i in _state)
+            {
+                enumerator.OnAdd(i);
+            }
         }
     }
 }

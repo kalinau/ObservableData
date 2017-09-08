@@ -15,11 +15,12 @@ namespace ObservableData.Querying
             [NotNull] Func<TIn, TOut> selector)
         {
 
-            return ObservableCollectionQuery.Create<TOut>(o =>
+            return ObservableCollectionQuery.Create<TOut>(subscribe: o =>
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new Select.Constant.CollectionObserver<TIn, TOut>(o, selector);
+                var adapter = new Select.Constant.CollectionStateStateObserver<TIn, TOut>(o, selector);
+                adapter.OnStart(null);
                 return source.Subscribe(adapter);
             }).NotNull();
         }
@@ -33,7 +34,7 @@ namespace ObservableData.Querying
             {
                 if (o == null) return Disposable.Empty;
 
-                var adapter = new Select.Constant.CollectionObserver<TIn, TOut>(o, selector);
+                var adapter = new Select.Constant.CollectionStateStateObserver<TIn, TOut>(o, selector);
                 return source.Subscribe(adapter);
             }).NotNull();
         }

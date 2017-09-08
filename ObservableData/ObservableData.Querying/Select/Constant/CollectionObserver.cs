@@ -7,7 +7,7 @@ using ObservableData.Querying.Utils;
 
 namespace ObservableData.Querying.Select.Constant
 {
-    public class CollectionObserver<TIn, TOut> : IQueryObserver<ICollectionChange<TIn>, IReadOnlyCollection<TIn>>
+    public class CollectionStateStateObserver<TIn, TOut> : IQueryStateObserver<ICollectionChange<TIn>, IReadOnlyCollection<TIn>>
     {
         private sealed class State : IReadOnlyCollection<TOut>
         {
@@ -46,12 +46,12 @@ namespace ObservableData.Querying.Select.Constant
                 enumerator.OnRemove(_selector(item));
         }
 
-        [NotNull] private readonly IQueryObserver<ICollectionChange<TOut>, IReadOnlyCollection<TOut>> _adaptee;
-        [NotNull] private readonly ReassignableCollectionChange<TIn, TOut> _change;
+        [NotNull] private readonly IQueryStateObserver<ICollectionChange<TOut>, IReadOnlyCollection<TOut>> _adaptee;
         [NotNull] private readonly Func<TIn, TOut> _selector;
+        [CanBeNull] private readonly ReassignableCollectionChange<TIn, TOut> _change;
 
-        public CollectionObserver(
-            [NotNull] IQueryObserver<ICollectionChange<TOut>, IReadOnlyCollection<TOut>> adaptee,
+        public CollectionStateStateObserver(
+            [NotNull] IQueryStateObserver<ICollectionChange<TOut>, IReadOnlyCollection<TOut>> adaptee,
             [NotNull] Func<TIn, TOut> selector)
         {
             _adaptee = adaptee;
@@ -67,14 +67,22 @@ namespace ObservableData.Querying.Select.Constant
         {
             if (value == null) return;
 
-            _change.Assign(value);
+            var change = this.GetChange();
+            change.Assign(value);
             _adaptee.OnNext(_change);
-            _change.Invalidate();
+            change.Invalidate();
         }
 
-        public void SetState(IReadOnlyCollection<TIn> state)
+        public void OnStart(IReadOnlyCollection<TIn> state)
         {
-            _adaptee.SetState(new State(state, _selector));
+            _adaptee.OnStart(state == null ? null : new State(state, _selector));
+        }
+
+        [NotNull]
+        private ReassignableCollectionChange<TIn, TOut> GetChange()
+        {
+            if (_change == null) throw new ArgumentOutOfRangeException();
+            return _change;
         }
     }
 }
