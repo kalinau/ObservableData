@@ -49,12 +49,12 @@ namespace ObservableData.Structures
 
         [NotNull]
         public static IObservable<IEnumerable<T>> SelectNewItems<T>(
-            [NotNull] this IObservable<IBatch<IListInsertOperation<T>>> observable)
+            [NotNull] this IObservable<IBatch<IListOperation<T>>> observable)
         {
             return observable.Select(GetAdded).NotNull();
         }
 
-        private static IEnumerable<T> GetAdded<T>([NotNull] IBatch<IListInsertOperation<T>> batch)
+        private static IEnumerable<T> GetAdded<T>([NotNull] IBatch<IListOperation<T>> batch)
         {
             foreach (var peace in batch.GetPeaces())
             {
