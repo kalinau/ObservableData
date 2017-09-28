@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using ObservableData.Querying.Utils;
 using System.Reactive.Linq;
@@ -42,6 +43,5 @@ namespace ObservableData.Querying
             return observable.Select(x => new GeneralChangesPlusState<T>(x.NotNull(), state))
                 .NotNull();
         }
-
     }
 }
