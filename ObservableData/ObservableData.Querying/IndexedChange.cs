@@ -83,7 +83,7 @@ namespace ObservableData.Querying
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(change));
             }
         }
 
@@ -113,7 +113,7 @@ namespace ObservableData.Querying
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(change));
             }
         }
 
@@ -142,7 +142,7 @@ namespace ObservableData.Querying
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException(nameof(change));
             }
         }
 
